@@ -12,26 +12,29 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+  const [loaded, error] = useFonts({
+    MerriweatherBold: require('../assets/fonts/Merriweather-Bold.ttf'),
+    MerriweatherRegular: require("../assets/fonts/Merriweather-Regular.ttf"),
+    Montserrat: require("../assets/fonts/Montserrat[wght].ttf"),
+    OpenSans: require("../assets/fonts/OpenSans[wdth,wght].ttf"),
+    Roboto: require("../assets/fonts/Roboto[wdth,wght].ttf"),
+    RobotoItalic: require("../assets/fonts/Roboto-Italic[wdth,wght].ttf"),
+    SourceCodePro: require("../assets/fonts/SourceCodePro[wght].ttf"),
   });
 
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, error]);
 
   if (!loaded) {
     return null;
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
+        <Stack.Screen name="index" options={{headerShown: false}} />
       </Stack>
-    </ThemeProvider>
   );
 }
