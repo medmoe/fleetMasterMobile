@@ -1,10 +1,11 @@
 import React from 'react';
-import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {Image, ScrollView, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context'
 import {images} from "@/constants/images";
 import ThemedButton from "@/components/ThemedButton";
 import ThemedInputText from "@/components/ThemedInputText";
 import {icons} from "@/constants/icons";
+import {Link} from "expo-router";
 
 const App = () => {
     return (
@@ -28,7 +29,7 @@ const App = () => {
                         containerStyles={"bg-white w-full p-5 mt-[15px]"}
                         placeholder={"Enter your password"}
                         onChange={() => {
-                    }}/>
+                        }}/>
                     <ThemedButton
                         title="Log in"
                         handlePress={() => {
@@ -38,18 +39,20 @@ const App = () => {
                     />
                     <View className={"mt-[50px]"}>
                         <Text className={"text-txt font-open-sans"}>
-                            Don't have an account? <Text className={"text-secondary font-open-sans"}>Create account</Text>
+                            Don't have an account? <Link href={"/sign-up"} className={"text-secondary font-open-sans"}>Create account</Link>
                         </Text>
                     </View>
                     <ThemedButton
                         title={"Log in with Google"}
-                        handlePress={() => {}}
+                        handlePress={() => {
+                        }}
                         containerStyles={"w-full bg-white mt-[50px]"}
                         icon={icons.google}
                     />
                     <ThemedButton
                         title={"Log in with Apple"}
-                        handlePress={() => {}}
+                        handlePress={() => {
+                        }}
                         containerStyles={"w-full bg-white mt-[15px]"}
                         icon={icons.apple}
                     />
@@ -59,12 +62,5 @@ const App = () => {
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-});
 
 export default App;
