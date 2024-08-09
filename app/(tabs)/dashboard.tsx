@@ -1,20 +1,15 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, {useState} from 'react';
+import {SafeAreaView} from "react-native-safe-area-context";
+import { icons } from "@/constants/icons"
 
 const Dashboard = () => {
+    const handlePress = () => {
+
+    }
     return (
-        <View style={styles.container}>
-            <Text>Home</Text>
-        </View>
+        <SafeAreaView>
+        </SafeAreaView>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-});
 
 export default Dashboard;

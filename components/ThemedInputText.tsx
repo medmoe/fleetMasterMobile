@@ -16,6 +16,7 @@ const ThemedInputText = ({containerStyles, placeholder, onChange, value, name}: 
             placeholder={placeholder}
             onChangeText={(text) => onChange(name, text)}
             value={value}
+            secureTextEntry={name === "password"}
         />
     );
 };
