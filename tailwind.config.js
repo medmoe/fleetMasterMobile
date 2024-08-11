@@ -12,6 +12,8 @@ module.exports = {
                 success: "#57b269",
                 error: "#e93c0c",
                 warning: "#ffc107",
+                default: "#9BA1A6",
+
             },
             fontFamily: {
                 'merriweather-bold': ['MerriweatherBold'],

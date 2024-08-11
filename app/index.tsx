@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Alert, Image, ScrollView, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context'
 import {images} from "@/constants/images";
@@ -10,14 +10,30 @@ import axios from "axios";
 import {API} from "@/constants/endpoints";
 import {handleCookies, handleError} from "@/utils/authentication";
 import Spinner from "@/components/Spinner";
-import {StatusBar} from "expo-status-bar";
-
+import * as SecureStore from "expo-secure-store";
 export type FormState = {
     username: string
     password: string
 }
 
 const App = () => {
+    useEffect(() => {
+        setLoading(true);
+        const verifyToken = async () => {
+            try {
+                const response = await axios.get(`${API}refresh/`, {withCredentials: true});
+                if (response.status === 200) {
+                    router.replace("/dashboard");
+                }
+            } catch (error) {
+                const errorMessage = handleError(error)
+                console.log(errorMessage);
+            } finally {
+                setLoading(false);
+            }
+        }
+        verifyToken();
+    }, [])
     const [formState, setFormState] = useState<FormState>({
         username: "",
         password: "",
