@@ -19,7 +19,7 @@ const TableEntry = ({name, numeric, status, note, containerStyles, textStyles}: 
                 <Text className={`${textStyles}`} numberOfLines={1}>{name}</Text>
             </View>
             <View className={"flex-1"}>
-                <Text className={`${textStyles}`}>{numeric}</Text>
+                <Text className={`${textStyles}`} numberOfLines={1}>{numeric}</Text>
             </View>
             <View className={"flex-1"}>{typeof status === 'boolean'?
                 status?
@@ -29,7 +29,7 @@ const TableEntry = ({name, numeric, status, note, containerStyles, textStyles}: 
                     <Image source={icons.inactive}
                            resizeMode={"contain"}
                            className={"w-6 h-6"} />:
-                <Text className={`${textStyles}`}>{status}</Text>
+                <Text className={`${textStyles}`} numberOfLines={1}>{status}</Text>
             }</View>
             <View className={"flex-1"}>
                 <Text className={`${textStyles}`} numberOfLines={1} ellipsizeMode={"tail"}>{note}</Text>

@@ -1,8 +1,7 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {SafeAreaView} from "react-native-safe-area-context";
-import {icons} from "@/constants/icons"
-import {ScrollView, View, Text} from "react-native";
-import {drivers, trucks} from "@/constants/fixtures";
+import {ScrollView, Text, View} from "react-native";
+import {drivers, maintenanceData, trucks} from "@/constants/fixtures";
 import TableEntry from "@/components/TableEntry";
 
 const Dashboard = () => {
@@ -11,8 +10,8 @@ const Dashboard = () => {
     }
     return (
         <SafeAreaView>
-            <ScrollView contentContainerStyle={{height: "100%"}}>
-                <View className={"w-full justify-center items-center"}>
+            <ScrollView>
+                <View className={"w-full justify-center items-center gap-3"}>
                     <View className={"w-[90%] bg-white rounded pt-5 pl-5 pb-5"}>
                         <View>
                             <Text className={"font-merriweather-bold text-txt"}>Drivers Overview</Text>
@@ -38,10 +37,61 @@ const Dashboard = () => {
                             })}
                         </View>
                     </View>
+                    <View className={"w-[90%] bg-white rounded pt-5 pl-5 pb-5"}>
+                        <View>
+                            <Text className={"font-merriweather-bold text-txt"}>Trucks Overview</Text>
+                        </View>
+                        <View className={"mt-5"}>
+                            <TableEntry
+                                name={"Name"}
+                                numeric={"Mileage"}
+                                status={"Status"}
+                                note={"Note"}
+                                containerStyles={"mb-3"}
+                                textStyles={"text-default font-merriweather-regular"}
+                            />
+                            {trucks.map(([name, status, mileage, note], idx) => {
+                                return (
+                                    <TableEntry
+                                        name={name}
+                                        numeric={mileage}
+                                        status={status}
+                                        note={note}
+                                        key={idx}
+                                        textStyles={"font-merriweather-regular text-txt"}
+                                    />
+                                )
+                            })}
+                        </View>
+                    </View>
+                    <View className={"w-[90%] bg-white rounded pt-5 pl-5 pb-5"}>
+                        <View>
+                            <Text className={"font-merriweather-bold text-txt"}>Maintenance Overview</Text>
+                        </View>
+                        <View className={"mt-5"}>
+                            <TableEntry name={"Name"}
+                                        numeric={"Date"}
+                                        status={"Type"}
+                                        note={"Provider"}
+                                        containerStyles={"mb-3"}
+                                        textStyles={"text-default font-merriweather-regular"}/>
+                            {maintenanceData.map((entry, idx) => {
+                                return (
+                                    <TableEntry name={entry.truckName}
+                                                numeric={entry.dueDate}
+                                                status={entry.maintenanceType}
+                                                note={entry.provider}
+                                                key={idx}
+                                                textStyles={"font-merriweather-regular text-txt"}
+                                    />
+                                )
+                            })}
+                        </View>
+                    </View>
                 </View>
             </ScrollView>
         </SafeAreaView>
-);
+    );
 };
 
 export default Dashboard;
