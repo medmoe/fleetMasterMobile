@@ -2,6 +2,10 @@ import React from 'react';
 import {Image, ImageSourcePropType, Text, View} from 'react-native';
 import {Tabs} from "expo-router";
 import {icons} from "@/constants/icons"
+import {StatusBar} from "expo-status-bar";
+import {bgWhite} from "colorette";
+
+
 
 interface TabIconProps {
     icon: ImageSourcePropType | undefined,
@@ -27,10 +31,18 @@ const TabIcon = ({icon, color, name, focused}: TabIconProps) => {
 }
 
 const TabsLayout = () => {
-    const tabsInfo: [string, ImageSourcePropType | undefined][] = [["dashboard", icons.dashboard], ["fleet", icons.fleet], ["drivers", icons.drivers], ["routes", icons.routes], ["settings", icons.settings]]
+    const tabsInfo: [string, ImageSourcePropType | undefined][] = [
+        ["dashboard", icons.dashboard],
+        ["fleet", icons.fleet],
+        ["drivers", icons.drivers],
+        ["settings", icons.settings],
+        ["notifications", icons.notifications]
+    ]
     return (
         <>
+
             <Tabs screenOptions={{
+                headerShown: false,
                 tabBarShowLabel: false,
                 tabBarActiveTintColor: "#9c27b0",
                 tabBarInactiveTintColor: "#CDCDE0",
@@ -54,6 +66,7 @@ const TabsLayout = () => {
                     )
                 })}
             </Tabs>
+
         </>
     );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image, ImageSourcePropType} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, Image, ImageSourcePropType, Pressable} from 'react-native';
 import {icons} from "@/constants/icons";
 interface ThemedButtonProps {
     title: string,

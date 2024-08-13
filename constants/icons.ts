@@ -7,4 +7,7 @@ export const icons: {[key: string]: any} = {
     notifications: require("../assets/icons/notifications.png"),
     google: require("../assets/icons/google.png"),
     apple: require("../assets/icons/apple.png"),
+    logout: require("../assets/icons/logout.png"),
+    active: require("../assets/icons/active.png"),
+    inactive: require("../assets/icons/inactive.png"),
 }
