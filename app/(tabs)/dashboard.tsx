@@ -12,7 +12,7 @@ const Dashboard = () => {
         <SafeAreaView>
             <ScrollView>
                 <View className={"w-full justify-center items-center gap-3"}>
-                    <View className={"w-[90%] bg-white rounded pt-5 pl-5 pb-5"}>
+                    <View className={"w-[94%] bg-white rounded pt-5 pl-5 pb-5"}>
                         <View>
                             <Text className={"font-merriweather-bold text-txt"}>Drivers Overview</Text>
                         </View>
@@ -37,7 +37,7 @@ const Dashboard = () => {
                             })}
                         </View>
                     </View>
-                    <View className={"w-[90%] bg-white rounded pt-5 pl-5 pb-5"}>
+                    <View className={"w-[94%] bg-white rounded pt-5 pl-5 pb-5"}>
                         <View>
                             <Text className={"font-merriweather-bold text-txt"}>Trucks Overview</Text>
                         </View>
@@ -64,7 +64,7 @@ const Dashboard = () => {
                             })}
                         </View>
                     </View>
-                    <View className={"w-[90%] bg-white rounded pt-5 pl-5 pb-5"}>
+                    <View className={"w-[94%] bg-white rounded pt-5 pl-5 pb-5"}>
                         <View>
                             <Text className={"font-merriweather-bold text-txt"}>Maintenance Overview</Text>
                         </View>
