@@ -10,4 +10,5 @@ export const icons: {[key: string]: any} = {
     logout: require("../assets/icons/logout.png"),
     active: require("../assets/icons/active.png"),
     inactive: require("../assets/icons/inactive.png"),
+    add: require("../assets/icons/add.png"),
 }

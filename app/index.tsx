@@ -89,7 +89,7 @@ const App = () => {
                         <ThemedButton
                             title="Log in"
                             handlePress={submitForm}
-                            containerStyles="w-full mt-[50px] bg-primary"
+                            containerStyles="w-full mt-[50px] bg-primary p-5 rounded-[50%]"
                             textStyles={"text-white font-semibold text-base"}
                         />
                         <View className={"mt-[50px]"}>
@@ -101,14 +101,14 @@ const App = () => {
                             title={"Log in with Google"}
                             handlePress={() => {
                             }}
-                            containerStyles={"w-full bg-white mt-[50px]"}
+                            containerStyles={"w-full bg-white mt-[50px] p-5 rounded-[50%]"}
                             icon={icons.google}
                         />
                         <ThemedButton
                             title={"Log in with Apple"}
                             handlePress={() => {
                             }}
-                            containerStyles={"w-full bg-white mt-[15px]"}
+                            containerStyles={"w-full bg-white mt-[15px] p-5 rounded-[50%]"}
                             icon={icons.apple}
                         />
                     </View>
