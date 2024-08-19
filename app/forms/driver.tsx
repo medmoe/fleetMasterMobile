@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Image, SafeAreaView, ScrollView, Text, View} from 'react-native';
+import {Alert, Image, SafeAreaView, ScrollView, Text, View} from 'react-native';
 import ThemedInputText from "@/components/ThemedInputText";
 import {icons} from "@/constants/icons";
 import DateTimePicker, {DateTimePickerEvent} from "@react-native-community/datetimepicker";
@@ -7,6 +7,10 @@ import {Picker} from "@react-native-picker/picker";
 import countries from "@/constants/countries.json";
 import ThemedButton from "@/components/ThemedButton";
 import {router} from "expo-router";
+import {API} from "@/constants/endpoints";
+import axios from "axios";
+import {err} from "react-native-svg";
+import {set} from "yaml/dist/schema/yaml-1.1/set";
 
 interface DriverType {
     first_name: string
@@ -32,6 +36,7 @@ interface DatesType {
 }
 
 const Driver = () => {
+    const [isLoading, setIsLoading] = useState(false);
     const [driverData, setDriverData] = useState<DriverType>({
         first_name: "",
         last_name: "",
@@ -75,7 +80,29 @@ const Driver = () => {
     const handleStatusChange = (value: string, _: number): void => {
         setStatus(value);
     }
-    const submitForm = () => {
+    const submitForm = async () => {
+        setIsLoading(true);
+        driverData.licence_expiry_date = dates.licenceExpiry.toLocaleDateString()
+        driverData.date_of_birth = dates.dateOfBirth.toLocaleDateString()
+        driverData.hire_date = dates.hire.toLocaleDateString()
+        driverData.country = country;
+        driverData.employment_status = status;
+        try {
+            const response = await axios.post(
+                `${API}drivers/`,
+                driverData,
+                {
+                    headers: {'Content-Type': 'application/json'},
+                    withCredentials: true
+                });
+            console.log(response);
+            router.replace("/drivers");
+        } catch (error) {
+            Alert.alert("Error")
+            console.log(error);
+        } finally {
+            setIsLoading(false);
+        }
 
     }
     const cancelSubmission = () => {
@@ -93,19 +120,19 @@ const Driver = () => {
                         <View className={"mt-[25px]"}>
                             <ThemedInputText containerStyles={"bg-background p-5"} placeholder={"First name"} value={driverData.first_name}
                                              onChange={handleChange}
-                                             name={"firstName"}/>
+                                             name={"first_name"}/>
                             <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Last name"} value={driverData.last_name}
                                              onChange={handleChange}
-                                             name={"lastName"}/>
+                                             name={"last_name"}/>
                             <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Email"} value={driverData.email}
                                              onChange={handleChange}
                                              name={"email"} icon={icons.mail}/>
                             <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Phone number"} value={driverData.phone_number}
                                              onChange={handleChange}
-                                             name={"phoneNumber"} icon={icons.phone}/>
+                                             name={"phone_number"} icon={icons.phone}/>
                             <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Licence number"}
                                              value={driverData.licence_number}
-                                             onChange={handleChange} name={"licenceNumber"}/>
+                                             onChange={handleChange} name={"licence_number"}/>
                             <View className={"flex-row"}>
                                 <View className={"justify-center p-4"}>
                                     <Text className={"text-txt font-open-sans text-sm"}>Licence expiry date</Text>
@@ -135,7 +162,7 @@ const Driver = () => {
                                              name={'state'}/>
                             <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"zip code"} value={driverData.zip_code}
                                              onChange={handleChange}
-                                             name={"zipcode"}/>
+                                             name={"zip_code"}/>
                             <Picker onValueChange={handleCountryChange} selectedValue={country}>
                                 {countries.map((item, idx) => {
                                     return (

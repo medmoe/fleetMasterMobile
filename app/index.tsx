@@ -21,7 +21,7 @@ const App = () => {
         setLoading(true);
         const verifyToken = async () => {
             try {
-                const response = await axios.get(`${API}refresh/`, {withCredentials: true});
+                const response = await axios.get(`${API}accounts/refresh/`, {withCredentials: true});
                 if (response.status === 200) {
                     router.replace("/dashboard");
                 }
@@ -50,7 +50,7 @@ const App = () => {
     const submitForm = async () => {
         setLoading(true)
         try {
-            const response = await axios.post(`${API}login/`, formState, {headers: {'Content-Type': 'application/json'}})
+            const response = await axios.post(`${API}accounts/login/`, formState, {headers: {'Content-Type': 'application/json'}})
             handleCookies(response.headers);
             router.replace("/dashboard");
         } catch (error) {

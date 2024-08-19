@@ -27,7 +27,7 @@ export type FormState = {
 
 const SignUp = () => {
     const router = useRouter();
-    const api = axios.create({baseURL: `${API}`})
+    const api = axios.create({baseURL: `${API}accounts/`})
     const [formState, setFormState] = useState<FormState>({
         user: {
             username: "",
