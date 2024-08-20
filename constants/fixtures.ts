@@ -21,6 +21,12 @@ export const trucks: [string, boolean, number, string][] = [
     ["Rivian R1T", true, 90123, "Purple"]
 ];
 
+export const trucksList: [string, string][] = [
+    ["1", "Truck1"],
+    ["2", "Truck2"],
+    ["3", "Truck3"],
+]
+
 type MaintenanceEntry = {
   truckName: string;
   dueDate: string;

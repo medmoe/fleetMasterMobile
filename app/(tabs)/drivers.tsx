@@ -2,8 +2,7 @@ import React from 'react';
 import {Text, View} from 'react-native';
 import {SafeAreaView} from "react-native-safe-area-context";
 import {driversEntries} from "@/constants/fixtures";
-import TableEntry from "@/components/TableEntry";
-import ThemedButton from "@/components/ThemedButton";
+import {TableEntry, ThemedButton} from "@/components";
 import {router} from "expo-router";
 
 const Drivers = () => {

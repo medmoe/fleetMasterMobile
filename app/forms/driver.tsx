@@ -9,10 +9,9 @@ import ThemedButton from "@/components/ThemedButton";
 import {router} from "expo-router";
 import {API} from "@/constants/endpoints";
 import axios from "axios";
-import {err} from "react-native-svg";
-import {set} from "yaml/dist/schema/yaml-1.1/set";
+import {trucksList} from "@/constants/fixtures";
 
-interface DriverType {
+export interface DriverType {
     first_name: string
     last_name: string
     email: string
@@ -27,12 +26,21 @@ interface DriverType {
     country: string
     hire_date: string
     employment_status: string
+    emergency_contact_name: string
+    emergency_contact_phone: string
+    notes: string
 }
 
 interface DatesType {
     dateOfBirth: Date
     licenceExpiry: Date
     hire: Date
+}
+
+interface PickerType {
+    country: string
+    status: string
+    trucks: string[] | null
 }
 
 const Driver = () => {
@@ -52,14 +60,20 @@ const Driver = () => {
         country: "",
         hire_date: "",
         employment_status: "",
+        emergency_contact_name: "",
+        emergency_contact_phone: "",
+        notes: "",
     })
     const [dates, setDates] = useState<DatesType>({
         dateOfBirth: new Date(),
         licenceExpiry: new Date(),
         hire: new Date(),
     })
-    const [country, setCountry] = useState<string>("Algeria")
-    const [status, setStatus] = useState<string>("Active");
+    const [pickers, setPickers] = useState<PickerType>({
+        country: "Algeria",
+        status: "ACTIVE",
+        trucks: null
+    })
     const handleChange = (name: string, value: string) => {
         setDriverData(prevState => ({
             ...prevState,
@@ -74,19 +88,19 @@ const Driver = () => {
             }))
         }
     }
-    const handleCountryChange = (value: string, _: number): void => {
-        setCountry(value);
-    }
-    const handleStatusChange = (value: string, _: number): void => {
-        setStatus(value);
+    const handlePickerChange = (value: string, name: string): void => {
+        setPickers(prevState => ({
+            ...prevState,
+            [name]: name === "trucks" ? [value] : value
+        }))
     }
     const submitForm = async () => {
         setIsLoading(true);
-        driverData.licence_expiry_date = dates.licenceExpiry.toLocaleDateString()
-        driverData.date_of_birth = dates.dateOfBirth.toLocaleDateString()
-        driverData.hire_date = dates.hire.toLocaleDateString()
-        driverData.country = country;
-        driverData.employment_status = status;
+        driverData.licence_expiry_date = dates.licenceExpiry.toLocaleDateString('en-CA', {year: 'numeric', month: '2-digit', day: '2-digit'})
+        driverData.date_of_birth = dates.dateOfBirth.toLocaleDateString('en-CA', {year: 'numeric', month: '2-digit', day: '2-digit'})
+        driverData.hire_date = dates.hire.toLocaleDateString('en-CA', {year: 'numeric', month: '2-digit', day: '2-digit'})
+        driverData.country = pickers.country;
+        driverData.employment_status = pickers.status;
         try {
             const response = await axios.post(
                 `${API}drivers/`,
@@ -163,7 +177,7 @@ const Driver = () => {
                             <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"zip code"} value={driverData.zip_code}
                                              onChange={handleChange}
                                              name={"zip_code"}/>
-                            <Picker onValueChange={handleCountryChange} selectedValue={country}>
+                            <Picker onValueChange={(value) => handlePickerChange(value, "country")} selectedValue={pickers.country}>
                                 {countries.map((item, idx) => {
                                     return (
                                         <Picker.Item label={`${item.name} ${item.emoji}`} value={item.name} key={idx}/>
@@ -177,12 +191,30 @@ const Driver = () => {
                                     <DateTimePicker value={dates.hire} mode={"date"} display={"default"} onChange={handleDateChange("hire")}/>
                                 </View>
                             </View>
-                            <Picker onValueChange={handleStatusChange} selectedValue={status}>
-                                <Picker.Item label={"Active"} value={"active"}/>
-                                <Picker.Item label={"Inactive"} value={"inactive"}/>
-                                <Picker.Item label={"On Leave"} value={"onleave"}/>
+                            <Picker onValueChange={(value) => handlePickerChange(value, "status")} selectedValue={pickers.status}>
+                                <Picker.Item label={"Active"} value={"ACTIVE"}/>
+                                <Picker.Item label={"Inactive"} value={"INACTIVE"}/>
+                                <Picker.Item label={"On Leave"} value={"ON_LEAVE"}/>
                             </Picker>
-
+                            <ThemedInputText containerStyles={"bg-background p-5"} placeholder={"Emergency contact name"}
+                                             value={driverData.emergency_contact_name}
+                                             onChange={handleChange}
+                                             name={"emergency_contact_name"}/>
+                            <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Emergency contact phone"}
+                                             value={driverData.emergency_contact_phone}
+                                             onChange={handleChange}
+                                             name={"emergency_contact_phone"}/>
+                            <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Notes"} value={driverData.notes}
+                                             onChange={handleChange}
+                                             name={"notes"}/>
+                            <Picker onValueChange={(value) => handlePickerChange(value, "trucks")}
+                                    selectedValue={pickers.trucks ? pickers.trucks[0] : ""}>
+                                {trucksList.map(([id, name], idx) => {
+                                    return (
+                                        <Picker.Item label={name} value={id} key={idx}/>
+                                    )
+                                })}
+                            </Picker>
 
                         </View>
 
@@ -190,6 +222,7 @@ const Driver = () => {
                                       textStyles={"text-white font-semibold text-base"}/>
                         <ThemedButton title={"Cancel"} handlePress={cancelSubmission} containerStyles="w-full bg-error p-5 rounded-[50%] mt-[10px]"
                                       textStyles={"text-white font-semibold text-base"}/>
+
 
                     </View>
                 </View>
