@@ -1,10 +1,12 @@
 import React, {useState} from 'react';
-import {Image, SafeAreaView, ScrollView, Text, View} from 'react-native';
+import {Alert, Image, SafeAreaView, ScrollView, Text, View} from 'react-native';
 import {ThemedButton, ThemedInputText} from "@/components";
 import {Picker} from "@react-native-picker/picker";
 import {icons} from "@/constants/icons";
 import DateTimePicker, {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 import {router} from "expo-router";
+import axios from "axios";
+import {API} from "@/constants/endpoints";
 
 export interface VehicleType {
     registration_number?: string
@@ -20,6 +22,11 @@ export interface VehicleType {
     capacity?: string
     insurance_policy_number?: string
     notes?: string
+    purchase_date?: string
+    last_service_date?: string
+    next_service_due?: string
+    insurance_expiry_date?: string
+    license_expiry_date?: string
 }
 
 interface DatesType {
@@ -29,6 +36,8 @@ interface DatesType {
     insurance_expiry_date: Date
     license_expiry_date: Date
 }
+
+type VehicleKey = 'purchase_date' | 'last_service_date' | 'next_service_due' | 'insurance_expiry_date' | 'license_expiry_date';
 
 const vehicleTypes = {
     "car": "CAR",
@@ -49,6 +58,7 @@ const fuelTypes = {
 }
 
 const Vehicle = () => {
+    const [isLoading, setIsLoading] = useState(false);
     const [vehicleData, setVehicleData] = useState<VehicleType>({
         type: "TRUCK",
         status: "ACTIVE",
@@ -76,7 +86,28 @@ const Vehicle = () => {
         }
     }
     const submitForm = async () => {
-
+        setIsLoading(true);
+        let keys: VehicleKey[] = ["purchase_date", "last_service_date", "next_service_due", "insurance_expiry_date", "license_expiry_date"]
+        for (let key of keys) {
+            vehicleData[key] = dates[key].toLocaleDateString("en-CA", {year: "numeric", month: "2-digit", day: "2-digit"})
+        }
+        try {
+            const response = await axios.post(
+                `${API}vehicles/`,
+                vehicleData,
+                {
+                    headers: {'Content-Type': 'application/json'},
+                    withCredentials: true,
+                }
+            )
+            console.log(response)
+            router.replace("/fleet");
+        } catch (error) {
+            Alert.alert("Error")
+            console.log(error)
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     const cancelSubmission = () => {
