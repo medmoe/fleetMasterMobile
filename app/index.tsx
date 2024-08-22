@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Alert, Image, ScrollView, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context'
 import {images} from "@/constants/images";
@@ -10,11 +10,6 @@ import axios from "axios";
 import {API} from "@/constants/endpoints";
 import {handleCookies, handleError} from "@/utils/authentication";
 import Spinner from "@/components/Spinner";
-import * as SecureStore from "expo-secure-store";
-export type FormState = {
-    username: string
-    password: string
-}
 
 const App = () => {
     useEffect(() => {
@@ -61,6 +56,7 @@ const App = () => {
         }
     }
     return (
+
         <SafeAreaView className="bg-background hl-full">
             <ScrollView contentContainerStyle={{height: "100%"}}>
                 {loading ? <View className="w-full justify-center items-center h-full px-4"><Spinner isVisible={loading}/></View> :
@@ -115,8 +111,14 @@ const App = () => {
                 }
             </ScrollView>
         </SafeAreaView>
+
     );
 };
+
+export type FormState = {
+    username: string
+    password: string
+}
 
 
 export default App;

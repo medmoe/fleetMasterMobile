@@ -137,7 +137,7 @@ const SignUp = () => {
                             <ThemedButton
                                 title={"Continue"}
                                 handlePress={submitForm}
-                                containerStyles={"w-full mt-[50px] bg-primary"}
+                                containerStyles={"w-full mt-[50px] bg-primary p-5 rounded-[50%]"}
                                 textStyles={"text-white font-semibold text-base"}
                             />
                             <View className={"mt-[25px]"}>
