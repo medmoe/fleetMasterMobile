@@ -7,27 +7,8 @@ import DateTimePicker, {DateTimePickerEvent} from "@react-native-community/datet
 import {router} from "expo-router";
 import axios from "axios";
 import {API} from "@/constants/endpoints";
+import {VehicleType} from "@/types/types";
 
-export interface VehicleType {
-    registration_number?: string
-    make?: string
-    model?: string
-    year?: string
-    vin?: string
-    color?: string
-    type: string
-    status: string
-    mileage?: string
-    fuel_type?: string
-    capacity?: string
-    insurance_policy_number?: string
-    notes?: string
-    purchase_date?: string
-    last_service_date?: string
-    next_service_due?: string
-    insurance_expiry_date?: string
-    license_expiry_date?: string
-}
 
 interface DatesType {
     purchase_date: Date

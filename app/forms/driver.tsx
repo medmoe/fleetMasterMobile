@@ -10,26 +10,9 @@ import {router} from "expo-router";
 import {API} from "@/constants/endpoints";
 import axios from "axios";
 import {trucksList} from "@/constants/fixtures";
+import {DriverType} from "@/types/types";
 
-export interface DriverType {
-    first_name: string
-    last_name: string
-    email: string
-    phone_number: string
-    licence_number: string
-    licence_expiry_date: string
-    date_of_birth: string
-    address: string
-    city: string
-    state: string
-    zip_code: string
-    country: string
-    hire_date: string
-    employment_status: string
-    emergency_contact_name: string
-    emergency_contact_phone: string
-    notes: string
-}
+
 
 interface DatesType {
     dateOfBirth: Date

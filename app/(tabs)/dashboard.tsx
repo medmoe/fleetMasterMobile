@@ -3,8 +3,12 @@ import {SafeAreaView} from "react-native-safe-area-context";
 import {ScrollView, Text, View} from "react-native";
 import {drivers, maintenanceData, trucks} from "@/constants/fixtures";
 import TableEntry from "@/components/TableEntry";
+import {useGlobalContext} from "@/context/GlobalProvider";
 
 const Dashboard = () => {
+    const {responseData, setResponseData} = useGlobalContext()
+    console.log("FIND ME");
+    console.log(responseData);
     const handlePress = () => {
 
     }

@@ -3,8 +3,7 @@ import {Stack} from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, {useEffect} from 'react';
 import 'react-native-reanimated';
-import {Provider} from "react-redux";
-import store from "@/redux/store";
+import {GlobalProvider} from "@/context/GlobalProvider";
 
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -32,14 +31,14 @@ export default function RootLayout() {
     }
 
     return (
-        <Provider store={store}>
+        <GlobalProvider>
             <Stack>
                 <Stack.Screen name="index" options={{headerShown: false}}/>
                 <Stack.Screen name="signup" options={{headerShown: false}}/>
                 <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
                 <Stack.Screen name="forms" options={{headerShown: false}}/>
             </Stack>
-        </Provider>
+        </GlobalProvider>
 
 
     );

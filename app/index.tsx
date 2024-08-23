@@ -10,8 +10,15 @@ import axios from "axios";
 import {API} from "@/constants/endpoints";
 import {handleCookies, handleError} from "@/utils/authentication";
 import Spinner from "@/components/Spinner";
+import {useGlobalContext} from "@/context/GlobalProvider";
+
+export type FormState = {
+    username: string
+    password: string
+}
 
 const App = () => {
+    const {responseData, setResponseData} = useGlobalContext();
     useEffect(() => {
         setLoading(true);
         const verifyToken = async () => {
@@ -29,6 +36,7 @@ const App = () => {
         }
         verifyToken();
     }, [])
+
     const [formState, setFormState] = useState<FormState>({
         username: "",
         password: "",
@@ -42,11 +50,13 @@ const App = () => {
             }
         })
     }
+
     const submitForm = async () => {
         setLoading(true)
         try {
             const response = await axios.post(`${API}accounts/login/`, formState, {headers: {'Content-Type': 'application/json'}})
             handleCookies(response.headers);
+            setResponseData(response.data);
             router.replace("/dashboard");
         } catch (error) {
             const errorMessage: string = handleError(error);
@@ -56,7 +66,6 @@ const App = () => {
         }
     }
     return (
-
         <SafeAreaView className="bg-background hl-full">
             <ScrollView contentContainerStyle={{height: "100%"}}>
                 {loading ? <View className="w-full justify-center items-center h-full px-4"><Spinner isVisible={loading}/></View> :
@@ -114,11 +123,5 @@ const App = () => {
 
     );
 };
-
-export type FormState = {
-    username: string
-    password: string
-}
-
 
 export default App;
