@@ -1,11 +1,13 @@
 import React from 'react';
 import {Text, View} from 'react-native';
 import {SafeAreaView} from "react-native-safe-area-context";
-import {driversEntries} from "@/constants/fixtures";
 import {TableEntry, ThemedButton} from "@/components";
 import {router} from "expo-router";
+import {useGlobalContext} from "@/context/GlobalProvider";
+import {driverStatus} from "@/constants/constants";
 
 const Drivers = () => {
+    const {responseData} = useGlobalContext();
     const addDriver = () => {
         router.replace("/forms/driver")
     }
@@ -28,13 +30,13 @@ const Drivers = () => {
                             containerStyles={"mb-3"}
                             textStyles={"text-default font-semibold"}
                         />
-                        {driversEntries.map((entry, idx) => {
+                        {responseData.drivers?.map((driver, idx) => {
                             return (
                                 <TableEntry
-                                    name={entry.fullname}
-                                    numeric={entry.joinedDate}
-                                    status={entry.status}
-                                    note={entry.vehicleName}
+                                    name={`${driver.first_name} ${driver.last_name}`}
+                                    numeric={"To be implemented"}
+                                    status={driver.employment_status === driverStatus.active}
+                                    note={driver.notes}
                                     textStyles={"font-open-sans text-txt"}
                                     key={idx}
                                 />

@@ -4,7 +4,7 @@ import {icons} from "@/constants/icons";
 
 interface TableEntryProps {
     name: string,
-    numeric: number | string,
+    numeric: string | undefined,
     status: boolean | string,
     note?: string
     containerStyles?: string

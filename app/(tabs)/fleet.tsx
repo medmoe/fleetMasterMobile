@@ -2,9 +2,10 @@ import React from 'react';
 import {SafeAreaView, Text, View} from 'react-native';
 import {TableEntry, ThemedButton} from "@/components";
 import {router} from "expo-router";
-import {trucks} from "@/constants/fixtures";
+import {useGlobalContext} from "@/context/GlobalProvider";
 
 const Fleet = () => {
+    const {responseData} = useGlobalContext();
     const addVehicle = () => {
         router.replace("/forms/vehicle");
     }
@@ -26,13 +27,13 @@ const Fleet = () => {
                                     containerStyles={"mb-3"}
                                     textStyles={"text-default font-semibold"}
                         />
-                        {trucks.map(([name, status, mileage, note], idx) => {
+                        {responseData.vehicles?.map((vehicle, idx) => {
                             return (
-                                <TableEntry name={name}
-                                            numeric={Number(mileage).toLocaleString('en')}
-                                            status={status}
-                                            note={note}
-                                            textStyles={"font-open-sans text-txt"}
+                                <TableEntry name={`${vehicle.make} ${vehicle.model} ${vehicle.registration_number}`}
+                                            numeric={vehicle.mileage}
+                                            status={vehicle.status === "ACTIVE"}
+                                            note={vehicle.notes}
+                                            textStyles={"font-merriweather-regular text-txt"}
                                             key={idx}
                                 />
                             )
