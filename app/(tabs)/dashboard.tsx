@@ -6,20 +6,6 @@ import TableEntry from "@/components/TableEntry";
 import {useGlobalContext} from "@/context/GlobalProvider";
 import {driverStatus, vehicleStatus} from "@/constants/constants";
 
-interface TruckTable {
-    name: string
-    mileage: string | undefined
-    status: boolean
-    note: string | undefined
-}
-
-interface DriverTable {
-    name: string
-    grade: string,
-    status: boolean,
-    note: string,
-}
-
 const Dashboard = () => {
     const {responseData} = useGlobalContext()
     const handlePress = () => {
@@ -49,7 +35,7 @@ const Dashboard = () => {
                                                 note={driver.notes}
                                                 textStyles={"font-merriweather-regular text-txt"}
                                                 key={idx}
-                                                />
+                                    />
                                 )
                             })}
                         </View>

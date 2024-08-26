@@ -1,4 +1,6 @@
 export interface DriverType {
+    id?: number
+    vehicles?: number[]
     first_name: string
     last_name: string
     email: string
@@ -19,17 +21,18 @@ export interface DriverType {
 }
 
 export interface VehicleType {
+    id?: number
     registration_number?: string
     make?: string
     model?: string
-    year?: string
+    year: string
     vin?: string
     color?: string
     type: string
     status: string
-    mileage?: string
+    mileage: string
     fuel_type?: string
-    capacity?: string
+    capacity: string
     insurance_policy_number?: string
     notes?: string
     purchase_date?: string
@@ -40,7 +43,7 @@ export interface VehicleType {
 }
 
 export interface UserType {
-    id?: number
+    id: number
     username: string
     first_name?: string
     last_name?: string

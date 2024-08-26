@@ -8,6 +8,8 @@ import {router} from "expo-router";
 import axios from "axios";
 import {API} from "@/constants/endpoints";
 import {VehicleType} from "@/types/types";
+import {useGlobalContext} from "@/context/GlobalProvider";
+import {handleError} from "@/utils/authentication";
 
 
 interface DatesType {
@@ -39,11 +41,14 @@ const fuelTypes = {
 }
 
 const Vehicle = () => {
+    const {responseData, setResponseData} = useGlobalContext();
     const [isLoading, setIsLoading] = useState(false);
     const [vehicleData, setVehicleData] = useState<VehicleType>({
         type: "TRUCK",
         status: "ACTIVE",
-
+        year: "1990",
+        mileage: "0",
+        capacity: "0",
     })
     const [dates, setDates] = useState<DatesType>({
         purchase_date: new Date(),
@@ -68,6 +73,22 @@ const Vehicle = () => {
     }
     const submitForm = async () => {
         setIsLoading(true);
+        // Validate year
+        if (!isPositiveInteger(vehicleData.year)) {
+            Alert.alert("Error", "Year must be a positive number!")
+            return;
+        }
+        // Validate mileage
+        if (!isPositiveInteger(vehicleData.mileage)) {
+            Alert.alert("Error", "Mileage must be a positive number!")
+            return;
+        }
+        // Validate capacity
+        if (!isPositiveInteger(vehicleData.capacity)){
+            Alert.alert("Error", "Capacity must be a positive number!")
+            return;
+        }
+
         let keys: VehicleKey[] = ["purchase_date", "last_service_date", "next_service_due", "insurance_expiry_date", "license_expiry_date"]
         for (let key of keys) {
             vehicleData[key] = dates[key].toLocaleDateString("en-CA", {year: "numeric", month: "2-digit", day: "2-digit"})
@@ -81,14 +102,21 @@ const Vehicle = () => {
                     withCredentials: true,
                 }
             )
-            console.log(response)
+            setResponseData({
+                ...responseData,
+                vehicles: responseData.vehicles ? [...responseData.vehicles, response.data] : [responseData],
+            })
             router.replace("/fleet");
         } catch (error) {
-            Alert.alert("Error")
-            console.log(error)
+            Alert.alert(handleError(error));
         } finally {
             setIsLoading(false);
         }
+    }
+
+    const isPositiveInteger = (str: string): boolean => {
+        const pattern = new RegExp('^[1-9]\\d*$')
+        return pattern.test(str)
     }
 
     const cancelSubmission = () => {
@@ -190,10 +218,10 @@ const Vehicle = () => {
                                              onChange={handleChange}
                                              name={"capacity"}
                             />
-                            <Picker onValueChange={(value) => handleChange("fuel_type", value)} selectedValue={vehicleData.fuel_type} >
+                            <Picker onValueChange={(value) => handleChange("fuel_type", value)} selectedValue={vehicleData.fuel_type}>
                                 {Object.entries(fuelTypes).map(([name, value], idx) => {
                                     return (
-                                        <Picker.Item label={name} value={value} key={idx} />
+                                        <Picker.Item label={name} value={value} key={idx}/>
                                     )
                                 })}
                             </Picker>
@@ -208,14 +236,16 @@ const Vehicle = () => {
                                     <Text className={"text-txt font-open-sans items-center flex-row"}>Insurance expiry date</Text>
                                     <View className={"mt-3 justify-start items-center flex-row"}>
                                         <Image source={icons.calendar} resizeMode={"contain"} className={"w-[25px] h-[25px] mr-[5px]"}/>
-                                        <DateTimePicker value={dates.insurance_expiry_date} mode={"date"} onChange={handleDateChange("next_service_due")}/>
+                                        <DateTimePicker value={dates.insurance_expiry_date} mode={"date"}
+                                                        onChange={handleDateChange("next_service_due")}/>
                                     </View>
                                 </View>
                                 <View className={"justify-center p-4"}>
                                     <Text className={"text-txt font-open-sans items-center flex-row"}>License expiry date</Text>
                                     <View className={"mt-3 justify-start items-center flex-row"}>
                                         <Image source={icons.calendar} resizeMode={"contain"} className={"w-[25px] h-[25px] mr-[5px]"}/>
-                                        <DateTimePicker value={dates.license_expiry_date} mode={"date"} onChange={handleDateChange("license_expiry_date")}/>
+                                        <DateTimePicker value={dates.license_expiry_date} mode={"date"}
+                                                        onChange={handleDateChange("license_expiry_date")}/>
                                     </View>
                                 </View>
                             </View>

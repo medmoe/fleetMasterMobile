@@ -9,9 +9,11 @@ import ThemedButton from "@/components/ThemedButton";
 import {router} from "expo-router";
 import {API} from "@/constants/endpoints";
 import axios from "axios";
-import {trucksList} from "@/constants/fixtures";
 import {DriverType} from "@/types/types";
-
+import {useGlobalContext} from "@/context/GlobalProvider";
+import {handleError} from "@/utils/authentication";
+import {driverStatus} from "@/constants/constants";
+import {Spinner} from "@/components";
 
 
 interface DatesType {
@@ -23,10 +25,14 @@ interface DatesType {
 interface PickerType {
     country: string
     status: string
-    trucks: string[] | null
+    vehicles: number[]
 }
 
 const Driver = () => {
+    const {responseData, setResponseData} = useGlobalContext();
+    const vehicles: [number | undefined, string | undefined][] = responseData.vehicles ? responseData.vehicles.map((vehicle) => {
+        return [vehicle.id, `${vehicle.make} ${vehicle.model} ${vehicle.year}`]
+    }) : []
     const [isLoading, setIsLoading] = useState(false);
     const [driverData, setDriverData] = useState<DriverType>({
         first_name: "",
@@ -55,7 +61,7 @@ const Driver = () => {
     const [pickers, setPickers] = useState<PickerType>({
         country: "Algeria",
         status: "ACTIVE",
-        trucks: null
+        vehicles: []
     })
     const handleChange = (name: string, value: string) => {
         setDriverData(prevState => ({
@@ -71,10 +77,10 @@ const Driver = () => {
             }))
         }
     }
-    const handlePickerChange = (value: string, name: string): void => {
+    const handlePickerChange = (value: string | number, name: string): void => {
         setPickers(prevState => ({
             ...prevState,
-            [name]: name === "trucks" ? [value] : value
+            [name]: name === "vehicles" ? [value] : value
         }))
     }
     const submitForm = async () => {
@@ -84,6 +90,7 @@ const Driver = () => {
         driverData.hire_date = dates.hire.toLocaleDateString('en-CA', {year: 'numeric', month: '2-digit', day: '2-digit'})
         driverData.country = pickers.country;
         driverData.employment_status = pickers.status;
+        driverData.vehicles = pickers.vehicles
         try {
             const response = await axios.post(
                 `${API}drivers/`,
@@ -92,11 +99,13 @@ const Driver = () => {
                     headers: {'Content-Type': 'application/json'},
                     withCredentials: true
                 });
-            console.log(response);
+            setResponseData({
+                ...responseData,
+                drivers: responseData.drivers ? [...responseData.drivers, response.data] : [response.data]
+            })
             router.replace("/drivers");
         } catch (error) {
-            Alert.alert("Error")
-            console.log(error);
+            Alert.alert(handleError(error));
         } finally {
             setIsLoading(false);
         }
@@ -108,107 +117,111 @@ const Driver = () => {
     return (
         <SafeAreaView>
             <ScrollView>
-                <View className={"w-full justify-center items-center"}>
-                    <View className={"w-[94%] bg-white rounded p-5"}>
-                        <View className={"gap-2"}>
-                            <Text className={"font-semibold text-txt text-base"}>Driver Form</Text>
-                            <Text className={"font-open-sans text-txt text-sm"}>Fill in driver's details below.</Text>
-                        </View>
-                        <View className={"mt-[25px]"}>
-                            <ThemedInputText containerStyles={"bg-background p-5"} placeholder={"First name"} value={driverData.first_name}
-                                             onChange={handleChange}
-                                             name={"first_name"}/>
-                            <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Last name"} value={driverData.last_name}
-                                             onChange={handleChange}
-                                             name={"last_name"}/>
-                            <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Email"} value={driverData.email}
-                                             onChange={handleChange}
-                                             name={"email"} icon={icons.mail}/>
-                            <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Phone number"} value={driverData.phone_number}
-                                             onChange={handleChange}
-                                             name={"phone_number"} icon={icons.phone}/>
-                            <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Licence number"}
-                                             value={driverData.licence_number}
-                                             onChange={handleChange} name={"licence_number"}/>
-                            <View className={"flex-row"}>
-                                <View className={"justify-center p-4"}>
-                                    <Text className={"text-txt font-open-sans text-sm"}>Licence expiry date</Text>
-                                    <View className={"mt-3 justify-start items-center flex-row"}>
-                                        <Image source={icons.calendar} resizeMode={"contain"} className={"w-[25px] h-[25px] mr-[5px]"}/>
-                                        <DateTimePicker value={dates.dateOfBirth} mode={"date"} display={"default"}
-                                                        onChange={handleDateChange("dateOfBirth")}/>
+                {isLoading ? <View className={"w-full justify-center items-center h-full px-4"}><Spinner isVisible={isLoading} /></View> :
+                    <View className={"w-full justify-center items-center"}>
+                        <View className={"w-[94%] bg-white rounded p-5"}>
+                            <View className={"gap-2"}>
+                                <Text className={"font-semibold text-txt text-base"}>Driver Form</Text>
+                                <Text className={"font-open-sans text-txt text-sm"}>Fill in driver's details below.</Text>
+                            </View>
+                            <View className={"mt-[25px]"}>
+                                <ThemedInputText containerStyles={"bg-background p-5"} placeholder={"First name"} value={driverData.first_name}
+                                                 onChange={handleChange}
+                                                 name={"first_name"}/>
+                                <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Last name"} value={driverData.last_name}
+                                                 onChange={handleChange}
+                                                 name={"last_name"}/>
+                                <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Email"} value={driverData.email}
+                                                 onChange={handleChange}
+                                                 name={"email"} icon={icons.mail}/>
+                                <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Phone number"}
+                                                 value={driverData.phone_number}
+                                                 onChange={handleChange}
+                                                 name={"phone_number"} icon={icons.phone}/>
+                                <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Licence number"}
+                                                 value={driverData.licence_number}
+                                                 onChange={handleChange} name={"licence_number"}/>
+                                <View className={"flex-row"}>
+                                    <View className={"justify-center p-4"}>
+                                        <Text className={"text-txt font-open-sans text-sm"}>Licence expiry date</Text>
+                                        <View className={"mt-3 justify-start items-center flex-row"}>
+                                            <Image source={icons.calendar} resizeMode={"contain"} className={"w-[25px] h-[25px] mr-[5px]"}/>
+                                            <DateTimePicker value={dates.dateOfBirth} mode={"date"} display={"default"}
+                                                            onChange={handleDateChange("dateOfBirth")}/>
+                                        </View>
+                                    </View>
+                                    <View className={"justify-center p-4"}>
+                                        <Text className={"text-txt font-open-sans text-sm"}>Date of birth</Text>
+                                        <View className={"mt-3 justify-start items-center flex-row"}>
+                                            <Image source={icons.calendar} resizeMode={"contain"} className={"w-[25px] h-[25px] mr-[5px]"}/>
+                                            <DateTimePicker value={dates.licenceExpiry} mode={"date"} display={"default"}
+                                                            onChange={handleDateChange("licenceExpiry")}/>
+                                        </View>
                                     </View>
                                 </View>
+                                <ThemedInputText containerStyles={"bg-background p-5"} placeholder={"Address"} value={driverData.address}
+                                                 onChange={handleChange}
+                                                 name={"address"}/>
+                                <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={'city'} value={driverData.city}
+                                                 onChange={handleChange}
+                                                 name={"city"}/>
+                                <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={'state'} value={driverData.state}
+                                                 onChange={handleChange}
+                                                 name={'state'}/>
+                                <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"zip code"} value={driverData.zip_code}
+                                                 onChange={handleChange}
+                                                 name={"zip_code"}/>
+                                <Picker onValueChange={(value) => handlePickerChange(value, "country")} selectedValue={pickers.country}>
+                                    {countries.map((item, idx) => {
+                                        return (
+                                            <Picker.Item label={`${item.name} ${item.emoji}`} value={item.name} key={idx}/>
+                                        )
+                                    })}
+                                </Picker>
                                 <View className={"justify-center p-4"}>
-                                    <Text className={"text-txt font-open-sans text-sm"}>Date of birth</Text>
+                                    <Text className={"text-txt font-open-sans text-sm"}>Hire date</Text>
                                     <View className={"mt-3 justify-start items-center flex-row"}>
                                         <Image source={icons.calendar} resizeMode={"contain"} className={"w-[25px] h-[25px] mr-[5px]"}/>
-                                        <DateTimePicker value={dates.licenceExpiry} mode={"date"} display={"default"}
-                                                        onChange={handleDateChange("licenceExpiry")}/>
+                                        <DateTimePicker value={dates.hire} mode={"date"} display={"default"} onChange={handleDateChange("hire")}/>
                                     </View>
                                 </View>
+                                <Picker onValueChange={(value) => handlePickerChange(value, "status")} selectedValue={pickers.status}>
+                                    <Picker.Item label={"Active"} value={driverStatus.active}/>
+                                    <Picker.Item label={"Inactive"} value={driverStatus.inactive}/>
+                                    <Picker.Item label={"On Leave"} value={driverStatus.on_leave}/>
+                                </Picker>
+                                <ThemedInputText containerStyles={"bg-background p-5"} placeholder={"Emergency contact name"}
+                                                 value={driverData.emergency_contact_name}
+                                                 onChange={handleChange}
+                                                 name={"emergency_contact_name"}/>
+                                <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Emergency contact phone"}
+                                                 value={driverData.emergency_contact_phone}
+                                                 onChange={handleChange}
+                                                 name={"emergency_contact_phone"}/>
+                                <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Notes"} value={driverData.notes}
+                                                 onChange={handleChange}
+                                                 name={"notes"}/>
+                                <Picker onValueChange={(value) => handlePickerChange(value, "vehicles")}
+                                        selectedValue={pickers.vehicles ? pickers.vehicles[0] : ""}>
+                                    {vehicles.map(([id, name], idx) => {
+                                        return (
+                                            <Picker.Item label={name} value={id} key={idx}/>
+                                        )
+                                    })}
+                                </Picker>
+
                             </View>
-                            <ThemedInputText containerStyles={"bg-background p-5"} placeholder={"Address"} value={driverData.address}
-                                             onChange={handleChange}
-                                             name={"address"}/>
-                            <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={'city'} value={driverData.city}
-                                             onChange={handleChange}
-                                             name={"city"}/>
-                            <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={'state'} value={driverData.state}
-                                             onChange={handleChange}
-                                             name={'state'}/>
-                            <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"zip code"} value={driverData.zip_code}
-                                             onChange={handleChange}
-                                             name={"zip_code"}/>
-                            <Picker onValueChange={(value) => handlePickerChange(value, "country")} selectedValue={pickers.country}>
-                                {countries.map((item, idx) => {
-                                    return (
-                                        <Picker.Item label={`${item.name} ${item.emoji}`} value={item.name} key={idx}/>
-                                    )
-                                })}
-                            </Picker>
-                            <View className={"justify-center p-4"}>
-                                <Text className={"text-txt font-open-sans text-sm"}>Hire date</Text>
-                                <View className={"mt-3 justify-start items-center flex-row"}>
-                                    <Image source={icons.calendar} resizeMode={"contain"} className={"w-[25px] h-[25px] mr-[5px]"}/>
-                                    <DateTimePicker value={dates.hire} mode={"date"} display={"default"} onChange={handleDateChange("hire")}/>
-                                </View>
-                            </View>
-                            <Picker onValueChange={(value) => handlePickerChange(value, "status")} selectedValue={pickers.status}>
-                                <Picker.Item label={"Active"} value={"ACTIVE"}/>
-                                <Picker.Item label={"Inactive"} value={"INACTIVE"}/>
-                                <Picker.Item label={"On Leave"} value={"ON_LEAVE"}/>
-                            </Picker>
-                            <ThemedInputText containerStyles={"bg-background p-5"} placeholder={"Emergency contact name"}
-                                             value={driverData.emergency_contact_name}
-                                             onChange={handleChange}
-                                             name={"emergency_contact_name"}/>
-                            <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Emergency contact phone"}
-                                             value={driverData.emergency_contact_phone}
-                                             onChange={handleChange}
-                                             name={"emergency_contact_phone"}/>
-                            <ThemedInputText containerStyles={"bg-background p-5 mt-3"} placeholder={"Notes"} value={driverData.notes}
-                                             onChange={handleChange}
-                                             name={"notes"}/>
-                            <Picker onValueChange={(value) => handlePickerChange(value, "trucks")}
-                                    selectedValue={pickers.trucks ? pickers.trucks[0] : ""}>
-                                {trucksList.map(([id, name], idx) => {
-                                    return (
-                                        <Picker.Item label={name} value={id} key={idx}/>
-                                    )
-                                })}
-                            </Picker>
+
+                            <ThemedButton title={"Submit"} handlePress={submitForm} containerStyles="w-full bg-primary p-5 rounded-[50%]"
+                                          textStyles={"text-white font-semibold text-base"}/>
+                            <ThemedButton title={"Cancel"} handlePress={cancelSubmission}
+                                          containerStyles="w-full bg-error p-5 rounded-[50%] mt-[10px]"
+                                          textStyles={"text-white font-semibold text-base"}/>
+
 
                         </View>
-
-                        <ThemedButton title={"Submit"} handlePress={submitForm} containerStyles="w-full bg-primary p-5 rounded-[50%]"
-                                      textStyles={"text-white font-semibold text-base"}/>
-                        <ThemedButton title={"Cancel"} handlePress={cancelSubmission} containerStyles="w-full bg-error p-5 rounded-[50%] mt-[10px]"
-                                      textStyles={"text-white font-semibold text-base"}/>
-
-
                     </View>
-                </View>
+                }
             </ScrollView>
         </SafeAreaView>
     )
