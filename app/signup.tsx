@@ -3,7 +3,7 @@ import {Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View} from 'rea
 import {Link, useRouter} from "expo-router";
 import axios from "axios";
 import {API} from "@/constants/endpoints";
-import {handleCookies, handleError} from "@/utils/authentication";
+import {handleCookies, handleAuthenticationErrors} from "@/utils/authentication";
 import {SafeAreaView} from "react-native-safe-area-context";
 import Spinner from "@/components/Spinner";
 import ThemedInputText from "@/components/ThemedInputText";
@@ -89,7 +89,7 @@ const SignUp = () => {
 
         } catch (error) {
             // Handle errors
-            const errorMessage = handleError(error);
+            const errorMessage = handleAuthenticationErrors(error);
             Alert.alert('Error', errorMessage);
         } finally {
             setLoading(false);

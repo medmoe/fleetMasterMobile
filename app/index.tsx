@@ -8,7 +8,7 @@ import {icons} from "@/constants/icons";
 import {Link, router} from "expo-router";
 import axios from "axios";
 import {API} from "@/constants/endpoints";
-import {handleCookies, handleError} from "@/utils/authentication";
+import {handleCookies, handleAuthenticationErrors} from "@/utils/authentication";
 import Spinner from "@/components/Spinner";
 import {useGlobalContext} from "@/context/GlobalProvider";
 
@@ -28,7 +28,7 @@ const App = () => {
                     router.replace("/dashboard");
                 }
             } catch (error) {
-                const errorMessage = handleError(error)
+                const errorMessage = handleAuthenticationErrors(error)
                 console.log(errorMessage);
             } finally {
                 setLoading(false);
@@ -59,7 +59,7 @@ const App = () => {
             setResponseData(response.data);
             router.replace("/dashboard");
         } catch (error) {
-            const errorMessage: string = handleError(error);
+            const errorMessage: string = handleAuthenticationErrors(error);
             Alert.alert("Error", errorMessage);
         } finally {
             setLoading(false)
@@ -78,14 +78,14 @@ const App = () => {
                             <Text className="text-txt text-center font-open-sans">Sign in to manage your fleet</Text>
                         </View>
                         <ThemedInputText
-                            containerStyles={"bg-white w-full p-5 mt-[30px]"}
+                            containerStyles={"bg-white w-full p-5"}
                             placeholder={"Enter Your username"}
                             onChange={handleChange}
                             name={"username"}
                             value={formState.username}
                         />
                         <ThemedInputText
-                            containerStyles={"bg-white w-full p-5 mt-[15px]"}
+                            containerStyles={"bg-white w-full p-5"}
                             placeholder={"Enter your password"}
                             onChange={handleChange}
                             name={"password"}

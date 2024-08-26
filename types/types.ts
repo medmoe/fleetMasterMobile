@@ -1,27 +1,27 @@
 export interface DriverType {
-    id?: number
-    vehicles?: number[]
+    id?: string
+    vehicle?: string
     first_name: string
     last_name: string
-    email: string
+    email?: string
     phone_number: string
-    licence_number: string
-    licence_expiry_date: string
-    date_of_birth: string
-    address: string
-    city: string
-    state: string
-    zip_code: string
-    country: string
-    hire_date: string
+    licence_number?: string
+    license_expiry_date?: string
+    date_of_birth?: string
+    address?: string
+    city?: string
+    state?: string
+    zip_code?: string
+    country?: string
+    hire_date?: string
     employment_status: string
-    emergency_contact_name: string
-    emergency_contact_phone: string
-    notes: string
+    emergency_contact_name?: string
+    emergency_contact_phone?: string
+    notes?: string
 }
 
 export interface VehicleType {
-    id?: number
+    id?: string
     registration_number?: string
     make?: string
     model?: string
@@ -43,7 +43,7 @@ export interface VehicleType {
 }
 
 export interface UserType {
-    id: number
+    id?: string
     username: string
     first_name?: string
     last_name?: string

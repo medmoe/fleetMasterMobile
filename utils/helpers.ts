@@ -8,3 +8,9 @@ export function zip<T>(...arrays: T[][]): T[][] {
 
     return result;
 }
+
+
+export const isPositiveInteger = (str: string): boolean => {
+    const pattern = new RegExp('^[0-9]\\d*$')
+    return pattern.test(str)
+}
