@@ -11,7 +11,7 @@ import {API} from "@/constants/endpoints";
 import axios from "axios";
 import {DriverType} from "@/types/types";
 import {useGlobalContext} from "@/context/GlobalProvider";
-import {handleAuthenticationErrors} from "@/utils/authentication";
+import {handleAuthenticationErrors, handleGeneralErrors} from "@/utils/authentication";
 import {driverStatus} from "@/constants/constants";
 import {Spinner} from "@/components";
 import {isPositiveInteger} from "@/utils/helpers";
@@ -40,6 +40,7 @@ const Driver = () => {
         last_name: "",
         phone_number: "",
         employment_status: driverStatus.active,
+        vehicle: vehicles[0][0],
     })
     const [dates, setDates] = useState<DatesType>({
         date_of_birth: new Date(),
@@ -91,9 +92,9 @@ const Driver = () => {
                 drivers: responseData.drivers ? [...responseData.drivers, response.data] : [response.data]
             })
             router.replace("/drivers");
-        } catch (error) {
-            console.log(error);
-            Alert.alert(handleAuthenticationErrors(error));
+        } catch (error: any) {
+            const errorMessage = handleGeneralErrors(error);
+            Alert.alert("Error", errorMessage);
         } finally {
             setIsLoading(false);
         }
@@ -113,6 +114,10 @@ const Driver = () => {
                 Alert.alert("Error", error);
                 return false
             }
+        }
+        if (!driverData.license_number) {
+            Alert.alert("Error", "License number is required")
+            return false
         }
         if (!isPositiveInteger(pickers.vehicle)) {
             Alert.alert("Error", "You must assign a truck to the driver.")
@@ -157,9 +162,9 @@ const Driver = () => {
                                                  value={driverData.phone_number}
                                                  onChange={handleChange}
                                                  name={"phone_number"} icon={icons.phone}/>
-                                <ThemedInputText containerStyles={"bg-background p-5"} placeholder={"Licence number"}
-                                                 value={driverData.licence_number || ""}
-                                                 onChange={handleChange} name={"licence_number"}/>
+                                <ThemedInputText containerStyles={"bg-background p-5"} placeholder={"License number"}
+                                                 value={driverData.license_number || ""}
+                                                 onChange={handleChange} name={"license_number"}/>
                                 <View className={"flex-row"}>
                                     <View className={"justify-center p-4"}>
                                         <Text className={"text-txt font-open-sans text-sm"}>Licence expiry date</Text>

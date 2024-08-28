@@ -1,4 +1,7 @@
 import * as SecureStore from "expo-secure-store";
+import {err} from "react-native-svg";
+
+const UNKNOWN_ERROR_MESSAGE = "An error occurred. Please try again"
 
 interface Headers {
     'set-cookie'?: string[];
@@ -36,7 +39,7 @@ export const handleAuthenticationErrors = (error: any): string => {
         return "No response from server. Please try again later."
     } else {
         console.error("Error message:", error.message);
-        return "An error occurred. Please try again"
+        return UNKNOWN_ERROR_MESSAGE
     }
 };
 
@@ -50,8 +53,19 @@ export const handleGeneralErrors = (error: any): string => {
      * @return {String} An error message that describes the error.
      *
      */
+    if (error.response) {
+        const errorMessages = [];
+        for (const key in error.response.data) {
+            if (error.response.data[key]){
+                errorMessages.push(...error.response.data[key]);
+            }
+        }
+        return errorMessages.join("\n") || UNKNOWN_ERROR_MESSAGE;
+    } else {
+        console.error("Error message:", error.message);
+        return UNKNOWN_ERROR_MESSAGE
+    }
 
-    return ""
 }
 
 export const saveToken = async (key: string, value: string): Promise<boolean> => {

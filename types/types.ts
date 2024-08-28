@@ -5,7 +5,7 @@ export interface DriverType {
     last_name: string
     email?: string
     phone_number: string
-    licence_number?: string
+    license_number?: string
     license_expiry_date?: string
     date_of_birth?: string
     address?: string
