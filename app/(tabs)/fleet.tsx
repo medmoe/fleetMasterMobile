@@ -1,6 +1,6 @@
 import React from 'react';
 import {SafeAreaView, Text, View} from 'react-native';
-import {TableEntry, ThemedButton} from "@/components";
+import {ThemedButton, Vehicle} from "@/components";
 import {router} from "expo-router";
 import {useGlobalContext} from "@/context/GlobalProvider";
 
@@ -12,30 +12,17 @@ const Fleet = () => {
     return (
         <SafeAreaView>
             <View className={"w-full justify-center items-center"}>
-                <View className={"w-[94%] bg-white rounded pt-5 pl-5 pb-5"}>
+                <View className={"w-[94%] bg-white rounded p-5"}>
                     <View>
                         <Text className={"font-semibold text-base text-txt"}>Vehicle's list</Text>
                     </View>
                     <View className={"mt-5"}>
                         <Text className={"font-open-sans text-txt"}>Here is the list of vehicles.</Text>
                     </View>
-                    <View className={"mt-5"}>
-                        <TableEntry name={"Name"}
-                                    numeric={"Mileage"}
-                                    status={"Status"}
-                                    note={"Note"}
-                                    containerStyles={"mb-3"}
-                                    textStyles={"text-default font-semibold"}
-                        />
+                    <View>
                         {responseData.vehicles?.map((vehicle, idx) => {
                             return (
-                                <TableEntry name={`${vehicle.make} ${vehicle.model} ${vehicle.registration_number}`}
-                                            numeric={vehicle.mileage}
-                                            status={vehicle.status === "ACTIVE"}
-                                            note={vehicle.notes}
-                                            textStyles={"font-merriweather-regular text-txt"}
-                                            key={idx}
-                                />
+                                <Vehicle vehicle={vehicle} onPress={() => console.log("pressed")} key={idx}/>
                             )
                         })}
                     </View>

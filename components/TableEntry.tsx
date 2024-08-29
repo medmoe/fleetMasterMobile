@@ -14,7 +14,7 @@ interface TableEntryProps {
 const TableEntry = ({name, numeric, status, note, containerStyles, textStyles}: TableEntryProps) => {
 
     return (
-        <View className={`${containerStyles} flex-row`}>
+        <View className={`${containerStyles} flex-row pt-2 pb-2`}>
             <View className={"flex-1 p-1.5 justify-center"}>
                 <Text className={`${textStyles}`} numberOfLines={1}>{name}</Text>
             </View>
