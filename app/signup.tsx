@@ -3,7 +3,7 @@ import {Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View} from 'rea
 import {Link, useRouter} from "expo-router";
 import axios from "axios";
 import {API} from "@/constants/endpoints";
-import {handleCookies, handleError} from "@/utils/authentication";
+import {handleCookies, handleAuthenticationErrors} from "@/utils/authentication";
 import {SafeAreaView} from "react-native-safe-area-context";
 import Spinner from "@/components/Spinner";
 import ThemedInputText from "@/components/ThemedInputText";
@@ -27,7 +27,7 @@ export type FormState = {
 
 const SignUp = () => {
     const router = useRouter();
-    const api = axios.create({baseURL: `${API}`})
+    const api = axios.create({baseURL: `${API}accounts/`})
     const [formState, setFormState] = useState<FormState>({
         user: {
             username: "",
@@ -89,7 +89,7 @@ const SignUp = () => {
 
         } catch (error) {
             // Handle errors
-            const errorMessage = handleError(error);
+            const errorMessage = handleAuthenticationErrors(error);
             Alert.alert('Error', errorMessage);
         } finally {
             setLoading(false);
@@ -137,7 +137,7 @@ const SignUp = () => {
                             <ThemedButton
                                 title={"Continue"}
                                 handlePress={submitForm}
-                                containerStyles={"w-full mt-[50px] bg-primary"}
+                                containerStyles={"w-full mt-[50px] bg-primary p-5 rounded-[50%]"}
                                 textStyles={"text-white font-semibold text-base"}
                             />
                             <View className={"mt-[25px]"}>

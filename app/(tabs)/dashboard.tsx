@@ -1,10 +1,13 @@
 import React from 'react';
 import {SafeAreaView} from "react-native-safe-area-context";
 import {ScrollView, Text, View} from "react-native";
-import {drivers, maintenanceData, trucks} from "@/constants/fixtures";
+import {maintenanceData} from "@/constants/fixtures";
 import TableEntry from "@/components/TableEntry";
+import {useGlobalContext} from "@/context/GlobalProvider";
+import {driverStatus, vehicleStatus} from "@/constants/constants";
 
 const Dashboard = () => {
+    const {responseData} = useGlobalContext()
     const handlePress = () => {
 
     }
@@ -12,7 +15,7 @@ const Dashboard = () => {
         <SafeAreaView>
             <ScrollView>
                 <View className={"w-full justify-center items-center gap-3"}>
-                    <View className={"w-[90%] bg-white rounded pt-5 pl-5 pb-5"}>
+                    <View className={"w-[94%] bg-white rounded pt-5 pl-5 pb-5"}>
                         <View>
                             <Text className={"font-merriweather-bold text-txt"}>Drivers Overview</Text>
                         </View>
@@ -24,12 +27,12 @@ const Dashboard = () => {
                                         containerStyles={"mb-3"}
                                         textStyles={"text-default font-merriweather-regular"}
                             />
-                            {drivers.map(([name, grade, status, note], idx) => {
+                            {responseData.drivers?.map((driver, idx) => {
                                 return (
-                                    <TableEntry name={name}
-                                                numeric={grade}
-                                                status={status}
-                                                note={note}
+                                    <TableEntry name={`${driver.first_name} ${driver.last_name}`}
+                                                numeric={"To be implemented"}
+                                                status={driver.employment_status === driverStatus.active}
+                                                note={driver.notes}
                                                 textStyles={"font-merriweather-regular text-txt"}
                                                 key={idx}
                                     />
@@ -37,7 +40,7 @@ const Dashboard = () => {
                             })}
                         </View>
                     </View>
-                    <View className={"w-[90%] bg-white rounded pt-5 pl-5 pb-5"}>
+                    <View className={"w-[94%] bg-white rounded pt-5 pl-5 pb-5"}>
                         <View>
                             <Text className={"font-merriweather-bold text-txt"}>Trucks Overview</Text>
                         </View>
@@ -50,13 +53,13 @@ const Dashboard = () => {
                                 containerStyles={"mb-3"}
                                 textStyles={"text-default font-merriweather-regular"}
                             />
-                            {trucks.map(([name, status, mileage, note], idx) => {
+                            {responseData.vehicles?.map((vehicle, idx) => {
                                 return (
                                     <TableEntry
-                                        name={name}
-                                        numeric={mileage}
-                                        status={status}
-                                        note={note}
+                                        name={`${vehicle.make} ${vehicle.model} ${vehicle.registration_number}`}
+                                        numeric={vehicle.mileage}
+                                        status={vehicle.status === vehicleStatus.active}
+                                        note={vehicle.notes}
                                         key={idx}
                                         textStyles={"font-merriweather-regular text-txt"}
                                     />
@@ -64,7 +67,7 @@ const Dashboard = () => {
                             })}
                         </View>
                     </View>
-                    <View className={"w-[90%] bg-white rounded pt-5 pl-5 pb-5"}>
+                    <View className={"w-[94%] bg-white rounded pt-5 pl-5 pb-5"}>
                         <View>
                             <Text className={"font-merriweather-bold text-txt"}>Maintenance Overview</Text>
                         </View>

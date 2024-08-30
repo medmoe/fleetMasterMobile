@@ -1,4 +1,4 @@
-export const icons: {[key: string]: any} = {
+export const icons: { [key: string]: any } = {
     dashboard: require("../assets/icons/dashboard.png"),
     fleet: require("../assets/icons/fleet.png"),
     drivers: require("../assets/icons/drivers.png"),
@@ -10,4 +10,9 @@ export const icons: {[key: string]: any} = {
     logout: require("../assets/icons/logout.png"),
     active: require("../assets/icons/active.png"),
     inactive: require("../assets/icons/inactive.png"),
+    add: require("../assets/icons/add.png"),
+    mail: require("../assets/icons/mail.png"),
+    phone: require("../assets/icons/phone.png"),
+    calendar: require("../assets/icons/calendar.png"),
+
 }

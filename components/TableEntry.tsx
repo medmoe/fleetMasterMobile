@@ -4,7 +4,7 @@ import {icons} from "@/constants/icons";
 
 interface TableEntryProps {
     name: string,
-    numeric: number | string,
+    numeric: string | undefined,
     status: boolean | string,
     note?: string
     containerStyles?: string
@@ -14,14 +14,14 @@ interface TableEntryProps {
 const TableEntry = ({name, numeric, status, note, containerStyles, textStyles}: TableEntryProps) => {
 
     return (
-        <View className={`${containerStyles} flex-row`}>
-            <View className={"flex-1"}>
+        <View className={`${containerStyles} flex-row pt-2 pb-2`}>
+            <View className={"flex-1 p-1.5 justify-center"}>
                 <Text className={`${textStyles}`} numberOfLines={1}>{name}</Text>
             </View>
-            <View className={"flex-1"}>
+            <View className={"flex-1 p-1.5 justify-center"}>
                 <Text className={`${textStyles}`} numberOfLines={1}>{numeric}</Text>
             </View>
-            <View className={"flex-1"}>{typeof status === 'boolean'?
+            <View className={"flex-1 p-1.5 justify-center items-center"}>{typeof status === 'boolean'?
                 status?
                     <Image source={icons.active}
                            resizeMode={"contain"}
@@ -31,7 +31,7 @@ const TableEntry = ({name, numeric, status, note, containerStyles, textStyles}: 
                            className={"w-6 h-6"} />:
                 <Text className={`${textStyles}`} numberOfLines={1}>{status}</Text>
             }</View>
-            <View className={"flex-1"}>
+            <View className={"flex-1 p-1.5 justify-center"}>
                 <Text className={`${textStyles}`} numberOfLines={1} ellipsizeMode={"tail"}>{note}</Text>
             </View>
         </View>

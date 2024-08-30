@@ -3,15 +3,13 @@ import {Stack} from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, {useEffect} from 'react';
 import 'react-native-reanimated';
-import {StatusBar} from "expo-status-bar";
+import {GlobalProvider} from "@/context/GlobalProvider";
 
-import {useColorScheme} from '@/hooks/useColorScheme';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-    const colorScheme = useColorScheme();
     const [loaded, error] = useFonts({
         MerriweatherBold: require('../assets/fonts/Merriweather-Bold.ttf'),
         MerriweatherRegular: require("../assets/fonts/Merriweather-Regular.ttf"),
@@ -33,12 +31,16 @@ export default function RootLayout() {
     }
 
     return (
-
+        <GlobalProvider>
             <Stack>
                 <Stack.Screen name="index" options={{headerShown: false}}/>
-                <Stack.Screen name="signup" options={{headerShown: false }} />
-                <Stack.Screen name="(tabs)" options={{headerShown: false}} />
+                <Stack.Screen name="signup" options={{headerShown: false}}/>
+                <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
+                <Stack.Screen name="forms" options={{headerShown: false}}/>
+                <Stack.Screen name="details" options={{headerShown: false}} />
             </Stack>
+        </GlobalProvider>
+
 
     );
 }

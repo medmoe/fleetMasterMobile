@@ -6,21 +6,24 @@ interface ThemedButtonProps {
     handlePress: () => void,
     containerStyles: string,
     textStyles?: string,
+    iconStyles?: string,
     isLoading?: boolean,
     icon?: ImageSourcePropType,
 }
 
-const ThemedButton = ({title, handlePress, containerStyles, textStyles, isLoading, icon}: ThemedButtonProps) => {
+const ThemedButton = ({title, handlePress, containerStyles, textStyles, isLoading, icon, iconStyles}: ThemedButtonProps) => {
     return (
         <TouchableOpacity
-            className={`rounded-[50%] justify-center items-center min-h-[60px] flex-row ${containerStyles} ${isLoading? 'opacity-50': ''}`}
+            className={`justify-center items-center flex-row ${containerStyles} ${isLoading? 'opacity-50': ''}`}
             onPress={handlePress}
             activeOpacity={0.7}
             disabled={isLoading}
         >
-            <View className="mr-[15px]">
-                <Image source={icon} />
-            </View>
+            {icon?
+            <View className={`${iconStyles}`}>
+                <Image source={icon} resizeMode={"contain"} className={"w-20"}/>
+            </View> : <></>
+            }
             <Text className={`${textStyles}`}>{title}</Text>
         </TouchableOpacity>
     );
