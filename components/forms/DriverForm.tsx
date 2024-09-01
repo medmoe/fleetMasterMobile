@@ -2,45 +2,13 @@ import React from 'react';
 import {Text, View} from 'react-native';
 import ThemedInputText, {ThemedInputTextProps} from "@/components/ThemedInputText";
 import {icons} from "@/constants/icons";
-import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
-import countries from "@/constants/countries.json";
-import {driverStatus} from "@/constants/constants";
 import ThemedButton from "@/components/ThemedButton";
-import {DriverType, PickerItemType} from "@/types/types";
-import {CustomDatePicker, CustomPicker} from "@/components/index";
+import {DriverType} from "@/types/types";
+import {CustomDatePicker, CustomPicker} from "@/components";
+import {DriverFormProps} from "@/types/driver";
+import {countriesLst, driverStatuses} from "@/constants/forms/driver";
 
-export interface DatesType {
-    date_of_birth: Date
-    license_expiry_date: Date
-    hire_date: Date
-}
 
-export interface PickerType {
-    country: string
-    status: string
-    vehicle: string
-}
-
-interface DriverFormProps {
-    handleChange: (name: string, value: string) => void
-    driverData: DriverType
-    handleDateChange: (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => void
-    handlePickerChange: (value: number | null | string, name: string) => void
-    submitForm: () => void
-    cancelSubmission: () => void
-    dates: DatesType
-    pickers: PickerType
-    vehicles: PickerItemType[]
-}
-
-const countriesLst: PickerItemType[] = countries.map((country) => {
-    return {label: `${country.name} ${country.emoji}`, value: country.name}
-})
-const driverStatuses: PickerItemType[] = [
-    {label: "Active", value: driverStatus.active},
-    {label: "Inactive", value: driverStatus.inactive},
-    {label: "On leave", value: driverStatus.on_leave}
-]
 const createFirstInputTextPropsBlock = (driverData: DriverType, handleChange: (name: string, value: string) => void): ThemedInputTextProps[] =>
     [
         {placeholder: "First name", value: driverData.first_name, onChange: handleChange, name: "first_name"},
@@ -62,16 +30,7 @@ const createThirdInputTextPropsBlock = (driverData: DriverType, handleChange: (n
         {placeholder: "Emergency contact phone", value: driverData.emergency_contact_phone || "", onChange: handleChange, name: "emergency_contact_phone"},
         {placeholder: "Notes", value: driverData.notes || "", onChange: handleChange, name: "notes"}
     ]
-const DriverForm = ({
-                        handleChange,
-                        driverData,
-                        handleDateChange,
-                        handlePickerChange,
-                        dates, pickers,
-                        vehicles,
-                        submitForm,
-                        cancelSubmission
-                    }: DriverFormProps) => {
+const DriverForm = ({handleChange, driverData, handleDateChange, dates, pickers, vehicles, submitForm, cancelSubmission}: DriverFormProps) => {
     return (
         <View className={"w-full justify-center items-center"}>
             <View className={"w-[94%] bg-white rounded p-5"}>
@@ -90,13 +49,13 @@ const DriverForm = ({
                     {createSecondInputTextPropsBlock(driverData, handleChange).map(({placeholder, value, onChange, name}, idx) => {
                         return <ThemedInputText placeholder={placeholder} value={value} onChange={onChange} name={name} key={idx} containerStyles={"bg-background p-5"}/>
                     })}
-                    <CustomPicker name={"country"} value={pickers.country} items={countriesLst} handlePickerChange={handlePickerChange}/>
+                    <CustomPicker name={"country"} value={pickers.country} items={countriesLst} handleChange={handleChange}/>
                     <CustomDatePicker date={dates.hire_date} handleChange={handleDateChange} label={"Hire date"} name={"hire_date"}/>
-                    <CustomPicker name={"status"} value={pickers.status} items={driverStatuses} handlePickerChange={handlePickerChange}/>
+                    <CustomPicker name={"status"} value={pickers.status} items={driverStatuses} handleChange={handleChange}/>
                     {createThirdInputTextPropsBlock(driverData, handleChange).map(({placeholder, value, onChange, name}, idx) => {
                         return <ThemedInputText placeholder={placeholder} value={value} onChange={onChange} name={name} key={idx} containerStyles={"bg-background p-5"}/>
                     })}
-                    <CustomPicker name={"vehicle"} value={pickers.vehicle} items={vehicles} handlePickerChange={handlePickerChange}/>
+                    <CustomPicker name={"vehicle"} value={pickers.vehicle} items={vehicles} handleChange={handleChange}/>
                 </View>
                 <ThemedButton title={"Submit"} handlePress={submitForm} containerStyles="w-full bg-primary p-5 rounded-[50%]" textStyles={"text-white font-semibold text-base"}/>
                 <ThemedButton title={"Cancel"} handlePress={cancelSubmission} containerStyles="w-full bg-error p-5 rounded-[50%] mt-[10px]" textStyles={"text-white font-semibold text-base"}/>

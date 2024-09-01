@@ -6,17 +6,13 @@ interface CustomPickerProps {
     name: string
     value: string
     items: PickerItemType[]
-    handlePickerChange: (value: number | null | string, name: string) => void
+    handleChange: (name: string, value: string) => void
 }
 
-const CustomPicker = ({name, value, items, handlePickerChange}: CustomPickerProps) => {
+const CustomPicker = ({name, value, items, handleChange}: CustomPickerProps) => {
     return (
-        <Picker onValueChange={(value) => handlePickerChange(value, name)} selectedValue={value}>
-            {items.map((item, idx) => {
-                return (
-                    <Picker.Item label={item.label} value={item.value} key={idx}/>
-                )
-            })}
+        <Picker onValueChange={(value) => handleChange(name, value)} selectedValue={value}>
+            {items.map((item, idx) => <Picker.Item label={item.label} value={item.value} key={idx}/>)}
         </Picker>
     );
 };

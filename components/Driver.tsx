@@ -1,8 +1,8 @@
 import React from 'react';
 import {View, Text, Pressable} from 'react-native';
 import {DriverType} from '@/types/types';
-import {driverStatus} from "@/constants/constants";
 import {ListItemDetail} from "@/components/index";
+import {driverStatus} from "@/constants/forms/driver";
 
 interface DriverProps {
     driver: DriverType

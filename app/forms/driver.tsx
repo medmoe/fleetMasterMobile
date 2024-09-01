@@ -10,7 +10,7 @@ import {handleGeneralErrors} from "@/utils/authentication";
 import {driverStatus} from "@/constants/constants";
 import {DriverForm, Spinner} from "@/components";
 import {isPositiveInteger} from "@/utils/helpers";
-import {DatesType, PickerType} from "@/components/DriverForm";
+import {DatesType, PickerType} from "@/components/forms/DriverForm";
 
 
 const Driver = () => {

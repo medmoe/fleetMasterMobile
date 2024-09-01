@@ -1,0 +1,24 @@
+import {PickerItemType} from "@/types/types";
+import countries from "@/constants/countries.json";
+import {TEXT_ERROR, TEXT_SUCCESS, TEXT_WARNING} from "@/constants/constants";
+
+export const driverStatus = {
+    active: "ACTIVE",
+    inactive: "INACTIVE",
+    on_leave: "ON_LEAVE",
+}
+
+export const driverStatusMapping: {[key: string]: [string, string]} = {
+    "ACTIVE": [TEXT_SUCCESS, "Active"],
+    "INACTIVE": [TEXT_WARNING, "Inactive"],
+    "ON_LEAVE": [TEXT_ERROR, "On leave"],
+}
+
+export const countriesLst: PickerItemType[] = countries.map((country) => {
+    return {label: `${country.name} ${country.emoji}`, value: country.name}
+})
+export const driverStatuses: PickerItemType[] = [
+    {label: "Active", value: driverStatus.active},
+    {label: "Inactive", value: driverStatus.inactive},
+    {label: "On leave", value: driverStatus.on_leave}
+]
