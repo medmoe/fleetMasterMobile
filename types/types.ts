@@ -61,3 +61,8 @@ export interface ResponseDataType {
     drivers?: DriverType[]
     vehicles?: VehicleType[]
 }
+
+export interface PickerItemType {
+    label: string
+    value: string
+}
