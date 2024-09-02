@@ -7,12 +7,6 @@ export interface DriverDatesType {
     hire_date: Date
 }
 
-export interface DriverPickerType {
-    country: string
-    status: string
-    vehicle: string
-}
-
 export interface DriverFormProps {
     handleChange: (name: string, value: string) => void
     driverData: DriverType
@@ -20,6 +14,5 @@ export interface DriverFormProps {
     submitForm: () => void
     cancelSubmission: () => void
     dates: DriverDatesType
-    pickers: DriverPickerType
     vehicles: PickerItemType[]
 }

@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {VehicleType} from "@/types/types";
 import {Pressable, View, Text} from "react-native";
-import {ListItemDetail} from "@/components/index";
-import {vehicleStatusMapping} from "@/constants/constants";
+import ListItemDetail from "@/components/ListItemDetail";
+import {vehicleStatusMapping} from "@/constants/forms/vehicle";
 
 interface VehicleProps {
     vehicle: VehicleType
@@ -11,6 +11,7 @@ interface VehicleProps {
 
 
 const Vehicle = ({vehicle, onPress}: VehicleProps) => {
+    const [style, label] = vehicleStatusMapping[vehicle.status];
     return (
         <Pressable>
             <View className={"flex-row p-[16px] bg-white rounded shadow mt-3"}>
@@ -22,7 +23,7 @@ const Vehicle = ({vehicle, onPress}: VehicleProps) => {
                     <ListItemDetail label={"Next service due"} value={vehicle.next_service_due} />
                 </View>
                 <View className={"justify-center items-center"}>
-                    <Text className={`text-sm ${vehicleStatusMapping[vehicle.status][0]}`}>{vehicleStatusMapping[vehicle.status][1]}</Text>
+                    <Text className={`text-sm ${style}`}>{label}</Text>
                 </View>
             </View>
         </Pressable>

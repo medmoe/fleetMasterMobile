@@ -1,8 +1,8 @@
 import React from 'react';
-import {View, Text, Pressable} from 'react-native';
+import {Pressable, Text, View} from 'react-native';
 import {DriverType} from '@/types/types';
-import {ListItemDetail} from "@/components/index";
-import {driverStatus} from "@/constants/forms/driver";
+import ListItemDetail from "@/components/ListItemDetail";
+import {driverStatusMapping} from "@/constants/forms/driver";
 
 interface DriverProps {
     driver: DriverType
@@ -11,7 +11,8 @@ interface DriverProps {
 
 // This function wraps common parts to display driver's details
 
-const Driver = ({driver, onPress}: DriverProps) => {
+const DriverCardComponent = ({driver, onPress}: DriverProps) => {
+    const [style, label] = driverStatusMapping[driver.employment_status];
     return (
         <Pressable onPress={onPress}>
             <View className={"flex-row p-[16px] bg-white rounded-[10px] shadow mt-3"}>
@@ -23,14 +24,11 @@ const Driver = ({driver, onPress}: DriverProps) => {
                     <ListItemDetail label="Assigned vehicle" value={driver.vehicle}/>
                 </View>
                 <View className={"justify-center items-center"}>
-                    {driver.employment_status === driverStatus.active ?
-                        <Text className={"text-sm text-success"}>Active</Text> :
-                        <Text className={"text-sm text-error"}>{driver.employment_status}</Text>
-                    }
+                    <Text className={`${style} text-sm`}>{label}</Text>
                 </View>
             </View>
         </Pressable>
     )
 }
 
-export default Driver;
+export default DriverCardComponent;
