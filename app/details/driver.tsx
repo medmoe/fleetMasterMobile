@@ -3,20 +3,26 @@ import {SafeAreaView, ScrollView, Text, View} from 'react-native';
 import {useGlobalContext} from "@/context/GlobalProvider";
 import {ListItemDetail, ThemedButton} from "@/components";
 import {icons} from "@/constants/icons";
-import {DriverType} from "@/types/types";
+import {DriverType, VehicleType} from "@/types/types";
 import {router} from "expo-router";
+import {getVehicleName} from "@/utils/helpers";
 
-const getDriverDetails = (driverData: DriverType): { label: string, value: string }[] => {
+const getDriverDetails = (vehicles: VehicleType[] | undefined, driverData: DriverType): { label: string, value: string }[] => {
     return Object.entries(driverData).map(([label, value]) => {
         label = label.charAt(0).toUpperCase() + label.slice(1).replace(/_/g, " ");
+        if (label === "Vehicle") {
+            value = getVehicleName(vehicles, driverData);
+        }
         return {label, value}
     })
 }
 
 const DriverDetails = () => {
-    const {currentDriver} = useGlobalContext();
+    const {currentDriver, responseData} = useGlobalContext();
+
     const {id, profile_picture, created_at, updated_at, profile, ...driverData} = currentDriver;
-    const details = getDriverDetails(driverData);
+    const details = getDriverDetails(responseData.vehicles, driverData);
+    console.log(details)
     const handleUpdate = () => {
 
     }
@@ -24,7 +30,7 @@ const DriverDetails = () => {
 
     }
     const handleCancel = () => {
-        router
+        router.replace("/drivers");
     };
     return (
         <SafeAreaView>

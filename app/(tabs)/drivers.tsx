@@ -27,7 +27,13 @@ const Drivers = () => {
                             <Text className={"font-open-sans text-txt"}>Here is the list of drivers</Text>
                         </View>
                         <View>
-                            {responseData.drivers?.map((driver, idx) => <DriverCardComponent driver={driver} onPress={() => handlePress(driver)} key={idx}/>)}
+                            {responseData.drivers?.map((driver, idx) =>
+                                <DriverCardComponent
+                                    driver={driver}
+                                    onPress={() => handlePress(driver)}
+                                    vehicles={responseData.vehicles}
+                                    key={idx}
+                                />)}
                         </View>
                         <View className={"w-full pt-5"}>
                             <ThemedButton
