@@ -9,7 +9,7 @@ interface DriverProps {
     onPress: () => void
 }
 
-// This function wraps common parts to display driver's details
+// This function wraps common parts to display driver's path
 
 const DriverCardComponent = ({driver, onPress}: DriverProps) => {
     const [style, label] = driverStatusMapping[driver.employment_status];

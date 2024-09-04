@@ -18,6 +18,10 @@ export interface DriverType {
     emergency_contact_name?: string
     emergency_contact_phone?: string
     notes?: string
+    profile?: string
+    created_at?: string
+    updated_at?: string
+    profile_picture?: string
 }
 
 export interface VehicleType {

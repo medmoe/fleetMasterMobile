@@ -13,7 +13,7 @@ const Drivers = () => {
     }
     const handlePress = (driver: DriverType): void => {
         setCurrentDriver(driver)
-        router.replace("/details/driver")
+        router.replace("/details/driver");
     }
     return (
         <SafeAreaView>

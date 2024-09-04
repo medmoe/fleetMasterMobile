@@ -1,11 +1,13 @@
-import {Text} from "react-native";
+import {Text, View} from "react-native";
 import React from "react";
 
-function ListItemDetail({label, value}: { label: string, value: string | undefined }) {
+function ListItemDetail({label, value, containerStyle}: { label: string, value: string | undefined, containerStyle: string | undefined }) {
     return (
-        <Text className={"text-txt text-sm font-open-sans"}>
-            <Text className={"text-default text-sm font-open-sans"}>{label}:</Text> {value}
-        </Text>
+        <View className={`${containerStyle}`}>
+            <Text className={"text-txt text-sm font-open-sans"}>
+                <Text className={"text-default text-sm font-open-sans"}>{label}:</Text> {value}
+            </Text>
+        </View>
     );
 }
 

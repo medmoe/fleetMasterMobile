@@ -14,5 +14,6 @@ export const icons: { [key: string]: any } = {
     mail: require("../assets/icons/mail.png"),
     phone: require("../assets/icons/phone.png"),
     calendar: require("../assets/icons/calendar.png"),
-
+    pen: require("../assets/icons/pen.png"),
+    trash: require("../assets/icons/trash.png"),
 }

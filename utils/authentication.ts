@@ -16,7 +16,7 @@ export const handleAuthenticationErrors = (error: any): string => {
      *
      * This function, through one of the many conditions, checks if the error object has a response, a request, or a message.
      * Depending upon this information, the function generates a suitable error message.
-     * If the error object contains a response, the function checks if this response has user data or a detail.
+     * If the error object contains a response, the function checks if this response has user data or a details.
      * It then generates an error message from this information.
      * If the error object only contains a request but not a response, the generated error message says that there was no response from the server.
      * If the error object doesn't contain a request but contains a message, the function logs the error message, after which, it generates a general failure message.
