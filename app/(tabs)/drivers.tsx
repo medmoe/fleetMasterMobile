@@ -7,8 +7,9 @@ import {useGlobalContext} from "@/context/GlobalProvider";
 import {DriverType} from "@/types/types";
 
 const Drivers = () => {
-    const {responseData, setCurrentDriver} = useGlobalContext();
+    const {responseData, setCurrentDriver, setIsPostRequest} = useGlobalContext();
     const addDriver = () => {
+        setIsPostRequest(true);
         router.replace("/forms/driver")
     }
     const handlePress = (driver: DriverType): void => {

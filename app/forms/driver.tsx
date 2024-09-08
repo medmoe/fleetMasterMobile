@@ -14,7 +14,7 @@ import {DriverDatesType} from "@/types/driver";
 
 
 const Driver = () => {
-    const {responseData, setResponseData} = useGlobalContext();
+    const {responseData, setResponseData, currentDriver, setCurrentDriver, isPostRequest} = useGlobalContext();
     const vehicles: PickerItemType[] = responseData.vehicles ? responseData.vehicles.map((vehicle) => {
         return {
             label: `${vehicle.make} ${vehicle.model} ${vehicle.year}`,
@@ -22,14 +22,7 @@ const Driver = () => {
         }
     }) : []
     const [isLoading, setIsLoading] = useState(false);
-    const [driverData, setDriverData] = useState<DriverType>({
-        first_name: "",
-        last_name: "",
-        phone_number: "",
-        employment_status: driverStatus.active,
-        vehicle: vehicles[0].value,
-        country: "Algeria",
-    })
+    const [driverData, setDriverData] = useState<DriverType>(currentDriver)
     const [dates, setDates] = useState<DriverDatesType>({
         date_of_birth: new Date(),
         license_expiry_date: new Date(),
@@ -58,13 +51,8 @@ const Driver = () => {
             return;
         }
         try {
-            const response = await axios.post(
-                `${API}drivers/`,
-                driverData,
-                {
-                    headers: {'Content-Type': 'application/json'},
-                    withCredentials: true
-                });
+            const response = isPostRequest ? await axios.post(`${API}drivers/`, driverData, {headers: {'Content-Type': 'application/json'}, withCredentials: true}) :
+                await axios.put(`${API}drivers/${currentDriver.id}/`, driverData, {headers: {"Content-Type": "application/json"}, withCredentials: true});
             setResponseData({
                 ...responseData,
                 drivers: responseData.drivers ? [...responseData.drivers, response.data] : [response.data]

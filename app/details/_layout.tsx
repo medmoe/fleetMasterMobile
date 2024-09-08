@@ -5,6 +5,7 @@ const DetailsLayout = () => {
     return (
         <Stack>
             <Stack.Screen name="driver" options={{headerShown: false}}/>
+            <Stack.Screen name="update-driver" options={{headerShown: false}} />
         </Stack>
     )
 };

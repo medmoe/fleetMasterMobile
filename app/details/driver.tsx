@@ -1,11 +1,14 @@
-import React from 'react';
-import {SafeAreaView, ScrollView, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {Alert, SafeAreaView, ScrollView, Text, View} from 'react-native';
 import {useGlobalContext} from "@/context/GlobalProvider";
 import {ListItemDetail, ThemedButton} from "@/components";
 import {icons} from "@/constants/icons";
 import {DriverType, VehicleType} from "@/types/types";
-import {router} from "expo-router";
 import {getVehicleName} from "@/utils/helpers";
+import {router} from "expo-router";
+import {API} from "@/constants/endpoints";
+import axios from "axios";
+import {handleAuthenticationErrors} from "@/utils/authentication";
 
 const getDriverDetails = (vehicles: VehicleType[] | undefined, driverData: DriverType): { label: string, value: string }[] => {
     return Object.entries(driverData).map(([label, value]) => {
@@ -18,16 +21,30 @@ const getDriverDetails = (vehicles: VehicleType[] | undefined, driverData: Drive
 }
 
 const DriverDetails = () => {
-    const {currentDriver, responseData} = useGlobalContext();
-
+    const {currentDriver, responseData, setResponseData, setIsPostRequest} = useGlobalContext();
+    const [isLoading, setIsLoading] = useState(false);
     const {id, profile_picture, created_at, updated_at, profile, ...driverData} = currentDriver;
     const details = getDriverDetails(responseData.vehicles, driverData);
-    console.log(details)
     const handleUpdate = () => {
-
+        setIsPostRequest(false);
+        router.replace("/forms/driver");
     }
-    const handleDelete = () => {
-
+    const handleDelete = async () => {
+        setIsLoading(true);
+        try {
+            const _ = await axios.delete(`${API}drivers/${currentDriver.id}/`)
+            const drivers = responseData.drivers?.filter(driver => driver.id !== currentDriver.id)
+            setResponseData({
+                ...responseData,
+                drivers: drivers
+            })
+            router.replace("/drivers")
+        } catch (error) {
+            const errorMessage: string = handleAuthenticationErrors(error);
+            Alert.alert("Error", errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
     }
     const handleCancel = () => {
         router.replace("/drivers");

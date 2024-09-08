@@ -11,6 +11,8 @@ interface ContextProps {
     setResponseData: (data: ResponseDataType) => void
     currentDriver: DriverType
     setCurrentDriver: (driver: DriverType) => void
+    isPostRequest: boolean
+    setIsPostRequest: (isPostRequest: boolean) => void
 }
 
 const GlobalContext = createContext<ContextProps>({
@@ -29,7 +31,9 @@ const GlobalContext = createContext<ContextProps>({
         last_name: "",
         phone_number: "",
         employment_status: driverStatus.active
-    }
+    },
+    setIsPostRequest: () => {},
+    isPostRequest: true
 })
 
 export const useGlobalContext = () => useContext(GlobalContext);
@@ -48,6 +52,7 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({children}) => {
         phone_number: "",
         employment_status: driverStatus.active,
     });
+    const [isPostRequest, setIsPostRequest] = useState(true)
     return (
         <GlobalContext.Provider
             value={{
@@ -55,6 +60,8 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({children}) => {
                 setResponseData,
                 currentDriver,
                 setCurrentDriver,
+                setIsPostRequest,
+                isPostRequest
             }}
         >
             {children}
