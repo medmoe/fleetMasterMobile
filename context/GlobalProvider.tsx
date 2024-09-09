@@ -15,24 +15,28 @@ interface ContextProps {
     setIsPostRequest: (isPostRequest: boolean) => void
 }
 
+export const currentDriverInitialState: DriverType = {
+    first_name: "",
+    last_name: "",
+    phone_number: "",
+    employment_status: driverStatus.active
+}
+export const responseDataInitialState: ResponseDataType = {
+    user: {
+        username: "",
+        email: "",
+    }
+}
+
 const GlobalContext = createContext<ContextProps>({
     setResponseData: () => {
     },
-    responseData: {
-        user: {
-            username: "",
-            email: "",
-        }
+    responseData: responseDataInitialState,
+    setCurrentDriver: () => {
     },
-    setCurrentDriver: (driver: DriverType) => {
+    currentDriver: currentDriverInitialState,
+    setIsPostRequest: () => {
     },
-    currentDriver: {
-        first_name: "",
-        last_name: "",
-        phone_number: "",
-        employment_status: driverStatus.active
-    },
-    setIsPostRequest: () => {},
     isPostRequest: true
 })
 

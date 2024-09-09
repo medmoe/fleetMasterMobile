@@ -3,13 +3,14 @@ import {ScrollView, Text, View} from 'react-native';
 import {SafeAreaView} from "react-native-safe-area-context";
 import {DriverCardComponent, ThemedButton} from "@/components";
 import {router} from "expo-router";
-import {useGlobalContext} from "@/context/GlobalProvider";
+import {currentDriverInitialState, useGlobalContext} from "@/context/GlobalProvider";
 import {DriverType} from "@/types/types";
 
 const Drivers = () => {
     const {responseData, setCurrentDriver, setIsPostRequest} = useGlobalContext();
     const addDriver = () => {
         setIsPostRequest(true);
+        setCurrentDriver(currentDriverInitialState);
         router.replace("/forms/driver")
     }
     const handlePress = (driver: DriverType): void => {

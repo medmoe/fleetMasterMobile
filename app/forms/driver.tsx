@@ -9,12 +9,11 @@ import {useGlobalContext} from "@/context/GlobalProvider";
 import {handleGeneralErrors} from "@/utils/authentication";
 import {DriverForm, Spinner} from "@/components";
 import {isPositiveInteger} from "@/utils/helpers";
-import {driverStatus} from "@/constants/forms/driver";
 import {DriverDatesType} from "@/types/driver";
 
 
 const Driver = () => {
-    const {responseData, setResponseData, currentDriver, setCurrentDriver, isPostRequest} = useGlobalContext();
+    const {responseData, setResponseData, currentDriver, isPostRequest} = useGlobalContext();
     const vehicles: PickerItemType[] = responseData.vehicles ? responseData.vehicles.map((vehicle) => {
         return {
             label: `${vehicle.make} ${vehicle.model} ${vehicle.year}`,
@@ -53,10 +52,7 @@ const Driver = () => {
         try {
             const response = isPostRequest ? await axios.post(`${API}drivers/`, driverData, {headers: {'Content-Type': 'application/json'}, withCredentials: true}) :
                 await axios.put(`${API}drivers/${currentDriver.id}/`, driverData, {headers: {"Content-Type": "application/json"}, withCredentials: true});
-            setResponseData({
-                ...responseData,
-                drivers: responseData.drivers ? [...responseData.drivers, response.data] : [response.data]
-            })
+            updateResponseData(response, isPostRequest);
             router.replace("/drivers");
         } catch (error: any) {
             const errorMessage = handleGeneralErrors(error);
@@ -99,6 +95,17 @@ const Driver = () => {
             date_of_birth: dates.date_of_birth.toLocaleDateString('en-CA', {year: 'numeric', month: '2-digit', day: '2-digit'}),
             hire_date: dates.hire_date.toLocaleDateString('en-CA', {year: 'numeric', month: '2-digit', day: '2-digit'}),
         }))
+    }
+
+    const updateResponseData = (response: any, isPostRequest: boolean): void => {
+        let drivers;
+        if (isPostRequest) {
+            drivers = responseData.drivers ? [...responseData.drivers, response.data] : [response.data]
+        } else {
+            drivers = responseData.drivers?.filter((driver) => driver.id != currentDriver.id) || []
+            drivers.push(response.data)
+        }
+        setResponseData({...responseData, drivers: drivers})
     }
 
     return (
