@@ -1,18 +1,27 @@
 import React, {createContext, ReactNode, useContext, useState} from "react";
-import {DriverType, ResponseDataType} from "@/types/types";
+import {DriverType, ResponseDataType, VehicleType} from "@/types/types";
 import {driverStatus} from "@/constants/forms/driver";
+import {vehicleStatus, vehicleTypes} from "@/constants/forms/vehicle";
 
 type GlobalProviderProps = {
     children: ReactNode
 }
 
 interface ContextProps {
-    responseData: ResponseDataType,
+    responseData: ResponseDataType
     setResponseData: (data: ResponseDataType) => void
-    currentDriver: DriverType
-    setCurrentDriver: (driver: DriverType) => void
     isPostRequest: boolean
     setIsPostRequest: (isPostRequest: boolean) => void
+    currentItem: DriverType | VehicleType
+    setCurrentItem: (item: DriverType | VehicleType) => void
+}
+
+export const currentVehicleInitialState: VehicleType = {
+    year: "2000",
+    status: vehicleStatus.active,
+    type: vehicleTypes[0].value,
+    mileage: "0",
+    capacity: "0",
 }
 
 export const currentDriverInitialState: DriverType = {
@@ -29,43 +38,30 @@ export const responseDataInitialState: ResponseDataType = {
 }
 
 const GlobalContext = createContext<ContextProps>({
-    setResponseData: () => {
-    },
+    setResponseData: () => {},
     responseData: responseDataInitialState,
-    setCurrentDriver: () => {
-    },
-    currentDriver: currentDriverInitialState,
-    setIsPostRequest: () => {
-    },
-    isPostRequest: true
+    setIsPostRequest: () => {},
+    isPostRequest: true,
+    setCurrentItem: () => {},
+    currentItem: currentVehicleInitialState,
 })
 
 export const useGlobalContext = () => useContext(GlobalContext);
 
 
 export const GlobalProvider: React.FC<GlobalProviderProps> = ({children}) => {
-    const [responseData, setResponseData] = useState<ResponseDataType>({
-        user: {
-            username: "",
-            email: "",
-        }
-    })
-    const [currentDriver, setCurrentDriver] = useState<DriverType>({
-        first_name: "",
-        last_name: "",
-        phone_number: "",
-        employment_status: driverStatus.active,
-    });
-    const [isPostRequest, setIsPostRequest] = useState(true)
+    const [responseData, setResponseData] = useState<ResponseDataType>(responseDataInitialState);
+    const [isPostRequest, setIsPostRequest] = useState(true);
+    const [currentItem, setCurrentItem] = useState<VehicleType | DriverType>(currentVehicleInitialState)
     return (
         <GlobalContext.Provider
             value={{
                 responseData,
                 setResponseData,
-                currentDriver,
-                setCurrentDriver,
                 setIsPostRequest,
-                isPostRequest
+                isPostRequest,
+                setCurrentItem,
+                currentItem,
             }}
         >
             {children}

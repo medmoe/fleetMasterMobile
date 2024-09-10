@@ -1,13 +1,20 @@
 import React from 'react';
 import {SafeAreaView, Text, View} from 'react-native';
-import {ThemedButton, Vehicle} from "@/components";
+import {ThemedButton} from "@/components";
 import {router} from "expo-router";
 import {useGlobalContext} from "@/context/GlobalProvider";
+import VehicleCardComponent from "@/components/VehicleCardComponent";
+import {VehicleType} from "@/types/types";
 
 const Fleet = () => {
-    const {responseData} = useGlobalContext();
+    const {responseData, setCurrentVehicle, setIsPostRequest} = useGlobalContext();
     const addVehicle = () => {
         router.replace("/forms/vehicle");
+    }
+    const handlePress = (vehicle: VehicleType): void => {
+        console.log("Pressed");
+        setCurrentVehicle(vehicle);
+        router.replace("/details/vehicle");
     }
     return (
         <SafeAreaView>
@@ -22,7 +29,7 @@ const Fleet = () => {
                     <View>
                         {responseData.vehicles?.map((vehicle, idx) => {
                             return (
-                                <Vehicle vehicle={vehicle} onPress={() => console.log("pressed")} key={idx}/>
+                                <VehicleCardComponent vehicle={vehicle} onPress={() => handlePress(vehicle)} key={idx}/>
                             )
                         })}
                     </View>
