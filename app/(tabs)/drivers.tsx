@@ -7,15 +7,15 @@ import {currentDriverInitialState, useGlobalContext} from "@/context/GlobalProvi
 import {DriverType} from "@/types/types";
 
 const Drivers = () => {
-    const {responseData, setCurrentDriver, setIsPostRequest} = useGlobalContext();
+    const {responseData, setCurrentItem, setIsPostRequest} = useGlobalContext();
     const addDriver = () => {
         setIsPostRequest(true);
-        setCurrentDriver(currentDriverInitialState);
+        setCurrentItem(currentDriverInitialState);
         router.replace("/forms/driver")
     }
     const handlePress = (driver: DriverType): void => {
-        setCurrentDriver(driver)
-        router.replace("/details/driver");
+        setCurrentItem(driver)
+        router.replace("/details/item-details");
     }
     return (
         <SafeAreaView>

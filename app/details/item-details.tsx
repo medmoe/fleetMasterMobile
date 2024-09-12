@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, SafeAreaView, ScrollView, Alert} from 'react-native';
+import {Alert, SafeAreaView, ScrollView} from 'react-native';
 import {useGlobalContext} from "@/context/GlobalProvider";
 import {DriverType, ResponseDataType, VehicleType} from "@/types/types";
 import {getVehicleName} from "@/utils/helpers";
@@ -7,62 +7,50 @@ import {API} from "@/constants/endpoints";
 import axios from "axios";
 import {router} from "expo-router";
 import {handleAuthenticationErrors} from "@/utils/authentication";
+import {ItemDetailViewer, Spinner} from "@/components";
 
 const getItemDetails = (itemData: DriverType | VehicleType, vehicles?: VehicleType[]): { label: string, value: string }[] => {
     return Object.entries(itemData).map(([label, value]) => {
         label = label.charAt(0).toUpperCase() + label.slice(1).replace(/_/g, " ");
-        if ("phone_number" in itemData) {
-            if (label === "Vehicle") {
-                value = getVehicleName(vehicles, itemData);
-            }
-            if (label === "Employment status") {
-                value = value.charAt(0).toUpperCase() + value.slice(1).replace(/_/g, " ").toLowerCase();
-            }
+        if (isDriver(itemData) && label === "Vehicle") {
+            value = getVehicleName(vehicles, itemData as DriverType);
         } else {
-            if (label === "Status") {
-                value = value.charAt(0).toUpperCase() + value.slice(1).replace(/_/g, " ").toLowerCase();
-            }
+            value = (typeof value === 'string') ? value.charAt(0).toUpperCase() + value.slice(1).replace(/_/g, " ").toLowerCase() : value
         }
         return {label, value}
     })
 }
-
+const updateResponseData = (setResponseData: (data: ResponseDataType) => void, responseData: ResponseDataType, currentItem: DriverType | VehicleType, items?: (DriverType | VehicleType)[]) => {
+    const updateData = {
+        ...responseData,
+        [isDriver(currentItem) ? 'drivers' : 'vehicles']: items
+    }
+    setResponseData(updateData);
+}
 const isDriver = (item: DriverType | VehicleType): boolean => "phone_number" in item;
 
 
 const ItemDetails = () => {
-    const {currentItem, responseData, setResponseData} = useGlobalContext();
+    const {currentItem, responseData, setResponseData, setIsPostRequest} = useGlobalContext();
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const details = getItemDetails(currentItem, responseData.vehicles);
-    const updateResponseData = (responseData: ResponseDataType, currentItem: DriverType | VehicleType, items: (DriverType | VehicleType)[]) => {
-        const updateData = {
-            ...responseData,
-            [isDriver(currentItem) ? 'drivers' : 'vehicles']: items
-        }
-        setResponseData(updateData);
-    }
-    const handleUpdate = () => {
+    const title = isDriver(currentItem) ? "Driver's Detail" : "Vehicle's Detail";
+    const subtitle = `Here are the details of the current ${isDriver(currentItem) ? "driver" : "vehicle"}`;
+    const endpoint = isDriver(currentItem) ? "drivers/" : "vehicles/";
 
+    const handleUpdate = () => {
+        setIsPostRequest(false);
+        router.replace(isDriver(currentItem) ? "/forms/driver" : "/forms/vehicle")
     }
     const handleDelete = async () => {
         setIsLoading(true);
-        const endpoint = "phone_number" in currentItem ? "drivers/" : "vehicles/";
         try {
             await axios.delete(`${API}${endpoint}${currentItem.id}/`)
-            const items = "phone_number" in currentItem ? responseData.drivers : responseData.vehicles;
+            const itemKey = isDriver(currentItem) ? "drivers" : "vehicles";
+            const items = responseData[itemKey]
             const filteredItems = items?.filter(item => item.id !== currentItem.id)
-            if ("phone_number" in currentItem) {
-                setResponseData({
-                    ...responseData,
-                    drivers: filteredItems as DriverType[]
-                })
-            } else {
-                setResponseData({
-                    ...responseData,
-                    vehicles: filteredItems as VehicleType[]
-                })
-            }
-            router.replace("phone_number" in currentItem ? "/drivers" : "/fleet")
+            updateResponseData(setResponseData, responseData, currentItem, filteredItems);
+            router.replace(isDriver(currentItem) ? "/drivers" : "/fleet")
         } catch (error) {
             const errorMessage: string = handleAuthenticationErrors(error);
             Alert.alert("Error", errorMessage);
@@ -70,11 +58,21 @@ const ItemDetails = () => {
             setIsLoading(false);
         }
     }
+    const handleCancel = () => {
+        router.replace(isDriver(currentItem) ? "/drivers" : "/fleet");
+    }
 
     return (
         <SafeAreaView>
             <ScrollView>
-
+                {isLoading ? <Spinner isVisible={isLoading}/> :
+                    <ItemDetailViewer title={title}
+                                      subtitle={subtitle}
+                                      details={details}
+                                      handleUpdate={handleUpdate}
+                                      handleDelete={handleDelete}
+                                      handleCancel={handleCancel}
+                    />}
             </ScrollView>
         </SafeAreaView>
     );

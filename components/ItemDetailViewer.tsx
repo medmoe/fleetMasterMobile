@@ -1,13 +1,13 @@
 import React from 'react';
-import {View, Text, StyleSheet, SafeAreaView, ScrollView} from 'react-native';
+import {SafeAreaView, ScrollView, Text, View} from 'react-native';
 import ListItemDetail from "@/components/ListItemDetail";
-import {ThemedButton} from "@/components/index";
+import ThemedButton from "@/components/ThemedButton";
 import {icons} from "@/constants/icons";
 
 interface ItemDetailViewerProps {
     title: string
     subtitle: string
-    details: {label: string, value: string}[]
+    details: { label: string, value: string }[]
     handleUpdate: () => void
     handleDelete: () => void
     handleCancel: () => void
@@ -25,9 +25,9 @@ const ItemDetailViewer = ({title, subtitle, details, handleUpdate, handleDelete,
                         <Text className={"font-open-sans text-txt"}>{subtitle}</Text>
                     </View>
                     <View className={"flex-1 mt-3"}>
-                        {details.map(({label, value}, idx) => <ListItemDetail label={label} value={value} containerStyle={""} key={idx}/>)}
+                        {details.map(({label, value}, idx) => <ListItemDetail label={label} value={value} containerStyle={"pt-1 pb-1"} key={idx}/>)}
                     </View>
-                    <View className={"flex-row"}>
+                    <View className={"flex-row mt-3"}>
                         <ThemedButton title={"Edit"} handlePress={handleUpdate} containerStyles={"bg-primary p-5 rounded-[50%] flex-1"} textStyles={"text-white font-semibold text-base"}
                                       icon={icons.pen}/>
                         <ThemedButton title={"Delete"} handlePress={handleDelete} containerStyles={"bg-error p-5 rounded-[50%] flex-1"} textStyles={"text-white font-semibold text-base"}
