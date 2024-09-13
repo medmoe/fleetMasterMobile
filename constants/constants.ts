@@ -1,11 +1,8 @@
-export const vehicleStatus = {
-    active: "ACTIVE",
-    in_maintenance: "IN_MAINTENANCE",
-    out_of_service: "OUT_OF_SERVICE",
-}
+export const TEXT_SUCCESS = "text-success";
+export const TEXT_WARNING = "text-secondary";
+export const TEXT_ERROR = "text-error";
 
-export const driverStatus = {
-    active: "ACTIVE",
-    inactive: "INACTIVE",
-    on_leave: "ON_LEAVE",
-}
+
+
+
+

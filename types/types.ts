@@ -18,6 +18,10 @@ export interface DriverType {
     emergency_contact_name?: string
     emergency_contact_phone?: string
     notes?: string
+    profile?: string
+    created_at?: string
+    updated_at?: string
+    profile_picture?: string
 }
 
 export interface VehicleType {
@@ -60,4 +64,9 @@ export interface ResponseDataType {
     zip_code?: string
     drivers?: DriverType[]
     vehicles?: VehicleType[]
+}
+
+export interface PickerItemType {
+    label: string
+    value: string
 }

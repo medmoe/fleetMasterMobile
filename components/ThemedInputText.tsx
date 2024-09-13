@@ -1,8 +1,8 @@
 import React from 'react';
 import {Image, ImageSourcePropType, Text, TextInput, View} from 'react-native';
 
-interface ThemedInputTextProps {
-    containerStyles: string,
+export interface ThemedInputTextProps {
+    containerStyles?: string,
     placeholder: string,
     value: string,
     onChange: (name: string, value: string) => void,

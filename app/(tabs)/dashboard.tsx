@@ -4,7 +4,8 @@ import {ScrollView, Text, View} from "react-native";
 import {maintenanceData} from "@/constants/fixtures";
 import TableEntry from "@/components/TableEntry";
 import {useGlobalContext} from "@/context/GlobalProvider";
-import {driverStatus, vehicleStatus} from "@/constants/constants";
+import {driverStatus} from "@/constants/forms/driver";
+import {vehicleStatus} from "@/constants/forms/vehicle";
 
 const Dashboard = () => {
     const {responseData} = useGlobalContext()

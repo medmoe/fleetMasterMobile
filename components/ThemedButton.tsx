@@ -21,7 +21,7 @@ const ThemedButton = ({title, handlePress, containerStyles, textStyles, isLoadin
         >
             {icon?
             <View className={`${iconStyles}`}>
-                <Image source={icon} resizeMode={"contain"} className={"w-20"}/>
+                <Image source={icon} resizeMode={"contain"} className={"w-5 h-5 mr-2"}/>
             </View> : <></>
             }
             <Text className={`${textStyles}`}>{title}</Text>

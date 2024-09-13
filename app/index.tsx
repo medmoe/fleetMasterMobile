@@ -2,15 +2,13 @@ import React, {useEffect, useState} from 'react';
 import {Alert, Image, ScrollView, Text, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context'
 import {images} from "@/constants/images";
-import ThemedButton from "@/components/ThemedButton";
-import ThemedInputText from "@/components/ThemedInputText";
 import {icons} from "@/constants/icons";
 import {Link, router} from "expo-router";
 import axios from "axios";
 import {API} from "@/constants/endpoints";
-import {handleCookies, handleAuthenticationErrors} from "@/utils/authentication";
-import Spinner from "@/components/Spinner";
+import {handleAuthenticationErrors, handleCookies} from "@/utils/authentication";
 import {useGlobalContext} from "@/context/GlobalProvider";
+import {Spinner, ThemedButton, ThemedInputText} from "@/components";
 
 export type FormState = {
     username: string
