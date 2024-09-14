@@ -17,6 +17,11 @@ const Fleet = () => {
         setCurrentItem(vehicle);
         router.replace("/details/item-details");
     }
+
+    const handleMaintenance = (vehicle: VehicleType) => {
+        setCurrentItem(vehicle);
+        router.replace("/maintenance/maintenance-report");
+    }
     return (
         <SafeAreaView>
             <ScrollView>
@@ -31,7 +36,7 @@ const Fleet = () => {
                         <View>
                             {responseData.vehicles?.map((vehicle, idx) => {
                                 return (
-                                    <VehicleCardComponent vehicle={vehicle} onPress={() => handlePress(vehicle)} key={idx}/>
+                                    <VehicleCardComponent vehicle={vehicle} onPress={() => handlePress(vehicle)} key={idx} handleMaintenance={() => handleMaintenance(vehicle)}/>
                                 )
                             })}
                         </View>

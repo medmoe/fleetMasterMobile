@@ -9,7 +9,7 @@ module.exports = {
                 accent: "#9c27b0",
                 background: "#f5f5f5",
                 txt: "#263238",
-                success: "#57b269",
+                win: "#57b269",
                 error: "#e93c0c",
                 warning: "#ffc107",
                 default: "#9BA1A6",

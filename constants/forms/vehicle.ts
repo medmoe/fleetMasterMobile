@@ -1,9 +1,9 @@
-import {TEXT_ERROR, TEXT_SUCCESS, TEXT_WARNING} from "@/constants/constants";
+import {TEXT_ERROR, TEXT_WIN, TEXT_WARNING} from "@/constants/constants";
 import {PickerItemType} from "@/types/types";
 
 
 export const vehicleStatusMapping: { [key: string]: [string, string] } = {
-    "ACTIVE": [TEXT_SUCCESS, "Active"],
+    "ACTIVE": [TEXT_WIN, "Active"],
     "IN_MAINTENANCE": [TEXT_WARNING, "In maintenance"],
     "OUT_OF_SERVICE": [TEXT_ERROR, "Out of service"],
 }
