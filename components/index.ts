@@ -9,3 +9,5 @@ export {default as DriverForm} from "./forms/DriverForm";
 export {default as CustomPicker} from "./CustomPicker";
 export {default as CustomDatePicker} from "./CustomDatePicker";
 export {default as ItemDetailViewer} from "./ItemDetailViewer";
+export {default as StatCard} from "./StatCard";
+export {default as Percentage} from "./Percentage";
