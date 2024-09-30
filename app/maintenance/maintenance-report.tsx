@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {ImageSourcePropType, SafeAreaView, ScrollView, Text, View} from 'react-native';
 import {CustomDatePicker, ListItemDetail, MaintenanceForm, PartPurchaseEventViewer, StatCard, ThemedButton} from "@/components";
 import {useGlobalContext} from "@/context/GlobalProvider";
@@ -9,6 +9,28 @@ import {icons} from "@/constants/icons";
 import {maintenanceReport, MonthReportType, partPurchaseEvents} from "@/constants/fixtures";
 
 const MaintenanceReport = () => {
+    const [cost, setCost] = useState("0");
+    const [inputValue, setInputValue] = useState<{ id: string, name: string }>({id: "-1", name: ""});
+    const [isPartSelected, setIsSelected] = useState(false);
+    const setIsPartSelected = useCallback((isSelected: boolean) => {
+        setIsSelected(isSelected);
+    }, [])
+    const parts = [
+        {id: '1', name: 'Air Filter'},
+        {id: '2', name: 'Battery'},
+        {id: '3', name: 'Brake Pads'},
+        {id: '4', name: 'Catalytic Converter'},
+        {id: '5', name: 'Engine Oil'},
+        {id: '6', name: 'Fuel Filter'},
+        {id: '7', name: 'Headlights'},
+        {id: '8', name: 'Muffler'},
+        {id: '9', name: 'Oil Filter'},
+        {id: '10', name: 'Radiator'},
+        {id: '11', name: 'Spark Plugs'},
+        {id: '12', name: 'Tire Pressure Sensor'},
+        {id: '13', name: 'Transmission Fluid'},
+        {id: '14', name: 'Wiper Blades'},
+    ];
     const [showMaintenanceForm, setShowMaintenanceForm] = useState<boolean>(false);
     const {currentItem} = useGlobalContext();
     const vehicle = currentItem as VehicleType
@@ -48,6 +70,27 @@ const MaintenanceReport = () => {
     const cancelRecordingMaintenance = () => {
 
     }
+    const selectPart = (name: string, id: string) => {
+        setInputValue(prevState => ({id, name}))
+        setIsSelected(true);
+    }
+
+    const handlePartInputChange = (name: string, value: string): void => {
+        setInputValue(prevState => ({...prevState, name: value}))
+    }
+    const handleDateChange = (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => {
+
+    }
+    const handleEndDateChange = (name: string) => (_: DateTimePickerEvent, date: Date | undefined) =>  {
+
+    }
+    const handleStartDateChange = (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => {
+
+    }
+    const handleCostChange = (name: string, value: string) => {
+        setCost(value);
+    }
+
     return (
         <SafeAreaView>
             <ScrollView>
@@ -103,7 +146,18 @@ const MaintenanceReport = () => {
                         </View>
                     </View>
                     :
-                    <MaintenanceForm/>}
+                    <MaintenanceForm isPartSelected={isPartSelected}
+                                     setIsPartSelected={setIsPartSelected}
+                                     selectPart={selectPart}
+                                     parts={parts}
+                                     handlePartInputChange={handlePartInputChange}
+                                     inputValue={inputValue}
+                                     handleDateChange={handleDateChange}
+                                     handleCostChange={handleCostChange}
+                                     cost={cost}
+                                     handleEndDateChange={handleEndDateChange}
+                                     handleStartDateChange={handleStartDateChange}
+                    />}
             </ScrollView>
         </SafeAreaView>
     );

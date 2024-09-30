@@ -12,7 +12,7 @@ export interface ThemedInputTextProps {
 
 const ThemedInputText = ({containerStyles, placeholder, onChange, value, name, icon}: ThemedInputTextProps) => {
     return (
-        <View className={"mt-2"}>
+        <View className={"mt-2 flex-1"}>
             <Text className={"text-txt text-sm font-open-sans"}>{placeholder}:</Text>
             <View className={`${containerStyles} rounded flex-row items-center`}>
                 {icon && <Image source={icon} resizeMode={"contain"} className={"w-[25px] h-[25px] mr-[10px]"}/>}
