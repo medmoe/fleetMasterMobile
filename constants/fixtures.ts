@@ -212,7 +212,6 @@ export const maintenanceReport: MaintenanceReportType = {
         mechanic: "2000.00",
         electrician: "2500.00",
         cleaning: "500.00"
-
     },
     current_month: {
         total_maintenance: "30",
@@ -227,5 +226,23 @@ export const maintenanceReport: MaintenanceReportType = {
         cleaning: "1700.00"
     }
 };
+
+export const partPurchaseEvents = [
+    {
+        name: "Brake",
+        provider: "Amazon",
+        cost: "$1.1k",
+    },
+    {
+        name: "Exhaust",
+        provider: "Amazon",
+        cost: "$500"
+    },
+    {
+        name: "Wheels",
+        provider: "Amazon",
+        cost: "$900"
+    }
+]
 
 
