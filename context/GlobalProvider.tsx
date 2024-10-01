@@ -2,6 +2,7 @@ import React, {createContext, ReactNode, useContext, useState} from "react";
 import {DriverType, ResponseDataType, VehicleType} from "@/types/types";
 import {driverStatus} from "@/constants/forms/driver";
 import {vehicleStatus, vehicleTypes} from "@/constants/forms/vehicle";
+import {PartProviderType} from "@/types/maintenance";
 
 type GlobalProviderProps = {
     children: ReactNode
@@ -14,6 +15,8 @@ interface ContextProps {
     setIsPostRequest: (isPostRequest: boolean) => void
     currentItem: DriverType | VehicleType
     setCurrentItem: (item: DriverType | VehicleType) => void
+    partProviders: PartProviderType[]
+    setPartProviders: (partProviders: PartProviderType[]) => void
 }
 
 export const currentVehicleInitialState: VehicleType = {
@@ -38,12 +41,18 @@ export const responseDataInitialState: ResponseDataType = {
 }
 
 const GlobalContext = createContext<ContextProps>({
-    setResponseData: () => {},
+    setResponseData: () => {
+    },
     responseData: responseDataInitialState,
-    setIsPostRequest: () => {},
+    setIsPostRequest: () => {
+    },
     isPostRequest: true,
-    setCurrentItem: () => {},
+    setCurrentItem: () => {
+    },
     currentItem: currentVehicleInitialState,
+    setPartProviders: () => {
+    },
+    partProviders: []
 })
 
 export const useGlobalContext = () => useContext(GlobalContext);
@@ -53,6 +62,7 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({children}) => {
     const [responseData, setResponseData] = useState<ResponseDataType>(responseDataInitialState);
     const [isPostRequest, setIsPostRequest] = useState(true);
     const [currentItem, setCurrentItem] = useState<VehicleType | DriverType>(currentVehicleInitialState)
+    const [partProviders, setPartProviders] = useState<PartProviderType[]>([])
     return (
         <GlobalContext.Provider
             value={{
@@ -62,6 +72,8 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({children}) => {
                 isPostRequest,
                 setCurrentItem,
                 currentItem,
+                setPartProviders,
+                partProviders,
             }}
         >
             {children}

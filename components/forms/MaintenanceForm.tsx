@@ -1,13 +1,14 @@
 import React from 'react';
 import {Text, View} from 'react-native';
-import CustomPicker from "@/components/CustomPicker";
-import ThemedButton from "@/components/ThemedButton";
 import AutoPartInput from "@/components/AutoPartInput";
 import Divider from "@/components/Divider";
 import CustomDatePicker from "@/components/CustomDatePicker";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 import ThemedInputText from "@/components/ThemedInputText";
 import MaintenancePicker from "@/components/MaintenancePicker";
+import ThemedButton from "@/components/ThemedButton";
+import {router} from "expo-router";
+import {useGlobalContext} from "@/context/GlobalProvider";
 
 
 interface MaintenanceFormProps {
@@ -21,6 +22,10 @@ interface MaintenanceFormProps {
     handleStartDateChange: (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => void
     handleEndDateChange: (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => void
     handleCostChange: (name: string, value: string) => void
+    handleMaintenanceReportFormChange: (name: string, value: string) => void
+    handleMaintenanceReportSubmission: () => void
+    cancelMaintenanceReport: () => void
+
     cost: string
 }
 
@@ -36,10 +41,14 @@ const MaintenanceForm = ({
                              handleDateChange,
                              handleCostChange,
                              handleEndDateChange,
-                             handleStartDateChange
+                             handleStartDateChange,
+                             handleMaintenanceReportFormChange,
+                             handleMaintenanceReportSubmission,
+                             cancelMaintenanceReport
                          }: MaintenanceFormProps) => {
-    const handleCreateProvider = () => {
-
+    const {partProviders} = useGlobalContext();
+    const handleCreatePartProvider = () => {
+        router.replace("/forms/part-provider");
     }
     const handleCreateServiceProvider = () => {
 
@@ -57,10 +66,10 @@ const MaintenanceForm = ({
                     <MaintenancePicker containerStyles={"mb-3"}
                                        title={"Pick a provider"}
                                        name={"provider"} value={"value"}
-                                       items={[{label: "one", value: "ONE"}, {label: "two", value: "TWO"}]}
+                                       items={partProviders.map((partProvider) => ({label: partProvider.name, value: partProvider.id}))}
                                        handleChange={() => console.log("provider picked")}
                                        buttonTitle={"Create Part Provider"}
-                                       handleButtonPress={handleCreateProvider}
+                                       handleButtonPress={handleCreatePartProvider}
                     />
                     <AutoPartInput parts={parts}
                                    handlePartInputChange={handlePartInputChange}
@@ -99,6 +108,20 @@ const MaintenanceForm = ({
                         <CustomDatePicker date={new Date()} handleChange={handleStartDateChange} label={"Start date"} name={"start_date"}/>
                         <CustomDatePicker date={new Date()} handleChange={handleEndDateChange} label={"End date"} name={"end_date"}/>
                     </View>
+                    <ThemedInputText placeholder={"Enter the Cost"} value={"0"} onChange={handleMaintenanceReportFormChange} name={'cost'} containerStyles={"bg-background p-5"}/>
+                    <ThemedInputText placeholder={"Enter Mileage"} value={"0"} onChange={handleMaintenanceReportFormChange} name={'mileage'} containerStyles={"bg-background p-5"}/>
+                    <ThemedInputText placeholder={"Notes"} value={"0"} onChange={handleMaintenanceReportFormChange} name={'mileage'} containerStyles={"bg-background p-5"}/>
+                    <Divider/>
+                    <ThemedButton title={"Submit Report"}
+                                  handlePress={handleMaintenanceReportSubmission}
+                                  containerStyles={"bg-primary p-5 rounded-[50%]"}
+                                  textStyles={"text-white text-base font-semibold"}
+                    />
+                    <ThemedButton title={"Cancel"}
+                                  handlePress={cancelMaintenanceReport}
+                                  containerStyles="bg-default p-5 rounded-[50%] mt-[10px]"
+                                  textStyles={"text-white font-semibold text-base"}
+                    />
                 </View>
             </View>
         </View>

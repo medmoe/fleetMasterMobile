@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {ImageSourcePropType, SafeAreaView, ScrollView, Text, View} from 'react-native';
 import {CustomDatePicker, ListItemDetail, MaintenanceForm, PartPurchaseEventViewer, StatCard, ThemedButton} from "@/components";
 import {useGlobalContext} from "@/context/GlobalProvider";
@@ -7,11 +7,15 @@ import {vehicleStatusMapping} from "@/constants/forms/vehicle";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 import {icons} from "@/constants/icons";
 import {maintenanceReport, MonthReportType, partPurchaseEvents} from "@/constants/fixtures";
+import axios from "axios";
+import {API} from "@/constants/endpoints";
 
 const MaintenanceReport = () => {
+    const {setPartProviders} = useGlobalContext();
     const [cost, setCost] = useState("0");
     const [inputValue, setInputValue] = useState<{ id: string, name: string }>({id: "-1", name: ""});
     const [isPartSelected, setIsSelected] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const setIsPartSelected = useCallback((isSelected: boolean) => {
         setIsSelected(isSelected);
     }, [])
@@ -47,7 +51,20 @@ const MaintenanceReport = () => {
 
         return [label, formattedValue, formattedPercentage, color, icon];
     });
-
+    useEffect(() => {
+        const fetchPartProviders = async () => {
+            setIsLoading(true);
+            try {
+                const response = await axios.get(`${API}maintenance/parts-providers/`)
+                setPartProviders(response.data);
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        fetchPartProviders();
+    }, [showMaintenanceForm]);
 
     function formatValue(value: string): string {
         const num = parseFloat(value);
@@ -81,7 +98,7 @@ const MaintenanceReport = () => {
     const handleDateChange = (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => {
 
     }
-    const handleEndDateChange = (name: string) => (_: DateTimePickerEvent, date: Date | undefined) =>  {
+    const handleEndDateChange = (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => {
 
     }
     const handleStartDateChange = (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => {
@@ -89,6 +106,15 @@ const MaintenanceReport = () => {
     }
     const handleCostChange = (name: string, value: string) => {
         setCost(value);
+    }
+    const handleReportFormChange = (name: string, value: string) => {
+
+    }
+    const handleReportSubmission = () => {
+
+    }
+    const cancelReportSubmission = () => {
+        setShowMaintenanceForm(false);
     }
 
     return (
@@ -157,6 +183,9 @@ const MaintenanceReport = () => {
                                      cost={cost}
                                      handleEndDateChange={handleEndDateChange}
                                      handleStartDateChange={handleStartDateChange}
+                                     handleMaintenanceReportFormChange={handleReportFormChange}
+                                     handleMaintenanceReportSubmission={handleReportSubmission}
+                                     cancelMaintenanceReport={cancelReportSubmission}
                     />}
             </ScrollView>
         </SafeAreaView>
