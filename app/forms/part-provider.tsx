@@ -12,7 +12,7 @@ const PartProvider = () => {
     const {partProviders, setPartProviders} = useGlobalContext()
     const [showPartProviderForm, setShowPartProviderForm] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [partProviderFormData, setPartProviderFormData] = useState<PartProviderType>({name: "", address: "", phone_number: "", id: ""})
+    const [partProviderFormData, setPartProviderFormData] = useState<PartProviderType>({name: "", address: "", phone_number: "", id: -1})
 
     const handleEditPartProvider = () => {
 

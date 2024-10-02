@@ -9,48 +9,48 @@ import MaintenancePicker from "@/components/MaintenancePicker";
 import ThemedButton from "@/components/ThemedButton";
 import {router} from "expo-router";
 import {useGlobalContext} from "@/context/GlobalProvider";
+import {PartPurchaseFormDataType, PartType} from "@/types/maintenance";
+import {icons} from "@/constants/icons";
 
 
 interface MaintenanceFormProps {
-    parts: { id: string, name: string }[]
-    handlePartInputChange: (name: string, value: string) => void
-    inputValue: { id: string, name: string }
+    parts: PartType[]
+    searchTerm: string
     selectPart: (name: string, value: string) => void
     setIsPartSelected: (value: boolean) => void
     isPartSelected: boolean
     handleDateChange: (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => void
-    handleStartDateChange: (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => void
-    handleEndDateChange: (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => void
-    handleCostChange: (name: string, value: string) => void
     handleMaintenanceReportFormChange: (name: string, value: string) => void
     handleMaintenanceReportSubmission: () => void
     cancelMaintenanceReport: () => void
-
-    cost: string
+    handlePartPurchaseFormChange: (name: string, value: string) => void
+    handlePartInputChange: (name: string, value: string) => void
+    partPurchaseFormData: PartPurchaseFormDataType
 }
 
 
 const MaintenanceForm = ({
-                             cost,
                              parts,
                              selectPart,
-                             handlePartInputChange,
-                             inputValue,
+                             searchTerm,
                              setIsPartSelected,
                              isPartSelected,
                              handleDateChange,
-                             handleCostChange,
-                             handleEndDateChange,
-                             handleStartDateChange,
                              handleMaintenanceReportFormChange,
                              handleMaintenanceReportSubmission,
-                             cancelMaintenanceReport
+                             cancelMaintenanceReport,
+                             handlePartPurchaseFormChange,
+                             partPurchaseFormData,
+                             handlePartInputChange,
                          }: MaintenanceFormProps) => {
     const {partProviders} = useGlobalContext();
     const handleCreatePartProvider = () => {
         router.replace("/forms/part-provider");
     }
     const handleCreateServiceProvider = () => {
+
+    }
+    const handlePartCreation = () => {
 
     }
     return (
@@ -65,30 +65,40 @@ const MaintenanceForm = ({
                     <Text className={"font-semibold text-txt text-sm"}>Part Purchase Form</Text>
                     <MaintenancePicker containerStyles={"mb-3"}
                                        title={"Pick a provider"}
-                                       name={"provider"} value={"value"}
+                                       name={"provider"}
+                                       value={partPurchaseFormData.provider.toString()}
                                        items={partProviders.map((partProvider) => ({label: partProvider.name, value: partProvider.id}))}
-                                       handleChange={() => console.log("provider picked")}
+                                       handleItemChange={handlePartPurchaseFormChange}
                                        buttonTitle={"Create Part Provider"}
                                        handleButtonPress={handleCreatePartProvider}
                     />
-                    <AutoPartInput parts={parts}
-                                   handlePartInputChange={handlePartInputChange}
-                                   inputValue={inputValue}
-                                   selectPart={selectPart}
-                                   setIsPartSelected={setIsPartSelected}
-                                   isPartSelected={isPartSelected}
-                    />
+                    <View className={"flex-1"}>
+                        <AutoPartInput parts={parts}
+                                       handlePartInputChange={handlePartInputChange}
+                                       searchTerm={searchTerm}
+                                       selectPart={selectPart}
+                                       setIsPartSelected={setIsPartSelected}
+                                       isPartSelected={isPartSelected}
+                                       icon={icons.search}
+                        />
+                        <ThemedButton title={"Create part"}
+                                      handlePress={handlePartCreation}
+                                      containerStyles={"bg-secondary w-full p-5 rounded-[50%] mt-3"}
+                                      textStyles={"text-white font-semibold text-base"}
+                        />
+                    </View>
+
                     <View className={"flex-row"}>
                         <CustomDatePicker date={new Date()}
                                           handleChange={handleDateChange}
                                           label={"Purchase Date"}
                                           name={"purchase_date"}
                         />
-                        <ThemedInputText onChange={handleCostChange}
+                        <ThemedInputText onChange={handlePartPurchaseFormChange}
                                          containerStyles={"bg-background p-5"}
                                          placeholder={"Enter cost"}
                                          name={"cost"}
-                                         value={cost}
+                                         value={partPurchaseFormData.cost}
                         />
                     </View>
                 </View>
@@ -100,13 +110,13 @@ const MaintenanceForm = ({
                                        name={"service_provider"}
                                        value={"value"}
                                        items={[{label: "one", value: "ONE"}, {label: "two", value: "TWO"}]}
-                                       handleChange={() => console.log("service provider picked")}
+                                       handleItemChange={() => console.log("service provider picked")}
                                        buttonTitle={"Create service Provider"}
                                        handleButtonPress={handleCreateServiceProvider}
                     />
                     <View className={"flex-row"}>
-                        <CustomDatePicker date={new Date()} handleChange={handleStartDateChange} label={"Start date"} name={"start_date"}/>
-                        <CustomDatePicker date={new Date()} handleChange={handleEndDateChange} label={"End date"} name={"end_date"}/>
+                        <CustomDatePicker date={new Date()} handleChange={handleDateChange} label={"Start date"} name={"start_date"}/>
+                        <CustomDatePicker date={new Date()} handleChange={handleDateChange} label={"End date"} name={"end_date"}/>
                     </View>
                     <ThemedInputText placeholder={"Enter the Cost"} value={"0"} onChange={handleMaintenanceReportFormChange} name={'cost'} containerStyles={"bg-background p-5"}/>
                     <ThemedInputText placeholder={"Enter Mileage"} value={"0"} onChange={handleMaintenanceReportFormChange} name={'mileage'} containerStyles={"bg-background p-5"}/>

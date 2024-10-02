@@ -1,18 +1,20 @@
 import React, {useEffect, useState} from 'react';
-import {Pressable, Text, View} from 'react-native';
+import {ImageSourcePropType, Pressable, Text, View} from 'react-native';
 import ThemedInputText from "@/components/ThemedInputText";
+import {PartType} from "@/types/maintenance";
 
 interface AutoPartInputProps {
-    parts: { id: string, name: string }[]
+    parts: PartType[]
     handlePartInputChange: (name: string, value: string) => void
-    inputValue: {id: string, name:string}
+    searchTerm: string
     selectPart: (name: string, value: string) => void
     isPartSelected: boolean
     setIsPartSelected: (value: boolean) => void
+    icon?: ImageSourcePropType
 }
 
 
-const AutoPartInput = ({handlePartInputChange, parts, inputValue, selectPart, isPartSelected, setIsPartSelected}: AutoPartInputProps) => {
+const AutoPartInput = ({handlePartInputChange, parts, searchTerm, selectPart, isPartSelected, setIsPartSelected, icon}: AutoPartInputProps) => {
     const [suggestions, setSuggestions] = useState<{ id: string, name: string }[]>([])
     const [showSuggestions, setShowSuggestions] = useState(false);
     const getSuggestions = (prefix: string): { id: string, name: string }[] => {
@@ -46,11 +48,11 @@ const AutoPartInput = ({handlePartInputChange, parts, inputValue, selectPart, is
             setShowSuggestions(false);
             setIsPartSelected(false);
         } else {
-            const suggestions = getSuggestions(inputValue.name);
+            const suggestions = getSuggestions(searchTerm);
             setSuggestions(suggestions);
             setShowSuggestions(suggestions.length > 0);
         }
-    }, [inputValue]);
+    }, [searchTerm]);
     const trie: { [key: string]: {} } = {};
     const addWord = (word: string, id: string) => {
         let currentNode = trie;
@@ -63,11 +65,17 @@ const AutoPartInput = ({handlePartInputChange, parts, inputValue, selectPart, is
         }
         currentNode['$'] = {id, exists: true}
     }
-    parts.forEach(item => addWord(item.name, item.id));
+    parts.forEach(item => addWord(item.name, item.id.toString()));
 
     return (
-        <View>
-            <ThemedInputText placeholder={"Enter part"} value={inputValue.name} onChange={handlePartInputChange} name={'part'} containerStyles={"bg-background p-5"}/>
+        <View className={"flex-1"}>
+            <ThemedInputText placeholder={"Find part"}
+                             value={searchTerm}
+                             onChange={handlePartInputChange}
+                             name={'part'}
+                             containerStyles={"bg-background p-5"}
+                             icon={icon}
+            />
             {showSuggestions && suggestions.map((part, idx) => {
                 return (
                     <Pressable key={idx} className={"bg-white rounded shadow p-4 m-2"} onPress={() => selectPart(part.name, part.id)}>

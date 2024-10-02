@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import {Text, View} from 'react-native';
 import CustomPicker from "@/components/CustomPicker";
 import ThemedButton from "@/components/ThemedButton";
 
@@ -9,16 +9,16 @@ interface MaintenancePickerProps {
     name: string
     value: string
     items: any[]
-    handleChange: () => void
+    handleItemChange: (name: string, value: string) => void
     buttonTitle: string
     handleButtonPress: () => void
 }
 
-const MaintenancePicker = ({containerStyles, title, name, value, items, handleButtonPress, handleChange, buttonTitle}: MaintenancePickerProps) => {
+const MaintenancePicker = ({containerStyles, title, name, value, items, handleButtonPress, handleItemChange, buttonTitle}: MaintenancePickerProps) => {
     return (
         <View className={`${containerStyles}`}>
             <Text className={"text-txt text-sm font-open-sans"}>{title}</Text>
-            <CustomPicker name={name} value={value} items={items} handleChange={handleChange} />
+            <CustomPicker name={name} value={value} items={items} handleChange={handleItemChange}/>
             <ThemedButton title={buttonTitle} handlePress={handleButtonPress} containerStyles={"bg-secondary w-full p-5 rounded-[50%]"} textStyles={"text-white font-semibold text-base"}/>
         </View>
     );

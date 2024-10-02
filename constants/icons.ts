@@ -19,4 +19,5 @@ export const icons: { [key: string]: any } = {
     repair: require("../assets/icons/repair.png"),
     up: require("../assets/icons/up.png"),
     down: require("../assets/icons/down.png"),
+    search: require("../assets/icons/search.png"),
 }
