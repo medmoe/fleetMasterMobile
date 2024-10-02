@@ -9,10 +9,10 @@ import {icons} from "@/constants/icons";
 import {maintenanceReport, MonthReportType, partPurchaseEvents} from "@/constants/fixtures";
 import axios from "axios";
 import {API} from "@/constants/endpoints";
-import {PartPurchaseFormDataType, PartType} from "@/types/maintenance";
+import {PartPurchaseFormDataType} from "@/types/maintenance";
 
 const MaintenanceReport = () => {
-    const {setPartProviders} = useGlobalContext();
+    const {setPartProviders, setParts, parts} = useGlobalContext();
     const [partPurchaseFormData, setPartPurchaseFormData] = useState<PartPurchaseFormDataType>({part: "", provider: "", cost: "", purchase_date: ""});
     const [searchTerm, setSearchTerm] = useState("");
     const [isPartSelected, setIsSelected] = useState(false);
@@ -20,7 +20,6 @@ const MaintenanceReport = () => {
     const setIsPartSelected = useCallback((isSelected: boolean) => {
         setIsSelected(isSelected);
     }, [])
-    const [parts, setParts] = useState<PartType[]>([])
 
     const [showMaintenanceForm, setShowMaintenanceForm] = useState<boolean>(false);
     const {currentItem} = useGlobalContext();

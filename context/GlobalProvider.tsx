@@ -2,7 +2,7 @@ import React, {createContext, ReactNode, useContext, useState} from "react";
 import {DriverType, ResponseDataType, VehicleType} from "@/types/types";
 import {driverStatus} from "@/constants/forms/driver";
 import {vehicleStatus, vehicleTypes} from "@/constants/forms/vehicle";
-import {PartProviderType} from "@/types/maintenance";
+import {PartProviderType, PartType} from "@/types/maintenance";
 
 type GlobalProviderProps = {
     children: ReactNode
@@ -17,6 +17,8 @@ interface ContextProps {
     setCurrentItem: (item: DriverType | VehicleType) => void
     partProviders: PartProviderType[]
     setPartProviders: (partProviders: PartProviderType[]) => void
+    parts: PartType[]
+    setParts: (parts: PartType[]) => void
 }
 
 export const currentVehicleInitialState: VehicleType = {
@@ -52,7 +54,9 @@ const GlobalContext = createContext<ContextProps>({
     currentItem: currentVehicleInitialState,
     setPartProviders: () => {
     },
-    partProviders: []
+    partProviders: [],
+    setParts: () => {},
+    parts: []
 })
 
 export const useGlobalContext = () => useContext(GlobalContext);
@@ -63,6 +67,7 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({children}) => {
     const [isPostRequest, setIsPostRequest] = useState(true);
     const [currentItem, setCurrentItem] = useState<VehicleType | DriverType>(currentVehicleInitialState)
     const [partProviders, setPartProviders] = useState<PartProviderType[]>([])
+    const [parts, setParts] = useState<PartType[]>([])
     return (
         <GlobalContext.Provider
             value={{
@@ -74,6 +79,8 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({children}) => {
                 currentItem,
                 setPartProviders,
                 partProviders,
+                setParts,
+                parts,
             }}
         >
             {children}

@@ -51,7 +51,7 @@ const MaintenanceForm = ({
 
     }
     const handlePartCreation = () => {
-
+        router.replace("/forms/part");
     }
     return (
         <View className={"w-full justify-center items-center"}>
