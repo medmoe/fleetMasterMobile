@@ -17,3 +17,5 @@ export {default as AutoPartInput} from "./AutoPartInput";
 export {default as Divider} from "./Divider";
 export {default as MaintenancePicker} from "./MaintenancePicker";
 export {default as PartProviderForm} from "./forms/PartProviderForm";
+export {default as PartPurchaseForm} from "./forms/PartPurchaseForm";
+export {default as PartForm} from "./forms/PartForm";

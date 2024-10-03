@@ -2,7 +2,7 @@ import React, {createContext, ReactNode, useContext, useState} from "react";
 import {DriverType, ResponseDataType, VehicleType} from "@/types/types";
 import {driverStatus} from "@/constants/forms/driver";
 import {vehicleStatus, vehicleTypes} from "@/constants/forms/vehicle";
-import {PartProviderType, PartType} from "@/types/maintenance";
+import {PartProviderType, PartPurchaseEventType, PartType} from "@/types/maintenance";
 
 type GlobalProviderProps = {
     children: ReactNode
@@ -19,6 +19,8 @@ interface ContextProps {
     setPartProviders: (partProviders: PartProviderType[]) => void
     parts: PartType[]
     setParts: (parts: PartType[]) => void
+    partPurchaseEvents: PartPurchaseEventType[]
+    setPartPurchaseEvents: (partPurchaseEvents: PartPurchaseEventType[]) => void
 }
 
 export const currentVehicleInitialState: VehicleType = {
@@ -55,8 +57,12 @@ const GlobalContext = createContext<ContextProps>({
     setPartProviders: () => {
     },
     partProviders: [],
-    setParts: () => {},
-    parts: []
+    setParts: () => {
+    },
+    parts: [],
+    setPartPurchaseEvents: () => {
+    },
+    partPurchaseEvents: [],
 })
 
 export const useGlobalContext = () => useContext(GlobalContext);
@@ -68,6 +74,7 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({children}) => {
     const [currentItem, setCurrentItem] = useState<VehicleType | DriverType>(currentVehicleInitialState)
     const [partProviders, setPartProviders] = useState<PartProviderType[]>([])
     const [parts, setParts] = useState<PartType[]>([])
+    const [partPurchaseEvents, setPartPurchaseEvents] = useState<PartPurchaseEventType[]>([])
     return (
         <GlobalContext.Provider
             value={{
@@ -81,6 +88,8 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({children}) => {
                 partProviders,
                 setParts,
                 parts,
+                setPartPurchaseEvents,
+                partPurchaseEvents,
             }}
         >
             {children}

@@ -9,11 +9,11 @@ import {icons} from "@/constants/icons";
 import {maintenanceReport, MonthReportType, partPurchaseEvents} from "@/constants/fixtures";
 import axios from "axios";
 import {API} from "@/constants/endpoints";
-import {PartPurchaseFormDataType} from "@/types/maintenance";
+import {PartPurchaseEventType} from "@/types/maintenance";
 
 const MaintenanceReport = () => {
-    const {setPartProviders, setParts, parts} = useGlobalContext();
-    const [partPurchaseFormData, setPartPurchaseFormData] = useState<PartPurchaseFormDataType>({part: "", provider: "", cost: "", purchase_date: ""});
+    const {setPartProviders, setParts} = useGlobalContext();
+    const [partPurchaseFormData, setPartPurchaseFormData] = useState<PartPurchaseEventType>({part: "", provider: "", cost: "", purchase_date: ""});
     const [searchTerm, setSearchTerm] = useState("");
     const [isPartSelected, setIsSelected] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -174,7 +174,6 @@ const MaintenanceReport = () => {
                     <MaintenanceForm isPartSelected={isPartSelected}
                                      setIsPartSelected={setIsPartSelected}
                                      selectPart={selectPart}
-                                     parts={parts}
                                      searchTerm={searchTerm}
                                      handleDateChange={handleDateChange}
                                      handleMaintenanceReportFormChange={handleReportFormChange}

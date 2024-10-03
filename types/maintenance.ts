@@ -5,7 +5,8 @@ export interface PartProviderType {
     address: string
 }
 
-export interface PartPurchaseFormDataType {
+export interface PartPurchaseEventType {
+    id?: string
     part: string
     provider: string
     purchase_date: string
