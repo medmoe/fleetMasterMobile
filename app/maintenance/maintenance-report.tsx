@@ -166,7 +166,7 @@ const MaintenanceReport = () => {
                                      handleDateChange={handleDateChange}
                                      handleMaintenanceReportFormChange={handleReportFormChange}
                                      handleMaintenanceReportSubmission={handleReportSubmission}
-                                     cancelMaintenanceReport={cancelReportSubmission}
+                                     handleMaintenanceReportCancellation={cancelReportSubmission}
                                      handlePartPurchaseFormChange={handlePartPurchaseFormChange}
                                      partPurchaseFormData={partPurchaseFormData}
                                      handlePartInputChange={handlePartInputChange}

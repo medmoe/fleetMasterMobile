@@ -21,7 +21,7 @@ interface PartPurchaseFormProps {
     isPartSelected: boolean
     handleDateChange: (name: string) => (_: DateTimePickerEvent, date?: Date) => void
     handlePartPurchaseEventCancellation: () => void
-    handlePartPurchaseCreation: () => void
+    handlePartPurchaseEventSubmission: () => void
 
 
 }
@@ -36,7 +36,7 @@ const PartPurchaseForm = ({
                               isPartSelected,
                               handleDateChange,
                               handlePartPurchaseEventCancellation,
-                              handlePartPurchaseCreation,
+                              handlePartPurchaseEventSubmission,
                           }: PartPurchaseFormProps) => {
     const {generalData} = useGlobalContext();
     const handleCreatePartProvider = () => {
@@ -87,7 +87,7 @@ const PartPurchaseForm = ({
                 />
             </View>
             <ThemedButton title={"Submit purchase form"}
-                          handlePress={handlePartPurchaseCreation}
+                          handlePress={handlePartPurchaseEventSubmission}
                           containerStyles="bg-primary p-5 rounded-[50%] mt-[10px]"
                           textStyles={"text-white font-semibold text-base"}
             />

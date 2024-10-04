@@ -11,7 +11,7 @@ export {default as CustomDatePicker} from "./CustomDatePicker";
 export {default as ItemDetailViewer} from "./ItemDetailViewer";
 export {default as StatCard} from "./StatCard";
 export {default as Percentage} from "./Percentage";
-export {default as MaintenanceForm} from "./forms/MaintenanceForm";
+export {default as MaintenanceForm} from "./forms/MaintenanceReportForm";
 export {default as PartPurchaseEventViewer} from "./PartPurchaseEventViewer";
 export {default as AutoPartInput} from "./AutoPartInput";
 export {default as Divider} from "./Divider";
