@@ -1,6 +1,6 @@
 import React from 'react';
 import {VehicleType} from "@/types/types";
-import {Pressable, Text, View} from "react-native";
+import {Pressable, View} from "react-native";
 import ListItemDetail from "@/components/ListItemDetail";
 import {vehicleStatusMapping} from "@/constants/forms/vehicle";
 import ThemedButton from "@/components/ThemedButton";

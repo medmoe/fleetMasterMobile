@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Pressable, Text, View} from 'react-native';
+import {Alert, Pressable, Text, View} from 'react-native';
 import Divider from "@/components/Divider";
 import CustomDatePicker from "@/components/CustomDatePicker";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
@@ -7,9 +7,11 @@ import ThemedInputText from "@/components/ThemedInputText";
 import MaintenancePicker from "@/components/MaintenancePicker";
 import ThemedButton from "@/components/ThemedButton";
 import {useGlobalContext} from "@/context/GlobalProvider";
-import {PartPurchaseEventType} from "@/types/maintenance";
+import {PartPurchaseEventFormType, PartPurchaseEventType} from "@/types/maintenance";
 import ListItemDetail from "@/components/ListItemDetail";
 import PartPurchaseForm from "@/components/forms/PartPurchaseForm";
+import axios from "axios";
+import {API} from "@/constants/endpoints";
 
 
 interface MaintenanceFormProps {
@@ -23,7 +25,7 @@ interface MaintenanceFormProps {
     cancelMaintenanceReport: () => void
     handlePartPurchaseFormChange: (name: string, value: string) => void
     handlePartInputChange: (name: string, value: string) => void
-    partPurchaseFormData: PartPurchaseEventType
+    partPurchaseFormData: PartPurchaseEventFormType
 }
 
 
@@ -41,7 +43,7 @@ const MaintenanceForm = ({
                              handlePartInputChange,
                          }: MaintenanceFormProps) => {
 
-    const {partPurchaseEvents} = useGlobalContext();
+    const {partPurchaseEvents, setPartPurchaseEvents} = useGlobalContext();
     const [showPartPurchaseEventForm, setShowPartPurchaseEventForm] = useState(false);
     const handleCreateServiceProvider = () => {
 
@@ -55,6 +57,26 @@ const MaintenanceForm = ({
     const handlePartPurchaseEventCancellation = () => {
         setShowPartPurchaseEventForm(false);
     }
+    const handlePartPurchaseCreation = async () => {
+        try {
+            // Validating and formatting data
+            if (!partPurchaseFormData.cost || !partPurchaseFormData.part || !partPurchaseFormData.provider || !partPurchaseFormData.purchase_date) {
+                Alert.alert("Error", "Please fill all fields!.")
+                return
+            }
+            let partPurchaseEventDataToSend: PartPurchaseEventType = {
+                ...partPurchaseFormData,
+                purchase_date: partPurchaseFormData.purchase_date.toLocaleDateString("en-CA", {year: "numeric", month: "2-digit", day: "2-digit"})
+            }
+            const response = await axios.post(`${API}maintenance/part-purchase-events/`,
+                partPurchaseEventDataToSend,
+                {headers: {'Content-Type': 'application/json'}, withCredentials: true})
+            setPartPurchaseEvents([...partPurchaseEvents, response.data])
+            setShowPartPurchaseEventForm(false);
+        } catch (error: any) {
+            console.log(error.response.data)
+        }
+    }
     return (
         <View className={"w-full justify-center items-center"}>
             {showPartPurchaseEventForm ?
@@ -66,19 +88,19 @@ const MaintenanceForm = ({
                                   isPartSelected={isPartSelected}
                                   handleDateChange={handleDateChange}
                                   handlePartPurchaseEventCancellation={handlePartPurchaseEventCancellation}
+                                  handlePartPurchaseCreation={handlePartPurchaseCreation}
                 />
                 :
                 <View className={"w-[94%] bg-white rounded p-5"}>
-                    <View className={"gap-2"}>
+                    <View className={"gap-2 mb-3"}>
                         <Text className={"font-semibold text-txt text-base"}>Maintenance Form</Text>
                         <Text className={"font-open-sans text-txt text-sm"}>Fill in vehicle's details below.</Text>
                     </View>
-                    <Divider/>
-                    <View>
+                    <View className={"flex-1"}>
                         {partPurchaseEvents.map((partPurchaseEvent, idx) => {
                             return (
                                 <Pressable onPress={handleEditPartPurchaseEvent} key={idx}>
-                                    <View className={"flex-row p-[16px] bg-white rounded shadow mt-3"}>
+                                    <View className={"flex-1 p-[16px] bg-white rounded shadow mb-3"}>
                                         <ListItemDetail label={"Part name"} value={partPurchaseEvent.part} textStyle={"text-txt"}/>
                                         <ListItemDetail label={"Provider name"} value={partPurchaseEvent.provider} textStyle={"text-txt"}/>
                                         <ListItemDetail label={"Purchase date"} value={partPurchaseEvent.purchase_date} textStyle={"text-txt"}/>

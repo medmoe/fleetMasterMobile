@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Pressable, SafeAreaView, ScrollView, Text, View} from 'react-native';
 import {PartProviderType} from "@/types/maintenance";
 import axios from "axios";
@@ -9,7 +9,7 @@ import {useGlobalContext} from "@/context/GlobalProvider";
 
 
 const PartProvider = () => {
-    const {partProviders, setPartProviders} = useGlobalContext()
+    const {generalData, setGeneralData} = useGlobalContext()
     const [showPartProviderForm, setShowPartProviderForm] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [partProviderFormData, setPartProviderFormData] = useState<PartProviderType>({name: "", address: "", phone_number: "", id: -1})
@@ -32,11 +32,14 @@ const PartProvider = () => {
         try {
             const response = await axios.post(`${API}maintenance/parts-providers/`, partProviderFormData, {headers: {'Content-Type': 'application/json'}, withCredentials: true})
             const newPartProvider = response.data;
-            setPartProviders([...partProviders, newPartProvider]);
+            setGeneralData({
+                ...generalData,
+                part_providers: [...generalData.part_providers, newPartProvider]
+            })
             setShowPartProviderForm(false)
         } catch (error: any) {
             console.log(error);
-        }finally {
+        } finally {
             setIsLoading(false);
         }
     }
@@ -64,7 +67,7 @@ const PartProvider = () => {
                                     <Text className={"font-open-sans text-txt text-sm"}>Here is the list of part providers</Text>
                                 </View>
                                 <View>
-                                    {partProviders.map((partProvider, idx) => {
+                                    {generalData.part_providers.map((partProvider, idx) => {
                                         return (
                                             <Pressable onPress={handleEditPartProvider} key={idx}>
                                                 <View className={"flex-row p-[16px] bg-white rounded shadow mt-3"}>
@@ -88,7 +91,7 @@ const PartProvider = () => {
                                                   handlePress={handleCancelPartProviderAddition}
                                                   containerStyles={"bg-default p-5 rounded-[50%] mt-3"}
                                                   textStyles={"font-semibold text-base text-white"}
-                                                  />
+                                    />
                                 </View>
                             </View>
                         }

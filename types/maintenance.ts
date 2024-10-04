@@ -10,11 +10,26 @@ export interface PartPurchaseEventType {
     part: string
     provider: string
     purchase_date: string
-    cost : string
+    cost: string
 }
 
 export interface PartType {
     id: number
     name: string
     description: string
+}
+
+export interface ServiceProviderType {
+    id?: string
+    name: string
+    service_type: "MECHANIC" | "ELECTRICIAN" | "CLEANING"
+    phone_number: string
+    address: string
+}
+
+export interface PartPurchaseEventFormType {
+    part: string,
+    provider: string,
+    purchase_date: Date,
+    cost: string
 }

@@ -9,11 +9,12 @@ import {icons} from "@/constants/icons";
 import {maintenanceReport, MonthReportType, partPurchaseEvents} from "@/constants/fixtures";
 import axios from "axios";
 import {API} from "@/constants/endpoints";
-import {PartPurchaseEventType} from "@/types/maintenance";
+import {PartPurchaseEventFormType} from "@/types/maintenance";
+import {router} from "expo-router";
 
 const MaintenanceReport = () => {
-    const {setPartProviders, setParts} = useGlobalContext();
-    const [partPurchaseFormData, setPartPurchaseFormData] = useState<PartPurchaseEventType>({part: "", provider: "", cost: "", purchase_date: ""});
+    const {generalData, setGeneralData} = useGlobalContext();
+    const [partPurchaseFormData, setPartPurchaseFormData] = useState<PartPurchaseEventFormType>({part: "", provider: "", cost: "", purchase_date: new Date()});
     const [searchTerm, setSearchTerm] = useState("");
     const [isPartSelected, setIsSelected] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -38,30 +39,18 @@ const MaintenanceReport = () => {
         return [label, formattedValue, formattedPercentage, color, icon];
     });
     useEffect(() => {
-        const fetchPartProviders = async () => {
+        const fetchGeneralData = async () => {
             setIsLoading(true);
             try {
-                const response = await axios.get(`${API}maintenance/parts-providers/`)
-                setPartProviders(response.data);
+                const response = await axios.get(`${API}maintenance/general-data/`, {withCredentials: true})
+                setGeneralData(response.data);
             } catch (error) {
-                console.log(error);
+                console.log(error)
             } finally {
                 setIsLoading(false);
             }
         }
-        const fetchParts = async () => {
-            setIsLoading(true);
-            try {
-                const response = await axios.get(`${API}maintenance/parts/`)
-                setParts(response.data)
-            } catch (error) {
-                console.log(error)
-            } finally {
-                setIsLoading(false)
-            }
-        }
-        fetchPartProviders();
-        fetchParts();
+        fetchGeneralData();
     }, [showMaintenanceForm]);
 
     function formatValue(value: string): string {
@@ -83,7 +72,7 @@ const MaintenanceReport = () => {
         setShowMaintenanceForm(true);
     }
     const cancelRecordingMaintenance = () => {
-
+        router.replace('/fleet');
     }
     const selectPart = (name: string, id: string) => {
         setSearchTerm(name);
@@ -115,7 +104,6 @@ const MaintenanceReport = () => {
     const handlePartInputChange = (name: string, value: string) => {
         setSearchTerm(value);
     }
-    console.log(searchTerm);
     return (
         <SafeAreaView>
             <ScrollView>

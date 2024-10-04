@@ -6,13 +6,13 @@ import {icons} from "@/constants/icons";
 import ThemedButton from "../ThemedButton";
 import CustomDatePicker from "../CustomDatePicker";
 import ThemedInputText from "../ThemedInputText";
-import {PartPurchaseEventType} from "@/types/maintenance";
+import {PartPurchaseEventFormType} from "@/types/maintenance";
 import {useGlobalContext} from "@/context/GlobalProvider";
 import {router} from "expo-router";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 
 interface PartPurchaseFormProps {
-    partPurchaseFormData: PartPurchaseEventType
+    partPurchaseFormData: PartPurchaseEventFormType
     handlePartPurchaseFormChange: (name: string, value: string) => void
     handlePartInputChange: (name: string, value: string) => void
     searchTerm: string
@@ -21,6 +21,7 @@ interface PartPurchaseFormProps {
     isPartSelected: boolean
     handleDateChange: (name: string) => (_: DateTimePickerEvent, date?: Date) => void
     handlePartPurchaseEventCancellation: () => void
+    handlePartPurchaseCreation: () => void
 
 
 }
@@ -34,17 +35,15 @@ const PartPurchaseForm = ({
                               setIsPartSelected,
                               isPartSelected,
                               handleDateChange,
-                              handlePartPurchaseEventCancellation
+                              handlePartPurchaseEventCancellation,
+                              handlePartPurchaseCreation,
                           }: PartPurchaseFormProps) => {
-    const {partProviders, parts} = useGlobalContext();
+    const {generalData} = useGlobalContext();
     const handleCreatePartProvider = () => {
         router.replace("/forms/part-provider");
     }
     const handlePartCreation = () => {
         router.replace("/forms/part")
-    }
-    const handlePurchasePartCreation = () => {
-
     }
     return (
         <View className={"w-[94%] bg-white rounded p-5"}>
@@ -53,13 +52,13 @@ const PartPurchaseForm = ({
                                title={"Pick a provider"}
                                name={"provider"}
                                value={partPurchaseFormData.provider.toString()}
-                               items={partProviders.map((partProvider) => ({label: partProvider.name, value: partProvider.id}))}
+                               items={generalData.part_providers.map((partProvider) => ({label: partProvider.name, value: partProvider.id}))}
                                handleItemChange={handlePartPurchaseFormChange}
                                buttonTitle={"Create Part Provider"}
                                handleButtonPress={handleCreatePartProvider}
             />
             <View className={"flex-1"}>
-                <AutoPartInput parts={parts}
+                <AutoPartInput parts={generalData.parts}
                                handlePartInputChange={handlePartInputChange}
                                searchTerm={searchTerm}
                                selectPart={selectPart}
@@ -88,7 +87,7 @@ const PartPurchaseForm = ({
                 />
             </View>
             <ThemedButton title={"Submit purchase form"}
-                          handlePress={handlePurchasePartCreation}
+                          handlePress={handlePartPurchaseCreation}
                           containerStyles="bg-primary p-5 rounded-[50%] mt-[10px]"
                           textStyles={"text-white font-semibold text-base"}
             />
