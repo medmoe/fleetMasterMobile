@@ -104,6 +104,15 @@ const MaintenanceReport = () => {
     const handlePartInputChange = (name: string, value: string) => {
         setSearchTerm(value);
     }
+    const handleNewPartAddition = () => {
+        router.replace('/forms/part');
+    }
+    const handleNewPartsProviderAddition = () => {
+        router.replace('/forms/part-provider')
+    }
+    const handleNewServiceProviderAddition = () => {
+        router.replace('/forms/service-provider')
+    }
     return (
         <SafeAreaView>
             <ScrollView>
@@ -144,19 +153,33 @@ const MaintenanceReport = () => {
                                 <View><Text className={"font-semibold text-base text-txt"}>Auto Parts Breakdown</Text></View>
                                 {partPurchaseEvents.map((obj, idx) => <PartPurchaseEventViewer name={obj.name} provider={obj.provider} cost={obj.cost} key={idx}/>)}
                             </View>
-                            <View className={"mt-5"}>
-                                <ThemedButton title={"Record maintenance"}
-                                              handlePress={startRecordingMaintenance}
-                                              containerStyles={"bg-primary w-full p-5 rounded-[50%]"}
-                                              textStyles={"text-white font-semibold text-base"}/>
-                                <ThemedButton title={"Cancel"}
-                                              handlePress={cancelRecordingMaintenance}
-                                              containerStyles={"bg-default w-full p-5 rounded-[50%] mt-5"}
-                                              textStyles={"text-white font-semibold text-base"}
-                                />
-                            </View>
-
+                            <ThemedButton title={"Add New Part"}
+                                          handlePress={handleNewPartAddition}
+                                          containerStyles={"bg-secondary w-full p-5 rounded-[50%] mt-3"}
+                                          textStyles={"text-white font-semibold text-base"}
+                            />
+                            <ThemedButton title={"Add New Service Provider"}
+                                          handlePress={handleNewServiceProviderAddition}
+                                          containerStyles={"bg-secondary w-full p-5 rounded-[50%] mt-3"}
+                                          textStyles={"text-white font-semibold text-base"}
+                            />
+                            <ThemedButton title={"Add New Parts Provider"}
+                                          handlePress={handleNewPartsProviderAddition}
+                                          containerStyles={"bg-secondary w-full p-5 rounded-[50%] mt-3"}
+                                          textStyles={"text-white font-semibold text-base"}
+                            />
+                            <ThemedButton title={"Record maintenance"}
+                                          handlePress={startRecordingMaintenance}
+                                          containerStyles={"bg-primary w-full p-5 rounded-[50%] mt-3"}
+                                          textStyles={"text-white font-semibold text-base"}/>
+                            <ThemedButton title={"Cancel"}
+                                          handlePress={cancelRecordingMaintenance}
+                                          containerStyles={"bg-default w-full p-5 rounded-[50%] mt-3"}
+                                          textStyles={"text-white font-semibold text-base"}
+                            />
                         </View>
+
+
                     </View>
                     :
                     <MaintenanceForm isPartSelected={isPartSelected}

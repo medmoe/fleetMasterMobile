@@ -39,29 +39,11 @@ const MaintenanceReportForm = ({
                                    handlePartInputChange,
                                }: MaintenanceFormProps) => {
     const {partPurchaseEvents, setPartPurchaseEvents, generalData, setGeneralData} = useGlobalContext();
-    const [serviceProviderFormData, setServiceProviderFormData] = useState<ServiceProviderType>({
-        service_type: "MECHANIC",
-        name: "",
-        address: "",
-        phone_number: ""
-    })
-    console.log(serviceProviderFormData);
+    const [showPartPurchaseEventForm, setShowPartPurchaseEventForm] = useState(false);
     const handleEditPartPurchaseEvent = () => {
 
     }
-    const handleServiceProviderFormChange = (name: string, value: string) => {
-        setServiceProviderFormData(prevState => ({
-            ...prevState,
-            [name]: value,
-        }))
-    }
-    const handleServiceProviderCreation = () => {
-        setFormToShow(<ServiceProviderForm handleServiceProviderSubmission={handleServiceProviderFormSubmission}
-                                           handleServiceProviderCancellation={handleServiceProviderCancellation}
-                                           handleServiceProviderFormChange={handleServiceProviderFormChange}
-                                           serviceProviderFormData={serviceProviderFormData}
-        />)
-    }
+
     const handlePartPurchaseEventSubmission = async () => {
         try {
             // Validating and formatting data
@@ -77,57 +59,39 @@ const MaintenanceReportForm = ({
                 partPurchaseEventDataToSend,
                 {headers: {'Content-Type': 'application/json'}, withCredentials: true})
             setPartPurchaseEvents([...partPurchaseEvents, response.data])
-            setFormToShow(initialForm)
+            setShowPartPurchaseEventForm(false)
         } catch (error: any) {
             console.log(error.response.data)
         }
     }
 
     const handlePartPurchaseEventCreation = () => {
-        setFormToShow(<PartPurchaseForm partPurchaseFormData={partPurchaseFormData}
-                                        handlePartPurchaseFormChange={handlePartPurchaseFormChange}
-                                        handlePartInputChange={handlePartInputChange}
-                                        searchTerm={searchTerm} selectPart={selectPart}
-                                        setIsPartSelected={setIsPartSelected}
-                                        isPartSelected={isPartSelected}
-                                        handleDateChange={handleDateChange}
-                                        handlePartPurchaseEventCancellation={handlePartPurchaseEventCancellation}
-                                        handlePartPurchaseEventSubmission={handlePartPurchaseEventSubmission}
-        />)
-    }
-    const initialForm = <MaintenanceForm handleEditPartPurchaseEvent={handleEditPartPurchaseEvent}
-                                         handlePartPurchaseEventCreation={handlePartPurchaseEventCreation}
-                                         handleServiceProviderCreation={handleServiceProviderCreation}
-                                         handleDateChange={handleDateChange}
-                                         handleMaintenanceReportFormChange={handleMaintenanceReportFormChange}
-                                         handleMaintenanceReportSubmission={handleMaintenanceReportSubmission}
-                                         handleMaintenanceReportCancellation={handleMaintenanceReportCancellation}
-    />
-
-    const [formToShow, setFormToShow] = useState(initialForm)
-    const handleServiceProviderFormSubmission = async () => {
-        try {
-            const response = await axios.post(`${API}maintenance/service-providers/`,
-                serviceProviderFormData, {headers: {'Content-Type': "application/json"}, withCredentials: true})
-            setGeneralData({
-                ...generalData,
-                service_providers: [...generalData.service_providers, response.data]
-            })
-            setFormToShow(initialForm)
-
-        } catch (error) {
-            console.log(error)
-        }
-    }
-    const handleServiceProviderCancellation = () => {
-        setFormToShow(initialForm)
+        setShowPartPurchaseEventForm(true)
     }
     const handlePartPurchaseEventCancellation = () => {
-        setFormToShow(initialForm)
+        setShowPartPurchaseEventForm(false)
     }
     return (
         <View>
-            {formToShow}
+            {
+             showPartPurchaseEventForm ? <PartPurchaseForm partPurchaseFormData={partPurchaseFormData}
+                                                               handlePartPurchaseFormChange={handlePartPurchaseFormChange}
+                                                               handlePartInputChange={handlePartInputChange}
+                                                               searchTerm={searchTerm} selectPart={selectPart}
+                                                               setIsPartSelected={setIsPartSelected}
+                                                               isPartSelected={isPartSelected}
+                                                               handleDateChange={handleDateChange}
+                                                               handlePartPurchaseEventCancellation={handlePartPurchaseEventCancellation}
+                                                               handlePartPurchaseEventSubmission={handlePartPurchaseEventSubmission}
+                /> :
+                <MaintenanceForm handleEditPartPurchaseEvent={handleEditPartPurchaseEvent}
+                                 handlePartPurchaseEventCreation={handlePartPurchaseEventCreation}
+                                 handleDateChange={handleDateChange}
+                                 handleMaintenanceReportFormChange={handleMaintenanceReportFormChange}
+                                 handleMaintenanceReportSubmission={handleMaintenanceReportSubmission}
+                                 handleMaintenanceReportCancellation={handleMaintenanceReportCancellation}
+                />
+            }
         </View>
     );
 };

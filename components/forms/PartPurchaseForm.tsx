@@ -8,7 +8,6 @@ import CustomDatePicker from "../CustomDatePicker";
 import ThemedInputText from "../ThemedInputText";
 import {PartPurchaseEventFormType} from "@/types/maintenance";
 import {useGlobalContext} from "@/context/GlobalProvider";
-import {router} from "expo-router";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 
 interface PartPurchaseFormProps {
@@ -39,12 +38,6 @@ const PartPurchaseForm = ({
                               handlePartPurchaseEventSubmission,
                           }: PartPurchaseFormProps) => {
     const {generalData} = useGlobalContext();
-    const handleCreatePartProvider = () => {
-        router.replace("/forms/part-provider");
-    }
-    const handlePartCreation = () => {
-        router.replace("/forms/part")
-    }
     return (
         <View className={"w-[94%] bg-white rounded p-5"}>
             <Text className={"font-semibold text-txt text-sm"}>Part Purchase Form</Text>
@@ -55,7 +48,6 @@ const PartPurchaseForm = ({
                                items={generalData.part_providers.map((partProvider) => ({label: partProvider.name, value: partProvider.id}))}
                                handleItemChange={handlePartPurchaseFormChange}
                                buttonTitle={"Create Part Provider"}
-                               handleButtonPress={handleCreatePartProvider}
             />
             <View className={"flex-1"}>
                 <AutoPartInput parts={generalData.parts}
@@ -65,11 +57,6 @@ const PartPurchaseForm = ({
                                setIsPartSelected={setIsPartSelected}
                                isPartSelected={isPartSelected}
                                icon={icons.search}
-                />
-                <ThemedButton title={"Create part"}
-                              handlePress={handlePartCreation}
-                              containerStyles={"bg-secondary w-full p-5 rounded-[50%] mt-3"}
-                              textStyles={"text-white font-semibold text-base"}
                 />
             </View>
 

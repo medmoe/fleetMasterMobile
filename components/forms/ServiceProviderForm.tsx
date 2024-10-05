@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Text, View} from 'react-native';
 import ThemedButton from "../ThemedButton";
 import CustomPicker from "@/components/CustomPicker";
@@ -7,14 +7,14 @@ import ThemedInputText from "@/components/ThemedInputText";
 
 interface ServiceProviderFormProps {
     handleServiceProviderSubmission: () => void
-    handleServiceProviderCancellation: () => void
+    handleServiceProviderCreationCancellation: () => void
     serviceProviderFormData: ServiceProviderType
     handleServiceProviderFormChange: (name: string, value: string) => void
 }
 
 const ServiceProviderForm = ({
                                  handleServiceProviderSubmission,
-                                 handleServiceProviderCancellation,
+                                 handleServiceProviderCreationCancellation,
                                  serviceProviderFormData,
                                  handleServiceProviderFormChange
                              }: ServiceProviderFormProps) => {
@@ -43,14 +43,13 @@ const ServiceProviderForm = ({
                              name={'address'}
                              containerStyles={"bg-background p-5"}
             />
-
             <ThemedButton title={"Submit"}
                           handlePress={handleServiceProviderSubmission}
                           containerStyles="bg-primary p-5 rounded-[50%] mt-[10px]"
                           textStyles={"text-white font-semibold text-base"}
             />
             <ThemedButton title={"Cancel"}
-                          handlePress={handleServiceProviderCancellation}
+                          handlePress={handleServiceProviderCreationCancellation}
                           containerStyles="bg-default p-5 rounded-[50%] mt-[10px]"
                           textStyles={"text-white font-semibold text-base"}
             />

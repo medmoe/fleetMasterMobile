@@ -8,7 +8,7 @@ import {API} from "@/constants/endpoints";
 import {router} from "expo-router";
 
 const Part = () => {
-    const {parts, setParts} = useGlobalContext();
+    const {generalData, setGeneralData} = useGlobalContext();
     const [isLoading, setIsLoading] = useState(false);
     const [showPartCreationForm, setShowPartCreationForm] = useState(false)
     const [partFormData, setPartFormData] = useState({name: "", description: ""})
@@ -31,7 +31,10 @@ const Part = () => {
         setIsLoading(true);
         try {
             const response = await axios.post(`${API}maintenance/parts/`, partFormData, {headers: {'Content-Type': 'application/json'}, withCredentials: true});
-            setParts([...parts, response.data]);
+            setGeneralData({
+                ...generalData,
+                parts: [...generalData.parts, response.data]
+            })
             setShowPartCreationForm(false);
         } catch (error: any) {
             console.log(error);
@@ -60,7 +63,7 @@ const Part = () => {
                                 <Text className={"font-open-sans text-txt text-sm"}>Here is the list of parts</Text>
                             </View>
                             <View>
-                                {parts.map((part, idx) => {
+                                {generalData.parts.map((part, idx) => {
                                     return (
                                         <Pressable onPress={handleEditPart} key={idx}>
                                             <View className={"flex-row p-[16px] bg-white rounded shadow mt-3"}>
@@ -85,7 +88,6 @@ const Part = () => {
                                               textStyles={"font-semibold text-base text-white"}
                                 />
                             </View>
-
                         </View>
                     </View>
                 }

@@ -13,7 +13,6 @@ import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 interface MaintenanceFormProps {
     handleEditPartPurchaseEvent: () => void
     handlePartPurchaseEventCreation: () => void
-    handleServiceProviderCreation: () => void
     handleDateChange: (name: string) => (_: DateTimePickerEvent, date?: Date) => void
     handleMaintenanceReportFormChange: (name: string, value: string) => void
     handleMaintenanceReportSubmission: () => void
@@ -27,7 +26,6 @@ const MaintenanceForm = ({
                              handleMaintenanceReportFormChange,
                              handleMaintenanceReportSubmission,
                              handleMaintenanceReportCancellation,
-                             handleServiceProviderCreation,
                              handlePartPurchaseEventCreation,
                          }: MaintenanceFormProps) => {
     const {partPurchaseEvents, generalData} = useGlobalContext()
@@ -65,10 +63,9 @@ const MaintenanceForm = ({
                                        title={"Pick service provider"}
                                        name={"service_provider"}
                                        value={"value"}
-                                       items={generalData.service_providers}
+                                       items={generalData.service_providers.map((serviceProvider) => ({label: serviceProvider.name, value: serviceProvider.id}))}
                                        handleItemChange={() => console.log("service provider picked")}
                                        buttonTitle={"Create service Provider"}
-                                       handleButtonPress={handleServiceProviderCreation}
                     />
                     <View className={"flex-row"}>
                         <CustomDatePicker date={new Date()} handleChange={handleDateChange} label={"Start date"} name={"start_date"}/>

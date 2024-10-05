@@ -54,8 +54,10 @@ const VehicleForm = ({vehicleData, handleChange, handleDateChange, dates, submit
                     })}
 
                 </View>
-                <ThemedButton title={"Submit"} handlePress={submitForm} containerStyles={"w-full bg-primary p-5 rounded-[50%]"} textStyles={"text-white font-semibold text-base"}/>
-                <ThemedButton title={"Cancel"} handlePress={cancelSubmission} containerStyles={"w-full bg-error p-5 rounded-[50%] mt-[10px]"} textStyles={"text-white font-semibold text-base"}/>
+                <View className={"mt-3"}>
+                    <ThemedButton title={"Submit"} handlePress={submitForm} containerStyles={"w-full bg-primary p-5 rounded-[50%]"} textStyles={"text-white font-semibold text-base"}/>
+                    <ThemedButton title={"Cancel"} handlePress={cancelSubmission} containerStyles={"w-full bg-default p-5 rounded-[50%] mt-[10px]"} textStyles={"text-white font-semibold text-base"}/>
+                </View>
             </View>
         </View>
     );

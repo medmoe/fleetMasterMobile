@@ -8,6 +8,7 @@ const FormsLayout = () => {
             <Stack.Screen name="vehicle" options={{headerShown: false}}/>
             <Stack.Screen name="part-provider" options={{headerShown: false}} />
             <Stack.Screen name={"part"} options={{headerShown: false}} />
+            <Stack.Screen name={"service-provider"} options={{headerShown: false}} />
         </Stack>
     )
 };

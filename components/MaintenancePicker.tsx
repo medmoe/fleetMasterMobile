@@ -11,15 +11,13 @@ interface MaintenancePickerProps {
     items: any[]
     handleItemChange: (name: string, value: string) => void
     buttonTitle: string
-    handleButtonPress: () => void
 }
 
-const MaintenancePicker = ({containerStyles, title, name, value, items, handleButtonPress, handleItemChange, buttonTitle}: MaintenancePickerProps) => {
+const MaintenancePicker = ({containerStyles, title, name, value, items , handleItemChange}: MaintenancePickerProps) => {
     return (
         <View className={`${containerStyles}`}>
             <Text className={"text-txt text-sm font-open-sans"}>{title}</Text>
             <CustomPicker name={name} value={value} items={items} handleChange={handleItemChange}/>
-            <ThemedButton title={buttonTitle} handlePress={handleButtonPress} containerStyles={"bg-secondary w-full p-5 rounded-[50%]"} textStyles={"text-white font-semibold text-base"}/>
         </View>
     );
 };
