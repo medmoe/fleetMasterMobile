@@ -9,15 +9,16 @@ interface PartFormProps {
     handlePartInputChange: (name: string, value: string) => void
     handlePartSubmission: () => void
     handlePartCancellation: () => void
+    subtitle: string
 }
 
-const PartForm = ({part, handlePartInputChange, handlePartSubmission, handlePartCancellation}: PartFormProps) => {
+const PartForm = ({subtitle, part, handlePartInputChange, handlePartSubmission, handlePartCancellation}: PartFormProps) => {
     return (
         <View className={"w-full justify-center items-center"}>
             <View className={"w-[94%] bg-white rounded p-5"}>
                 <View className={"gap-2"}>
                     <Text className={"font-semibold text-txt text-base"}>Part Form</Text>
-                    <Text className={"font-open-sans text-txt text-sm"}>Fill in part's details below.</Text>
+                    <Text className={"font-open-sans text-txt text-sm"}>{subtitle}</Text>
                 </View>
                 <View className={"mt-[25px]"}>
                     <ThemedInputText placeholder={"Enter part name"}

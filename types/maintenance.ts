@@ -1,5 +1,5 @@
 export interface PartProviderType {
-    id: number
+    id?: string
     name: string
     phone_number: string
     address: string
@@ -14,7 +14,7 @@ export interface PartPurchaseEventType {
 }
 
 export interface PartType {
-    id: number
+    id?: number
     name: string
     description: string
 }

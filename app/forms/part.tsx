@@ -1,27 +1,44 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {Pressable, SafeAreaView, ScrollView, Text, View} from 'react-native';
 import {useGlobalContext} from "@/context/GlobalProvider";
-import {ListItemDetail, ThemedButton} from "@/components";
+import {AutoPartInput, ListItemDetail, ThemedButton} from "@/components";
 import PartForm from "@/components/forms/PartForm";
 import axios from "axios";
 import {API} from "@/constants/endpoints";
 import {router} from "expo-router";
+import {PartType} from "@/types/maintenance";
+
 
 const Part = () => {
     const {generalData, setGeneralData} = useGlobalContext();
     const [isLoading, setIsLoading] = useState(false);
     const [showPartCreationForm, setShowPartCreationForm] = useState(false)
     const [partFormData, setPartFormData] = useState({name: "", description: ""})
-    const handleEditPart = () => {
-
+    const [searchTerm, setSearchTerm] = useState("");
+    const [isSelected, setIsSelected] = useState(false);
+    const [part, setPart] = useState<PartType>({name: "", description: ""})
+    const [isUpdate, setIsUpdate] = useState(false);
+    const [subtitle, setSubtitle] = useState("Fill in the fields below.")
+    const setIsPartSelected = useCallback((isSelected: boolean) => {
+        setIsSelected(isSelected)
+    }, [])
+    const handleEditPart = (part: PartType) => {
+        setPartFormData(part);
+        setShowPartCreationForm(true);
+        setIsUpdate(true);
+        setSubtitle("Edit the fields below.")
     }
     const handlePartCreation = () => {
+        setPartFormData({name: "", description: ""})
+        setIsUpdate(false);
         setShowPartCreationForm(true);
+        setSubtitle("Fill in the fields below.")
     }
     const handleCancelPartCreation = () => {
         router.replace("/maintenance/maintenance-report")
     }
     const handlePartInputChange = (name: string, value: string) => {
+        console.log(partFormData);
         setPartFormData(prevState => ({
             ...prevState,
             [name]: value
@@ -30,14 +47,26 @@ const Part = () => {
     const handlePartSubmission = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.post(`${API}maintenance/parts/`, partFormData, {headers: {'Content-Type': 'application/json'}, withCredentials: true});
-            setGeneralData({
-                ...generalData,
-                parts: [...generalData.parts, response.data]
-            })
+            const url = !isUpdate ? `${API}maintenance/parts/` : `${API}/maintenance/parts/${part.id}/`
+            const options = {headers: {'Content-Type': 'application/json'}, withCredentials: true};
+            const response = !isUpdate ? await axios.post(url, partFormData, options) : await axios.put(url, partFormData, options);
+            if (!isUpdate) {
+                setGeneralData({
+                    ...generalData,
+                    parts: [...generalData.parts, response.data]
+                })
+            } else {
+                const filteredParts = generalData.parts.filter((item) => item.id !== part.id);
+                setGeneralData({
+                    ...generalData,
+                    parts: [...filteredParts, response.data]
+                })
+            }
             setShowPartCreationForm(false);
+            setSearchTerm("")
+            setPart({name: "", description:""})
         } catch (error: any) {
-            console.log(error);
+            console.log(error.response.data);
         } finally {
             setIsLoading(false);
         }
@@ -45,7 +74,18 @@ const Part = () => {
     const handlePartCancellation = () => {
         setShowPartCreationForm(false);
     }
+    const handleSearchPartInputChange = (name: string, value: string) => {
+        setSearchTerm(value);
+    }
 
+    const selectPart = (name: string, id: string) => {
+        setSearchTerm(name)
+        const part = generalData.parts.find((part) => part.id?.toString() === id)
+        if (part) {
+            setPart(part);
+        }
+        setIsSelected(true);
+    }
     return (
         <SafeAreaView>
             <ScrollView>
@@ -54,27 +94,33 @@ const Part = () => {
                               handlePartInputChange={handlePartInputChange}
                               handlePartSubmission={handlePartSubmission}
                               handlePartCancellation={handlePartCancellation}
+                              subtitle={subtitle}
                     />
                     :
                     <View className={"w-full justify-center items-center"}>
                         <View className={"w-[94%] bg-white rounded p-5"}>
                             <View className={"gap-2"}>
                                 <Text className={"font-semibold text-base text-txt"}>Part's list</Text>
-                                <Text className={"font-open-sans text-txt text-sm"}>Here is the list of parts</Text>
+                                <Text className={"font-open-sans text-txt text-sm"}>Start typing to find auto part.</Text>
                             </View>
-                            <View>
-                                {generalData.parts.map((part, idx) => {
-                                    return (
-                                        <Pressable onPress={handleEditPart} key={idx}>
-                                            <View className={"flex-row p-[16px] bg-white rounded shadow mt-3"}>
-                                                <View className={"flex-1"}>
-                                                    <ListItemDetail label={"Part name"} value={part.name} textStyle={"text-txt"}/>
-                                                    <ListItemDetail label={"Description"} value={part.description} textStyle={"text-txt"}/>
-                                                </View>
+                            <View className={"flex-1"}>
+                                <AutoPartInput parts={generalData.parts}
+                                               handlePartInputChange={handleSearchPartInputChange}
+                                               searchTerm={searchTerm}
+                                               selectPart={selectPart}
+                                               isPartSelected={isSelected}
+                                               setIsPartSelected={setIsPartSelected}
+                                />
+                                {
+                                    part.name ? <Pressable onPress={() => handleEditPart(part)}>
+                                        <View className={"flex-row p-[16px] bg-white rounded shadow mt-3"}>
+                                            <View className={"flex-1"}>
+                                                <ListItemDetail label={"Part name"} value={part.name} textStyle={"text-txt"}/>
+                                                <ListItemDetail label={"Description"} value={part.description} textStyle={"text-txt"}/>
                                             </View>
-                                        </Pressable>
-                                    )
-                                })}
+                                        </View>
+                                    </Pressable> : <></>
+                                }
                             </View>
                             <View className={"w-full pt-5"}>
                                 <ThemedButton title={"Add part"}

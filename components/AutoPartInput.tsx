@@ -54,7 +54,7 @@ const AutoPartInput = ({handlePartInputChange, parts, searchTerm, selectPart, is
         }
     }, [searchTerm]);
     const trie: { [key: string]: {} } = {};
-    const addWord = (word: string, id: string) => {
+    const addWord = (word: string, id="") => {
         let currentNode = trie;
         for (let i = 0; i < word.length; i++) {
             const char = word[i];
@@ -65,7 +65,7 @@ const AutoPartInput = ({handlePartInputChange, parts, searchTerm, selectPart, is
         }
         currentNode['$'] = {id, exists: true}
     }
-    parts.forEach(item => addWord(item.name, item.id.toString()));
+    parts.forEach(item => addWord(item.name, item.id?.toString()));
 
     return (
         <View className={"flex-1"}>
