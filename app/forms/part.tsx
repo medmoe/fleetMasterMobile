@@ -1,7 +1,7 @@
 import React, {useCallback, useState} from 'react';
 import {Pressable, SafeAreaView, ScrollView, Text, View} from 'react-native';
 import {useGlobalContext} from "@/context/GlobalProvider";
-import {AutoPartInput, ListItemDetail, ThemedButton} from "@/components";
+import {AutoPartInput, ListItemDetail, Spinner, ThemedButton} from "@/components";
 import PartForm from "@/components/forms/PartForm";
 import axios from "axios";
 import {API} from "@/constants/endpoints";
@@ -64,7 +64,7 @@ const Part = () => {
             }
             setShowPartCreationForm(false);
             setSearchTerm("")
-            setPart({name: "", description:""})
+            setPart({name: "", description: ""})
         } catch (error: any) {
             console.log(error.response.data);
         } finally {
@@ -89,53 +89,54 @@ const Part = () => {
     return (
         <SafeAreaView>
             <ScrollView>
-                {showPartCreationForm ?
-                    <PartForm part={partFormData}
-                              handlePartInputChange={handlePartInputChange}
-                              handlePartSubmission={handlePartSubmission}
-                              handlePartCancellation={handlePartCancellation}
-                              subtitle={subtitle}
-                    />
-                    :
-                    <View className={"w-full justify-center items-center"}>
-                        <View className={"w-[94%] bg-white rounded p-5"}>
-                            <View className={"gap-2"}>
-                                <Text className={"font-semibold text-base text-txt"}>Part's list</Text>
-                                <Text className={"font-open-sans text-txt text-sm"}>Start typing to find auto part.</Text>
-                            </View>
-                            <View className={"flex-1"}>
-                                <AutoPartInput parts={generalData.parts}
-                                               handlePartInputChange={handleSearchPartInputChange}
-                                               searchTerm={searchTerm}
-                                               selectPart={selectPart}
-                                               isPartSelected={isSelected}
-                                               setIsPartSelected={setIsPartSelected}
-                                />
-                                {
-                                    part.name ? <Pressable onPress={() => handleEditPart(part)}>
-                                        <View className={"flex-row p-[16px] bg-white rounded shadow mt-3"}>
-                                            <View className={"flex-1"}>
-                                                <ListItemDetail label={"Part name"} value={part.name} textStyle={"text-txt"}/>
-                                                <ListItemDetail label={"Description"} value={part.description} textStyle={"text-txt"}/>
+                {isLoading ? <View className={"w-full justify-center items-center h-full px-4"}><Spinner isVisible={isLoading}/></View> :
+                    showPartCreationForm ?
+                        <PartForm part={partFormData}
+                                  handlePartInputChange={handlePartInputChange}
+                                  handlePartSubmission={handlePartSubmission}
+                                  handlePartCancellation={handlePartCancellation}
+                                  subtitle={subtitle}
+                        />
+                        :
+                        <View className={"w-full justify-center items-center"}>
+                            <View className={"w-[94%] bg-white rounded p-5"}>
+                                <View className={"gap-2"}>
+                                    <Text className={"font-semibold text-base text-txt"}>Part's list</Text>
+                                    <Text className={"font-open-sans text-txt text-sm"}>Start typing to find auto part.</Text>
+                                </View>
+                                <View className={"flex-1"}>
+                                    <AutoPartInput parts={generalData.parts}
+                                                   handlePartInputChange={handleSearchPartInputChange}
+                                                   searchTerm={searchTerm}
+                                                   selectPart={selectPart}
+                                                   isPartSelected={isSelected}
+                                                   setIsPartSelected={setIsPartSelected}
+                                    />
+                                    {
+                                        part.name ? <Pressable onPress={() => handleEditPart(part)}>
+                                            <View className={"flex-row p-[16px] bg-white rounded shadow mt-3"}>
+                                                <View className={"flex-1"}>
+                                                    <ListItemDetail label={"Part name"} value={part.name} textStyle={"text-txt"}/>
+                                                    <ListItemDetail label={"Description"} value={part.description} textStyle={"text-txt"}/>
+                                                </View>
                                             </View>
-                                        </View>
-                                    </Pressable> : <></>
-                                }
-                            </View>
-                            <View className={"w-full pt-5"}>
-                                <ThemedButton title={"Add part"}
-                                              handlePress={handlePartCreation}
-                                              containerStyles={"bg-primary p-5 rounded-[50%]"}
-                                              textStyles={"font-semibold text-base text-white"}
-                                />
-                                <ThemedButton title={"Cancel"}
-                                              handlePress={handleCancelPartCreation}
-                                              containerStyles={"bg-default p-5 rounded-[50%] mt-3"}
-                                              textStyles={"font-semibold text-base text-white"}
-                                />
+                                        </Pressable> : <></>
+                                    }
+                                </View>
+                                <View className={"w-full pt-5"}>
+                                    <ThemedButton title={"Add part"}
+                                                  handlePress={handlePartCreation}
+                                                  containerStyles={"bg-primary p-5 rounded-[50%]"}
+                                                  textStyles={"font-semibold text-base text-white"}
+                                    />
+                                    <ThemedButton title={"Cancel"}
+                                                  handlePress={handleCancelPartCreation}
+                                                  containerStyles={"bg-default p-5 rounded-[50%] mt-3"}
+                                                  textStyles={"font-semibold text-base text-white"}
+                                    />
+                                </View>
                             </View>
                         </View>
-                    </View>
                 }
             </ScrollView>
         </SafeAreaView>
