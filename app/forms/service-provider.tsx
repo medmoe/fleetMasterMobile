@@ -15,6 +15,8 @@ const ServiceProvider = () => {
     const [showServiceProviderCreationForm, setShowServiceProviderCreationForm] = useState(false);
     const [isUpdate, setIsUpdate] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [showDeleteFeatures, setShowDeleteFeatures] = useState(false);
+    const options = {headers: {'Content-Type': "application/json"}, withCredentials: true}
     const handleServiceProviderCreationCancellation = () => {
         setShowServiceProviderCreationForm(false);
     }
@@ -28,7 +30,6 @@ const ServiceProvider = () => {
         setIsLoading(true)
         try {
             const url = !isUpdate ? `${API}maintenance/service-providers/` : `${API}maintenance/service-providers/${serviceProviderFormData.id}/`
-            const options = {headers: {'Content-Type': "application/json"}, withCredentials: true}
             const response = !isUpdate ? await axios.post(url, serviceProviderFormData, options) : await axios.put(url, serviceProviderFormData, options)
             const filteredServiceProviders = generalData.service_providers.filter((serviceProvider) => serviceProvider.id !== serviceProviderFormData.id);
             setGeneralData({
@@ -57,6 +58,27 @@ const ServiceProvider = () => {
     const handleServiceProviderAdditionCancellation = () => {
         router.replace('/maintenance/maintenance-report');
     }
+    const handleServiceProviderDeletion = async () => {
+        setIsLoading(true)
+        try {
+            const url = `${API}maintenance/service-providers/${serviceProviderFormData.id}/`;
+            await axios.delete(url, options)
+            const filteredServiceProviders = generalData.service_providers.filter((serviceProvider) => serviceProvider.id !== serviceProviderFormData.id)
+            setGeneralData({
+                ...generalData,
+                service_providers: filteredServiceProviders,
+            })
+            setShowDeleteFeatures(false);
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setIsLoading(false);
+        }
+    }
+    const handleServiceProviderLongPress = (serviceProvider: ServiceProviderType) => {
+        setShowDeleteFeatures(true);
+        setServiceProviderFormData(serviceProvider);
+    }
     return (
         <SafeAreaView>
             <ScrollView>
@@ -77,8 +99,9 @@ const ServiceProvider = () => {
                                 <View>
                                     {generalData.service_providers.map((serviceProvider, idx) => {
                                         return (
-                                            <Pressable onPress={() => handleServiceProviderEdition(serviceProvider)} key={idx}>
-                                                <View className={"flex-row p-[16px] bg-white rounded shadow mt-3"}>
+                                            <Pressable onPress={() => handleServiceProviderEdition(serviceProvider)} key={idx} onLongPress={() => handleServiceProviderLongPress(serviceProvider)}>
+                                                <View
+                                                    className={`flex-row p-[16px] bg-white rounded shadow mt-3 ${showDeleteFeatures && serviceProvider.id === serviceProviderFormData.id ? "shadow-error" : ""}`}>
                                                     <View className={"flex-1"}>
                                                         <ListItemDetail label={"Name"} value={serviceProvider.name} textStyle={"text-txt"}/>
                                                         <ListItemDetail label={"Phone number"} value={serviceProvider.phone_number} textStyle={"text-txt"}/>
@@ -96,6 +119,12 @@ const ServiceProvider = () => {
                                                   containerStyles={"bg-primary p-5 rounded-[50%]"}
                                                   textStyles={"font-semibold text-base text-white"}
                                     />
+                                    {showDeleteFeatures && <ThemedButton title={"Delete Service Provider"}
+                                                                         handlePress={handleServiceProviderDeletion}
+                                                                         containerStyles={"bg-error p-5 rounded-[50%] mt-3"}
+                                                                         textStyles={"font-semibold text-base text-white"}
+                                    />
+                                    }
                                     <ThemedButton title={"Cancel"}
                                                   handlePress={handleServiceProviderAdditionCancellation}
                                                   containerStyles={"bg-default p-5 rounded-[50%] mt-3"}

@@ -19,6 +19,8 @@ const Part = () => {
     const [part, setPart] = useState<PartType>({name: "", description: ""})
     const [isUpdate, setIsUpdate] = useState(false);
     const [subtitle, setSubtitle] = useState("Fill in the fields below.")
+    const [showDeleteFeatures, setShowDeleteFeatures] = useState(false);
+    const options = {headers: {'Content-Type': 'application/json'}, withCredentials: true};
     const setIsPartSelected = useCallback((isSelected: boolean) => {
         setIsSelected(isSelected)
     }, [])
@@ -48,7 +50,7 @@ const Part = () => {
         setIsLoading(true);
         try {
             const url = !isUpdate ? `${API}maintenance/parts/` : `${API}/maintenance/parts/${part.id}/`
-            const options = {headers: {'Content-Type': 'application/json'}, withCredentials: true};
+
             const response = !isUpdate ? await axios.post(url, partFormData, options) : await axios.put(url, partFormData, options);
             if (!isUpdate) {
                 setGeneralData({
@@ -86,6 +88,30 @@ const Part = () => {
         }
         setIsSelected(true);
     }
+    const handlePartDeletion = async () => {
+        setIsLoading(true)
+        try {
+            const url = `${API}maintenance/parts/${part.id}/`
+            await axios.delete(url, options)
+            const filteredParts = generalData.parts.filter((item) => item.id !== part.id)
+            setGeneralData({
+                ...generalData,
+                parts: filteredParts,
+            })
+            setShowDeleteFeatures(false)
+            setPart({name: "", description: ""})
+            setPartFormData({name: "", description: ""})
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setIsLoading(false);
+        }
+    }
+    const handlePartLongPress = (part: PartType) => {
+        setShowDeleteFeatures(true);
+        setPart(part);
+    }
+
     return (
         <SafeAreaView>
             <ScrollView>
@@ -113,8 +139,8 @@ const Part = () => {
                                                    setIsPartSelected={setIsPartSelected}
                                     />
                                     {
-                                        part.name ? <Pressable onPress={() => handleEditPart(part)}>
-                                            <View className={"flex-row p-[16px] bg-white rounded shadow mt-3"}>
+                                        part.name ? <Pressable onPress={() => handleEditPart(part)} onLongPress={() => handlePartLongPress(part)}>
+                                            <View className={`flex-row p-[16px] bg-white rounded shadow mt-3 ${showDeleteFeatures ? "shadow-error" : ""}`}>
                                                 <View className={"flex-1"}>
                                                     <ListItemDetail label={"Part name"} value={part.name} textStyle={"text-txt"}/>
                                                     <ListItemDetail label={"Description"} value={part.description} textStyle={"text-txt"}/>
@@ -129,6 +155,12 @@ const Part = () => {
                                                   containerStyles={"bg-primary p-5 rounded-[50%]"}
                                                   textStyles={"font-semibold text-base text-white"}
                                     />
+                                    {showDeleteFeatures && <ThemedButton title={"Delete Part"}
+                                                                         handlePress={handlePartDeletion}
+                                                                         containerStyles={"bg-error p-5 rounded-[50%] mt-3"}
+                                                                         textStyles={"font-semibold text-base text-white"}
+                                    />
+                                    }
                                     <ThemedButton title={"Cancel"}
                                                   handlePress={handleCancelPartCreation}
                                                   containerStyles={"bg-default p-5 rounded-[50%] mt-3"}
