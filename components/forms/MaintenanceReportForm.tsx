@@ -2,12 +2,12 @@ import React, {useState} from 'react';
 import {Alert, View} from 'react-native';
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 import {useGlobalContext} from "@/context/GlobalProvider";
-import {PartPurchaseEventFormType, PartPurchaseEventType, ServiceProviderType} from "@/types/maintenance";
+import {PartPurchaseEventFormType, PartPurchaseEventType} from "@/types/maintenance";
 import PartPurchaseForm from "@/components/forms/PartPurchaseForm";
 import axios from "axios";
 import {API} from "@/constants/endpoints";
-import ServiceProviderForm from "@/components/forms/ServiceProviderForm";
 import MaintenanceForm from "@/components/forms/MaintenanceForm";
+import {router} from "expo-router";
 
 
 interface MaintenanceFormProps {
@@ -40,11 +40,20 @@ const MaintenanceReportForm = ({
                                }: MaintenanceFormProps) => {
     const {partPurchaseEvents, setPartPurchaseEvents, generalData, setGeneralData} = useGlobalContext();
     const [showPartPurchaseEventForm, setShowPartPurchaseEventForm] = useState(false);
+    const [showDeleteFeatures, setShowDeleteFeatures] = useState(false);
+    const [partPurchaseEventId, setPartPurchaseEventId] = useState("")
+    const [isLoading, setIsLoading] = useState(false)
+    const options = {headers: {'Content-Type': 'application/json'}, withCredentials: true};
     const handleEditPartPurchaseEvent = () => {
 
     }
+    const handlePartPurchaseEventOnLongPress = (partPurchaseEventId?: string) => {
+        setShowDeleteFeatures(true);
+        setPartPurchaseEventId(partPurchaseEventId || "")
+    }
 
     const handlePartPurchaseEventSubmission = async () => {
+        setIsLoading(true)
         try {
             // Validating and formatting data
             if (!partPurchaseFormData.cost || !partPurchaseFormData.part || !partPurchaseFormData.provider || !partPurchaseFormData.purchase_date) {
@@ -55,13 +64,14 @@ const MaintenanceReportForm = ({
                 ...partPurchaseFormData,
                 purchase_date: partPurchaseFormData.purchase_date.toLocaleDateString("en-CA", {year: "numeric", month: "2-digit", day: "2-digit"})
             }
-            const response = await axios.post(`${API}maintenance/part-purchase-events/`,
-                partPurchaseEventDataToSend,
-                {headers: {'Content-Type': 'application/json'}, withCredentials: true})
+            const url = `${API}maintenance/part-purchase-events/`;
+            const response = await axios.post(url, partPurchaseEventDataToSend, options)
             setPartPurchaseEvents([...partPurchaseEvents, response.data])
             setShowPartPurchaseEventForm(false)
         } catch (error: any) {
             console.log(error.response.data)
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -69,28 +79,59 @@ const MaintenanceReportForm = ({
         setShowPartPurchaseEventForm(true)
     }
     const handlePartPurchaseEventCancellation = () => {
-        setShowPartPurchaseEventForm(false)
+        if (showDeleteFeatures) {
+            setShowDeleteFeatures(false);
+            setPartPurchaseEventId("");
+        } else {
+            setShowPartPurchaseEventForm(false)
+        }
+    }
+    const handlePartPurchaseEventDeletion = async () => {
+        setIsLoading(true)
+        try {
+            if (!partPurchaseEventId) {
+                Alert.alert("Error", "No part purchase event selected.")
+                return
+            }
+            const url = `${API}maintenance/part-purchase-events/${partPurchaseEventId}/`
+            await axios.delete(url, options)
+            setShowDeleteFeatures(false)
+            const filteredPartPurchaseEvents = partPurchaseEvents.filter((partPurchaseEvent) => partPurchaseEvent.id?.toString() !== partPurchaseEventId)
+            setPartPurchaseEvents(filteredPartPurchaseEvents)
+
+        } catch (error: any) {
+            if (error.response.status === 401) {
+                Alert.alert("Authentication Error", "You are not allowed to perform this action!")
+                router.replace("/")
+            }
+        } finally {
+            setIsLoading(false);
+        }
     }
     return (
         <View>
             {
-             showPartPurchaseEventForm ? <PartPurchaseForm partPurchaseFormData={partPurchaseFormData}
-                                                               handlePartPurchaseFormChange={handlePartPurchaseFormChange}
-                                                               handlePartInputChange={handlePartInputChange}
-                                                               searchTerm={searchTerm} selectPart={selectPart}
-                                                               setIsPartSelected={setIsPartSelected}
-                                                               isPartSelected={isPartSelected}
-                                                               handleDateChange={handleDateChange}
-                                                               handlePartPurchaseEventCancellation={handlePartPurchaseEventCancellation}
-                                                               handlePartPurchaseEventSubmission={handlePartPurchaseEventSubmission}
-                /> :
-                <MaintenanceForm handleEditPartPurchaseEvent={handleEditPartPurchaseEvent}
-                                 handlePartPurchaseEventCreation={handlePartPurchaseEventCreation}
-                                 handleDateChange={handleDateChange}
-                                 handleMaintenanceReportFormChange={handleMaintenanceReportFormChange}
-                                 handleMaintenanceReportSubmission={handleMaintenanceReportSubmission}
-                                 handleMaintenanceReportCancellation={handleMaintenanceReportCancellation}
-                />
+                showPartPurchaseEventForm ? <PartPurchaseForm partPurchaseFormData={partPurchaseFormData}
+                                                              handlePartPurchaseFormChange={handlePartPurchaseFormChange}
+                                                              handlePartInputChange={handlePartInputChange}
+                                                              searchTerm={searchTerm} selectPart={selectPart}
+                                                              setIsPartSelected={setIsPartSelected}
+                                                              isPartSelected={isPartSelected}
+                                                              handleDateChange={handleDateChange}
+                                                              handlePartPurchaseEventCancellation={handlePartPurchaseEventCancellation}
+                                                              handlePartPurchaseEventSubmission={handlePartPurchaseEventSubmission}
+                    /> :
+                    <MaintenanceForm handleEditPartPurchaseEvent={handleEditPartPurchaseEvent}
+                                     handlePartPurchaseEventCreation={handlePartPurchaseEventCreation}
+                                     handleDateChange={handleDateChange}
+                                     handleMaintenanceReportFormChange={handleMaintenanceReportFormChange}
+                                     handleMaintenanceReportSubmission={handleMaintenanceReportSubmission}
+                                     handleMaintenanceReportCancellation={handleMaintenanceReportCancellation}
+                                     handlePartPurchaseEventDeletion={handlePartPurchaseEventDeletion}
+                                     handlePartPurchaseEventOnLongPress={handlePartPurchaseEventOnLongPress}
+                                     partPurchaseEventId={partPurchaseEventId}
+                                     showDeleteFeatures={showDeleteFeatures}
+                    />
             }
         </View>
     );

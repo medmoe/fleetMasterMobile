@@ -42,7 +42,7 @@ const PartPurchaseForm = ({
         <View className={"w-[94%] bg-white rounded p-5"}>
             <Text className={"font-semibold text-txt text-sm"}>Part Purchase Form</Text>
             <MaintenancePicker containerStyles={"mb-3"}
-                               title={"Pick a provider"}
+                               title={"Pick parts provider"}
                                name={"provider"}
                                value={partPurchaseFormData.provider.toString()}
                                items={generalData.part_providers.map((partProvider) => ({label: partProvider.name, value: partProvider.id}))}

@@ -2,21 +2,25 @@ import React from 'react';
 import {Pressable, Text, View} from 'react-native';
 import ListItemDetail from "../ListItemDetail";
 import ThemedButton from "../ThemedButton";
-import Divider from "../Divider";
 import MaintenancePicker from "../MaintenancePicker";
 import CustomDatePicker from "../CustomDatePicker";
 import ThemedInputText from "../ThemedInputText";
 import {useGlobalContext} from "@/context/GlobalProvider";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
+import {PartPurchaseEventType} from "@/types/maintenance";
 
 
 interface MaintenanceFormProps {
-    handleEditPartPurchaseEvent: () => void
+    handleEditPartPurchaseEvent: (partPurchaseEvent: PartPurchaseEventType) => void
     handlePartPurchaseEventCreation: () => void
     handleDateChange: (name: string) => (_: DateTimePickerEvent, date?: Date) => void
     handleMaintenanceReportFormChange: (name: string, value: string) => void
     handleMaintenanceReportSubmission: () => void
     handleMaintenanceReportCancellation: () => void
+    handlePartPurchaseEventOnLongPress: (partPurchaseEventId?: string) => void
+    handlePartPurchaseEventDeletion: () => void
+    showDeleteFeatures: boolean
+    partPurchaseEventId?: string
 
 }
 
@@ -27,38 +31,39 @@ const MaintenanceForm = ({
                              handleMaintenanceReportSubmission,
                              handleMaintenanceReportCancellation,
                              handlePartPurchaseEventCreation,
+                             handlePartPurchaseEventOnLongPress,
+                             handlePartPurchaseEventDeletion,
+                             showDeleteFeatures,
+                             partPurchaseEventId,
                          }: MaintenanceFormProps) => {
     const {partPurchaseEvents, generalData} = useGlobalContext()
     return (
         <View className={"w-full justify-center items-center"}>
             <View className={"w-[94%] bg-white rounded p-5"}>
                 <View className={"gap-2 mb-3"}>
-                    <Text className={"font-semibold text-txt text-base"}>Maintenance Form</Text>
-                    <Text className={"font-open-sans text-txt text-sm"}>Fill in vehicle's details below.</Text>
+                    <Text className={"font-semibold text-txt text-base"}>Maintenance Report Form</Text>
+                    <Text className={"font-open-sans text-txt text-sm"}>Fill details below.</Text>
                 </View>
                 <View className={"flex-1"}>
                     {partPurchaseEvents.map((partPurchaseEvent, idx) => {
+                        const part = generalData.parts.find((part) => partPurchaseEvent.part.toString() === part.id?.toString());
+                        const partProvider = generalData.part_providers.find((partsProvider) => partPurchaseEvent.provider === partsProvider.id);
                         return (
-                            <Pressable onPress={handleEditPartPurchaseEvent} key={idx}>
-                                <View className={"flex-1 p-[16px] bg-white rounded shadow mb-3"}>
-                                    <ListItemDetail label={"Part name"} value={partPurchaseEvent.part} textStyle={"text-txt"}/>
-                                    <ListItemDetail label={"Provider name"} value={partPurchaseEvent.provider} textStyle={"text-txt"}/>
+                            <Pressable onPress={() => handleEditPartPurchaseEvent(partPurchaseEvent)} key={idx}
+                                       onLongPress={() => handlePartPurchaseEventOnLongPress(partPurchaseEvent.id?.toString())}>
+                                <View className={`flex-1 p-[16px] bg-white rounded shadow mb-3 ${showDeleteFeatures && partPurchaseEventId === partPurchaseEvent.id?.toString()? "shadow-error" : ""}`}>
+                                    <ListItemDetail label={"Part name"} value={part?.name} textStyle={"text-txt"}/>
+                                    <ListItemDetail label={"Provider name"} value={partProvider?.name} textStyle={"text-txt"}/>
                                     <ListItemDetail label={"Purchase date"} value={partPurchaseEvent.purchase_date} textStyle={"text-txt"}/>
                                     <ListItemDetail label={"Cost"} value={partPurchaseEvent.cost} textStyle={"text-txt"}/>
                                 </View>
                             </Pressable>
                         )
                     })}
-                    <ThemedButton title={"Create part purchase event"}
-                                  handlePress={handlePartPurchaseEventCreation}
-                                  containerStyles={"bg-secondary p-5 rounded-[50%]"}
-                                  textStyles={"text-white text-base font-semibold"}
-                    />
+
                 </View>
 
-                <Divider/>
                 <View>
-                    <Text className={"font-semibold text-txt text-sm"}>Maintenance Report Form</Text>
                     <MaintenancePicker containerStyles={"mb-3"}
                                        title={"Pick service provider"}
                                        name={"service_provider"}
@@ -74,15 +79,25 @@ const MaintenanceForm = ({
                     <ThemedInputText placeholder={"Enter the Cost"} value={"0"} onChange={handleMaintenanceReportFormChange} name={'cost'} containerStyles={"bg-background p-5"}/>
                     <ThemedInputText placeholder={"Enter Mileage"} value={"0"} onChange={handleMaintenanceReportFormChange} name={'mileage'} containerStyles={"bg-background p-5"}/>
                     <ThemedInputText placeholder={"Notes"} value={"0"} onChange={handleMaintenanceReportFormChange} name={'mileage'} containerStyles={"bg-background p-5"}/>
-                    <Divider/>
+                    {showDeleteFeatures && <ThemedButton title={"Delete Part Purchase Event"}
+                                                         handlePress={handlePartPurchaseEventDeletion}
+                                                         containerStyles={"bg-error p-5 rounded-[50%] mt-3"}
+                                                         textStyles={"text-white text-base font-semibold"}
+                    />
+                    }
+                    <ThemedButton title={"Create part purchase event"}
+                                  handlePress={handlePartPurchaseEventCreation}
+                                  containerStyles={"bg-secondary p-5 rounded-[50%] mt-3"}
+                                  textStyles={"text-white text-base font-semibold"}
+                    />
                     <ThemedButton title={"Submit Report"}
                                   handlePress={handleMaintenanceReportSubmission}
-                                  containerStyles={"bg-primary p-5 rounded-[50%]"}
+                                  containerStyles={"bg-primary p-5 rounded-[50%] mt-3"}
                                   textStyles={"text-white text-base font-semibold"}
                     />
                     <ThemedButton title={"Cancel"}
                                   handlePress={handleMaintenanceReportCancellation}
-                                  containerStyles="bg-default p-5 rounded-[50%] mt-[10px]"
+                                  containerStyles="bg-default p-5 rounded-[50%] mt-3"
                                   textStyles={"text-white font-semibold text-base"}
                     />
                 </View>
