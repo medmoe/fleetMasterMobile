@@ -21,6 +21,7 @@ interface MaintenanceFormProps {
     handlePartPurchaseEventDeletion: () => void
     showDeleteFeatures: boolean
     partPurchaseEventId?: string
+    partPurchaseEvents: PartPurchaseEventType[]
 
 }
 
@@ -35,8 +36,9 @@ const MaintenanceForm = ({
                              handlePartPurchaseEventDeletion,
                              showDeleteFeatures,
                              partPurchaseEventId,
+                             partPurchaseEvents,
                          }: MaintenanceFormProps) => {
-    const {partPurchaseEvents, generalData} = useGlobalContext()
+    const {generalData} = useGlobalContext();
     return (
         <View className={"w-full justify-center items-center"}>
             <View className={"w-[94%] bg-white rounded p-5"}>
@@ -51,7 +53,8 @@ const MaintenanceForm = ({
                         return (
                             <Pressable onPress={() => handleEditPartPurchaseEvent(partPurchaseEvent)} key={idx}
                                        onLongPress={() => handlePartPurchaseEventOnLongPress(partPurchaseEvent.id?.toString())}>
-                                <View className={`flex-1 p-[16px] bg-white rounded shadow mb-3 ${showDeleteFeatures && partPurchaseEventId === partPurchaseEvent.id?.toString()? "shadow-error" : ""}`}>
+                                <View
+                                    className={`flex-1 p-[16px] bg-white rounded shadow mb-3 ${showDeleteFeatures && partPurchaseEventId === partPurchaseEvent.id?.toString() ? "shadow-error" : ""}`}>
                                     <ListItemDetail label={"Part name"} value={part?.name} textStyle={"text-txt"}/>
                                     <ListItemDetail label={"Provider name"} value={partProvider?.name} textStyle={"text-txt"}/>
                                     <ListItemDetail label={"Purchase date"} value={partPurchaseEvent.purchase_date} textStyle={"text-txt"}/>

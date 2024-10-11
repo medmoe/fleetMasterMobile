@@ -9,12 +9,14 @@ import {icons} from "@/constants/icons";
 import {maintenanceReport, MonthReportType, partPurchaseEvents} from "@/constants/fixtures";
 import axios from "axios";
 import {API} from "@/constants/endpoints";
-import {PartPurchaseEventFormType} from "@/types/maintenance";
+import {PartPurchaseEventType} from "@/types/maintenance";
 import {router} from "expo-router";
+import {getLocalDateString} from "@/utils/helpers";
 
 const MaintenanceReport = () => {
     const {generalData, setGeneralData} = useGlobalContext();
-    const [partPurchaseFormData, setPartPurchaseFormData] = useState<PartPurchaseEventFormType>({part: "", provider: "", cost: "", purchase_date: new Date()});
+    const partPurchaseEventFormInitialState: PartPurchaseEventType = {part: "", provider: generalData.part_providers[0]?.id || "", purchase_date: getLocalDateString(new Date()), cost: "0"}
+    const [partPurchaseFormData, setPartPurchaseFormData] = useState<PartPurchaseEventType>(partPurchaseEventFormInitialState);
     const [searchTerm, setSearchTerm] = useState("");
     const [isPartSelected, setIsSelected] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +40,7 @@ const MaintenanceReport = () => {
 
         return [label, formattedValue, formattedPercentage, color, icon];
     });
+    console.log(partPurchaseFormData);
     useEffect(() => {
         const fetchGeneralData = async () => {
             setIsLoading(true);
@@ -82,8 +85,13 @@ const MaintenanceReport = () => {
         }))
         setIsSelected(true);
     }
-    const handleDateChange = (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => {
-
+    const handleDateChange = (name: string) => (_: DateTimePickerEvent, date?: Date) => {
+        if (name == "purchase_date") {
+            setPartPurchaseFormData(prevState => ({
+                ...prevState,
+                purchase_date: getLocalDateString(date)
+            }))
+        }
     }
 
     const handleReportFormChange = (name: string, value: string) => {

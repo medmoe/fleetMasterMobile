@@ -26,10 +26,3 @@ export interface ServiceProviderType {
     phone_number: string
     address: string
 }
-
-export interface PartPurchaseEventFormType {
-    part: string,
-    provider: string,
-    purchase_date: Date,
-    cost: string
-}

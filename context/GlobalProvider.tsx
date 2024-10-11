@@ -2,7 +2,7 @@ import React, {createContext, ReactNode, useContext, useState} from "react";
 import {DriverType, ResponseDataType, VehicleType} from "@/types/types";
 import {driverStatus} from "@/constants/forms/driver";
 import {vehicleStatus, vehicleTypes} from "@/constants/forms/vehicle";
-import {PartProviderType, PartPurchaseEventType, PartType, ServiceProviderType} from "@/types/maintenance";
+import {PartProviderType, PartType, ServiceProviderType} from "@/types/maintenance";
 
 type GeneralDataType = { parts: PartType[], part_providers: PartProviderType[], service_providers: ServiceProviderType[] }
 
@@ -17,9 +17,6 @@ interface ContextProps {
     setIsPostRequest: (isPostRequest: boolean) => void
     currentItem: DriverType | VehicleType
     setCurrentItem: (item: DriverType | VehicleType) => void
-
-    partPurchaseEvents: PartPurchaseEventType[]
-    setPartPurchaseEvents: (partPurchaseEvents: PartPurchaseEventType[]) => void
     generalData: GeneralDataType
     setGeneralData: (generalData: GeneralDataType) => void
 }
@@ -55,9 +52,6 @@ const GlobalContext = createContext<ContextProps>({
     setCurrentItem: () => {
     },
     currentItem: currentVehicleInitialState,
-    setPartPurchaseEvents: () => {
-    },
-    partPurchaseEvents: [],
     generalData: {parts: [], part_providers: [], service_providers: []},
     setGeneralData: () => {
     }
@@ -70,7 +64,6 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({children}) => {
     const [responseData, setResponseData] = useState<ResponseDataType>(responseDataInitialState);
     const [isPostRequest, setIsPostRequest] = useState(true);
     const [currentItem, setCurrentItem] = useState<VehicleType | DriverType>(currentVehicleInitialState)
-    const [partPurchaseEvents, setPartPurchaseEvents] = useState<PartPurchaseEventType[]>([])
     const [generalData, setGeneralData] = useState<GeneralDataType>({parts: [], service_providers: [], part_providers: []})
     return (
         <GlobalContext.Provider
@@ -81,8 +74,6 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({children}) => {
                 isPostRequest,
                 setCurrentItem,
                 currentItem,
-                setPartPurchaseEvents,
-                partPurchaseEvents,
                 setGeneralData,
                 generalData,
             }}

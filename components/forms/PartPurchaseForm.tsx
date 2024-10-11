@@ -6,12 +6,12 @@ import {icons} from "@/constants/icons";
 import ThemedButton from "../ThemedButton";
 import CustomDatePicker from "../CustomDatePicker";
 import ThemedInputText from "../ThemedInputText";
-import {PartPurchaseEventFormType} from "@/types/maintenance";
 import {useGlobalContext} from "@/context/GlobalProvider";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
+import {PartPurchaseEventType} from "@/types/maintenance";
 
 interface PartPurchaseFormProps {
-    partPurchaseFormData: PartPurchaseEventFormType
+    partPurchaseFormData: PartPurchaseEventType
     handlePartPurchaseFormChange: (name: string, value: string) => void
     handlePartInputChange: (name: string, value: string) => void
     searchTerm: string
@@ -61,7 +61,7 @@ const PartPurchaseForm = ({
             </View>
 
             <View className={"flex-row"}>
-                <CustomDatePicker date={new Date()}
+                <CustomDatePicker date={new Date(partPurchaseFormData.purchase_date)}
                                   handleChange={handleDateChange}
                                   label={"Purchase Date"}
                                   name={"purchase_date"}

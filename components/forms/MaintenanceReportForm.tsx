@@ -2,12 +2,12 @@ import React, {useState} from 'react';
 import {Alert, View} from 'react-native';
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 import {useGlobalContext} from "@/context/GlobalProvider";
-import {PartPurchaseEventFormType, PartPurchaseEventType} from "@/types/maintenance";
 import PartPurchaseForm from "@/components/forms/PartPurchaseForm";
 import axios from "axios";
 import {API} from "@/constants/endpoints";
 import MaintenanceForm from "@/components/forms/MaintenanceForm";
 import {router} from "expo-router";
+import {PartPurchaseEventType} from "@/types/maintenance";
 
 
 interface MaintenanceFormProps {
@@ -21,7 +21,7 @@ interface MaintenanceFormProps {
     handleMaintenanceReportCancellation: () => void
     handlePartPurchaseFormChange: (name: string, value: string) => void
     handlePartInputChange: (name: string, value: string) => void
-    partPurchaseFormData: PartPurchaseEventFormType
+    partPurchaseFormData: PartPurchaseEventType
 }
 
 
@@ -38,11 +38,12 @@ const MaintenanceReportForm = ({
                                    partPurchaseFormData,
                                    handlePartInputChange,
                                }: MaintenanceFormProps) => {
-    const {partPurchaseEvents, setPartPurchaseEvents, generalData, setGeneralData} = useGlobalContext();
+    const {generalData, setGeneralData} = useGlobalContext();
     const [showPartPurchaseEventForm, setShowPartPurchaseEventForm] = useState(false);
     const [showDeleteFeatures, setShowDeleteFeatures] = useState(false);
     const [partPurchaseEventId, setPartPurchaseEventId] = useState("")
     const [isLoading, setIsLoading] = useState(false)
+    const [partPurchaseEvents, setPartPurchaseEvents] = useState<PartPurchaseEventType[]>([])
     const options = {headers: {'Content-Type': 'application/json'}, withCredentials: true};
     const handleEditPartPurchaseEvent = () => {
 
@@ -60,12 +61,8 @@ const MaintenanceReportForm = ({
                 Alert.alert("Error", "Please fill all fields!.")
                 return
             }
-            let partPurchaseEventDataToSend: PartPurchaseEventType = {
-                ...partPurchaseFormData,
-                purchase_date: partPurchaseFormData.purchase_date.toLocaleDateString("en-CA", {year: "numeric", month: "2-digit", day: "2-digit"})
-            }
             const url = `${API}maintenance/part-purchase-events/`;
-            const response = await axios.post(url, partPurchaseEventDataToSend, options)
+            const response = await axios.post(url, partPurchaseFormData, options)
             setPartPurchaseEvents([...partPurchaseEvents, response.data])
             setShowPartPurchaseEventForm(false)
         } catch (error: any) {
@@ -131,6 +128,7 @@ const MaintenanceReportForm = ({
                                      handlePartPurchaseEventOnLongPress={handlePartPurchaseEventOnLongPress}
                                      partPurchaseEventId={partPurchaseEventId}
                                      showDeleteFeatures={showDeleteFeatures}
+                                     partPurchaseEvents={partPurchaseEvents}
                     />
             }
         </View>
