@@ -15,4 +15,6 @@ declare module "*.svg" {
   export = value;
 }
 
+declare module 'uuid'
+
 

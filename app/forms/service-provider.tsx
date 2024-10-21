@@ -69,6 +69,7 @@ const ServiceProvider = () => {
                 service_providers: filteredServiceProviders,
             })
             setShowDeleteFeatures(false);
+            setServiceProviderFormData(initialState);
         } catch (error) {
             console.log(error)
         } finally {
@@ -76,8 +77,13 @@ const ServiceProvider = () => {
         }
     }
     const handleServiceProviderLongPress = (serviceProvider: ServiceProviderType) => {
-        setShowDeleteFeatures(true);
-        setServiceProviderFormData(serviceProvider);
+        if (!showDeleteFeatures) {
+            setShowDeleteFeatures(true);
+            setServiceProviderFormData(serviceProvider);
+        } else {
+            setShowDeleteFeatures(false);
+            setServiceProviderFormData(initialState);
+        }
     }
     return (
         <SafeAreaView>

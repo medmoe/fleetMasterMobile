@@ -9,6 +9,7 @@ import {API} from "@/constants/endpoints";
 import {handleAuthenticationErrors, handleCookies} from "@/utils/authentication";
 import {useGlobalContext} from "@/context/GlobalProvider";
 import {Spinner, ThemedButton, ThemedInputText} from "@/components";
+import "react-native-get-random-values";
 
 export type FormState = {
     username: string

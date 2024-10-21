@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {ImageSourcePropType, SafeAreaView, ScrollView, Text, View} from 'react-native';
-import {CustomDatePicker, ListItemDetail, MaintenanceForm, PartPurchaseEventViewer, StatCard, ThemedButton} from "@/components";
+import {CustomDatePicker, ListItemDetail, MaintenanceReportForm, PartPurchaseEventViewer, StatCard, ThemedButton} from "@/components";
 import {useGlobalContext} from "@/context/GlobalProvider";
 import {VehicleType} from "@/types/types";
 import {vehicleStatusMapping} from "@/constants/forms/vehicle";
@@ -17,6 +17,9 @@ const MaintenanceReport = () => {
     const {generalData, setGeneralData} = useGlobalContext();
     const partPurchaseEventFormInitialState: PartPurchaseEventType = {part: "", provider: generalData.part_providers[0]?.id || "", purchase_date: getLocalDateString(new Date()), cost: "0"}
     const [partPurchaseFormData, setPartPurchaseFormData] = useState<PartPurchaseEventType>(partPurchaseEventFormInitialState);
+    const [maintenanceReportDates, setMaintenanceReportDates] = useState({
+        "start_date": new Date(), "end_date": new Date(), "purchase_date": new Date()
+    })
     const [searchTerm, setSearchTerm] = useState("");
     const [isPartSelected, setIsSelected] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +43,6 @@ const MaintenanceReport = () => {
 
         return [label, formattedValue, formattedPercentage, color, icon];
     });
-    console.log(partPurchaseFormData);
     useEffect(() => {
         const fetchGeneralData = async () => {
             setIsLoading(true);
@@ -86,12 +88,10 @@ const MaintenanceReport = () => {
         setIsSelected(true);
     }
     const handleDateChange = (name: string) => (_: DateTimePickerEvent, date?: Date) => {
-        if (name == "purchase_date") {
-            setPartPurchaseFormData(prevState => ({
-                ...prevState,
-                purchase_date: getLocalDateString(date)
-            }))
-        }
+        setMaintenanceReportDates(prevState => ({
+            ...prevState,
+            [name]: date
+        }))
     }
 
     const handleReportFormChange = (name: string, value: string) => {
@@ -190,17 +190,20 @@ const MaintenanceReport = () => {
 
                     </View>
                     :
-                    <MaintenanceForm isPartSelected={isPartSelected}
-                                     setIsPartSelected={setIsPartSelected}
-                                     selectPart={selectPart}
-                                     searchTerm={searchTerm}
-                                     handleDateChange={handleDateChange}
-                                     handleMaintenanceReportFormChange={handleReportFormChange}
-                                     handleMaintenanceReportSubmission={handleReportSubmission}
-                                     handleMaintenanceReportCancellation={cancelReportSubmission}
-                                     handlePartPurchaseFormChange={handlePartPurchaseFormChange}
-                                     partPurchaseFormData={partPurchaseFormData}
-                                     handlePartInputChange={handlePartInputChange}
+                    <MaintenanceReportForm isPartSelected={isPartSelected}
+                                           setIsPartSelected={setIsPartSelected}
+                                           selectPart={selectPart}
+                                           searchTerm={searchTerm}
+                                           handleDateChange={handleDateChange}
+                                           handleMaintenanceReportFormChange={handleReportFormChange}
+                                           handleMaintenanceReportSubmission={handleReportSubmission}
+                                           handleMaintenanceReportCancellation={cancelReportSubmission}
+                                           handlePartPurchaseFormChange={handlePartPurchaseFormChange}
+                                           partPurchaseFormData={partPurchaseFormData}
+                                           handlePartInputChange={handlePartInputChange}
+                                           setPartPurchaseFormData={setPartPurchaseFormData}
+                                           setSearchTerm={setSearchTerm}
+                                           maintenanceReportDates={maintenanceReportDates}
                     />}
             </ScrollView>
         </SafeAreaView>

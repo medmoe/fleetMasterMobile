@@ -21,6 +21,7 @@ interface PartPurchaseFormProps {
     handleDateChange: (name: string) => (_: DateTimePickerEvent, date?: Date) => void
     handlePartPurchaseEventCancellation: () => void
     handlePartPurchaseEventSubmission: () => void
+    maintenanceReportDates: { [key in "start_date" | "end_date" | "purchase_date"]: Date }
 
 
 }
@@ -36,6 +37,7 @@ const PartPurchaseForm = ({
                               handleDateChange,
                               handlePartPurchaseEventCancellation,
                               handlePartPurchaseEventSubmission,
+                              maintenanceReportDates,
                           }: PartPurchaseFormProps) => {
     const {generalData} = useGlobalContext();
     return (
@@ -61,7 +63,7 @@ const PartPurchaseForm = ({
             </View>
 
             <View className={"flex-row"}>
-                <CustomDatePicker date={new Date(partPurchaseFormData.purchase_date)}
+                <CustomDatePicker date={maintenanceReportDates.purchase_date}
                                   handleChange={handleDateChange}
                                   label={"Purchase Date"}
                                   name={"purchase_date"}

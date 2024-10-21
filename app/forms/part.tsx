@@ -108,8 +108,13 @@ const Part = () => {
         }
     }
     const handlePartLongPress = (part: PartType) => {
-        setShowDeleteFeatures(true);
-        setPart(part);
+        if (!showDeleteFeatures) {
+            setShowDeleteFeatures(true);
+            setPart(part);
+        } else {
+            setShowDeleteFeatures(false);
+            setPart({name: "", description: ""})
+        }
     }
 
     return (

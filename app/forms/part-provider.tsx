@@ -54,15 +54,17 @@ const PartProvider = () => {
         setShowPartProviderForm(false);
     }
     const handleCancelPartProviderAddition = () => {
-        if (!showDeleteFeatures) {
-            router.replace("/maintenance/maintenance-report");
-        } else {
-            setShowDeleteFeatures(false);
-        }
+        router.replace("/maintenance/maintenance-report");
+
     }
     const handlePartsProviderLongPress = (partsProvider: PartProviderType) => {
-        setShowDeleteFeatures(true);
-        setPartProviderFormData(partsProvider);
+        if (!showDeleteFeatures) {
+            setShowDeleteFeatures(true);
+            setPartProviderFormData(partsProvider);
+        } else {
+            setShowDeleteFeatures(false)
+            setPartProviderFormData({name: "", address: "", phone_number: ""})
+        }
     }
     const handlePartsProviderDeletion = async () => {
         setIsLoading(true)
@@ -75,6 +77,7 @@ const PartProvider = () => {
                 part_providers: filteredPartsProviders
             })
             setShowDeleteFeatures(false);
+            setPartProviderFormData({name: "", address: "", phone_number: ""})
         } catch (error) {
             console.log(error)
         } finally {

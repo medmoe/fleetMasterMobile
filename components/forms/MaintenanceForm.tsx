@@ -8,7 +8,7 @@ import ThemedInputText from "../ThemedInputText";
 import {useGlobalContext} from "@/context/GlobalProvider";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 import {PartPurchaseEventType} from "@/types/maintenance";
-
+import {v4 as uuidv4} from 'uuid';
 
 interface MaintenanceFormProps {
     handleEditPartPurchaseEvent: (partPurchaseEvent: PartPurchaseEventType) => void
@@ -51,7 +51,7 @@ const MaintenanceForm = ({
                         const part = generalData.parts.find((part) => partPurchaseEvent.part.toString() === part.id?.toString());
                         const partProvider = generalData.part_providers.find((partsProvider) => partPurchaseEvent.provider === partsProvider.id);
                         return (
-                            <Pressable onPress={() => handleEditPartPurchaseEvent(partPurchaseEvent)} key={idx}
+                            <Pressable onPress={() => handleEditPartPurchaseEvent(partPurchaseEvent)} key={uuidv4()}
                                        onLongPress={() => handlePartPurchaseEventOnLongPress(partPurchaseEvent.id?.toString())}>
                                 <View
                                     className={`flex-1 p-[16px] bg-white rounded shadow mb-3 ${showDeleteFeatures && partPurchaseEventId === partPurchaseEvent.id?.toString() ? "shadow-error" : ""}`}>
@@ -82,11 +82,10 @@ const MaintenanceForm = ({
                     <ThemedInputText placeholder={"Enter the Cost"} value={"0"} onChange={handleMaintenanceReportFormChange} name={'cost'} containerStyles={"bg-background p-5"}/>
                     <ThemedInputText placeholder={"Enter Mileage"} value={"0"} onChange={handleMaintenanceReportFormChange} name={'mileage'} containerStyles={"bg-background p-5"}/>
                     <ThemedInputText placeholder={"Notes"} value={"0"} onChange={handleMaintenanceReportFormChange} name={'mileage'} containerStyles={"bg-background p-5"}/>
-                    {showDeleteFeatures && <ThemedButton title={"Delete Part Purchase Event"}
-                                                         handlePress={handlePartPurchaseEventDeletion}
-                                                         containerStyles={"bg-error p-5 rounded-[50%] mt-3"}
-                                                         textStyles={"text-white text-base font-semibold"}
-                    />
+                    {showDeleteFeatures && <ThemedButton
+                        title={"Delete purchase event"}
+                        handlePress={handlePartPurchaseEventDeletion}
+                        containerStyles={"bg-error p-5 rounded-[50%] mt-3"} textStyles={"text-white text-base font-semibold"}/>
                     }
                     <ThemedButton title={"Create part purchase event"}
                                   handlePress={handlePartPurchaseEventCreation}

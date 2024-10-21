@@ -8,6 +8,7 @@ import {API} from "@/constants/endpoints";
 import MaintenanceForm from "@/components/forms/MaintenanceForm";
 import {router} from "expo-router";
 import {PartPurchaseEventType} from "@/types/maintenance";
+import {getLocalDateString} from "@/utils/helpers";
 
 
 interface MaintenanceFormProps {
@@ -22,6 +23,9 @@ interface MaintenanceFormProps {
     handlePartPurchaseFormChange: (name: string, value: string) => void
     handlePartInputChange: (name: string, value: string) => void
     partPurchaseFormData: PartPurchaseEventType
+    setPartPurchaseFormData: (newState: PartPurchaseEventType) => void
+    setSearchTerm: (newState: string) => void
+    maintenanceReportDates: { [key in "start_date" | "end_date" | "purchase_date"]: Date }
 }
 
 
@@ -37,8 +41,11 @@ const MaintenanceReportForm = ({
                                    handlePartPurchaseFormChange,
                                    partPurchaseFormData,
                                    handlePartInputChange,
+                                   setPartPurchaseFormData,
+                                   setSearchTerm,
+                                   maintenanceReportDates,
                                }: MaintenanceFormProps) => {
-    const {generalData, setGeneralData} = useGlobalContext();
+    const {generalData} = useGlobalContext();
     const [showPartPurchaseEventForm, setShowPartPurchaseEventForm] = useState(false);
     const [showDeleteFeatures, setShowDeleteFeatures] = useState(false);
     const [partPurchaseEventId, setPartPurchaseEventId] = useState("")
@@ -49,22 +56,39 @@ const MaintenanceReportForm = ({
 
     }
     const handlePartPurchaseEventOnLongPress = (partPurchaseEventId?: string) => {
-        setShowDeleteFeatures(true);
-        setPartPurchaseEventId(partPurchaseEventId || "")
+        if (!showDeleteFeatures) {
+            setShowDeleteFeatures(true);
+            setPartPurchaseEventId(partPurchaseEventId || "")
+        } else {
+            setShowDeleteFeatures(false);
+            setPartPurchaseEventId("");
+        }
     }
 
     const handlePartPurchaseEventSubmission = async () => {
         setIsLoading(true)
         try {
             // Validating and formatting data
-            if (!partPurchaseFormData.cost || !partPurchaseFormData.part || !partPurchaseFormData.provider || !partPurchaseFormData.purchase_date) {
-                Alert.alert("Error", "Please fill all fields!.")
+            if (!partPurchaseFormData.part) {
+                Alert.alert("Error", "Please select an available part!")
                 return
             }
+            if (!partPurchaseFormData.provider) {
+                Alert.alert("Error", "Please select a parts provider!")
+                return
+            }
+            // convert Date to string format
+            if (!maintenanceReportDates.purchase_date) {
+                Alert.alert("Error", "Please select a purchase date")
+                return
+            }
+            partPurchaseFormData.purchase_date = getLocalDateString(maintenanceReportDates.purchase_date)
             const url = `${API}maintenance/part-purchase-events/`;
             const response = await axios.post(url, partPurchaseFormData, options)
             setPartPurchaseEvents([...partPurchaseEvents, response.data])
             setShowPartPurchaseEventForm(false)
+            setPartPurchaseFormData({part: "", provider: generalData.part_providers[0]?.id || "", purchase_date: getLocalDateString(new Date()), cost: "0"})
+            setSearchTerm("");
         } catch (error: any) {
             console.log(error.response.data)
         } finally {
@@ -117,6 +141,7 @@ const MaintenanceReportForm = ({
                                                               handleDateChange={handleDateChange}
                                                               handlePartPurchaseEventCancellation={handlePartPurchaseEventCancellation}
                                                               handlePartPurchaseEventSubmission={handlePartPurchaseEventSubmission}
+                                                              maintenanceReportDates={maintenanceReportDates}
                     /> :
                     <MaintenanceForm handleEditPartPurchaseEvent={handleEditPartPurchaseEvent}
                                      handlePartPurchaseEventCreation={handlePartPurchaseEventCreation}
