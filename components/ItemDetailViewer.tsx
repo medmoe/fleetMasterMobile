@@ -13,7 +13,14 @@ interface ItemDetailViewerProps {
     handleCancel: () => void
 }
 
-const ItemDetailViewer = ({title, subtitle, details, handleUpdate, handleDelete, handleCancel}: ItemDetailViewerProps) => {
+const ItemDetailViewer = ({
+                              title,
+                              subtitle,
+                              details,
+                              handleUpdate,
+                              handleDelete,
+                              handleCancel
+                          }: ItemDetailViewerProps) => {
     return (
         <SafeAreaView>
             <ScrollView>
@@ -25,16 +32,25 @@ const ItemDetailViewer = ({title, subtitle, details, handleUpdate, handleDelete,
                         <Text className={"font-open-sans text-txt"}>{subtitle}</Text>
                     </View>
                     <View className={"flex-1 mt-3"}>
-                        {details.map(({label, value}, idx) => <ListItemDetail label={label} value={value} containerStyle={"pt-1 pb-1"} key={idx}/>)}
+                        {details.map(({label, value}, idx) => <ListItemDetail label={label} value={value}
+                                                                              containerStyle={"pt-1 pb-1"} key={idx}/>)}
                     </View>
-                    <View className={"flex-row mt-3"}>
-                        <ThemedButton title={"Edit"} handlePress={handleUpdate} containerStyles={"bg-primary p-5 rounded-[50%] flex-1"} textStyles={"text-white font-semibold text-base"}
+                    <View className={"mt-5 flex-row"}>
+                        <ThemedButton title={"Edit"} handlePress={handleUpdate}
+                                      containerStyles={"bg-primary p-2 rounded-[50%] flex-1"}
+                                      textStyles={"text-white font-semibold text-base"}
+                                      imageStyles={"w-10 h-10"}
                                       icon={icons.pen}/>
-                        <ThemedButton title={"Delete"} handlePress={handleDelete} containerStyles={"bg-error p-5 rounded-[50%] flex-1"} textStyles={"text-white font-semibold text-base"}
+                        <ThemedButton title={"Delete"} handlePress={handleDelete}
+                                      containerStyles={"bg-error p-2 rounded-[50%] flex-1"}
+                                      textStyles={"text-white font-semibold text-base"}
+                                      imageStyles={"w-10 h-10"}
                                       icon={icons.trash}/>
-                        <ThemedButton title={"Cancel"} handlePress={handleCancel} containerStyles={"bg-default p-5 rounded-[50%] flex-1"} textStyles={"text-white font-semibold text-base"}/>
-
+                        <ThemedButton title={"Cancel"} handlePress={handleCancel}
+                                      containerStyles={"bg-default p-2 rounded-[50%] flex-1"}
+                                      textStyles={"text-white font-semibold text-base"}/>
                     </View>
+
                 </View>
             </ScrollView>
         </SafeAreaView>

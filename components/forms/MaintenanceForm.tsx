@@ -7,11 +7,11 @@ import CustomDatePicker from "../CustomDatePicker";
 import ThemedInputText from "../ThemedInputText";
 import {useGlobalContext} from "@/context/GlobalProvider";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
-import {PartPurchaseEventType} from "@/types/maintenance";
+import {MaintenanceReportType, PartPurchaseEventType} from "@/types/maintenance";
 import {v4 as uuidv4} from 'uuid';
 
 interface MaintenanceFormProps {
-    handleEditPartPurchaseEvent: (partPurchaseEvent: PartPurchaseEventType) => void
+    handlePartPurchaseEventEdition: (partPurchaseEvent: PartPurchaseEventType) => void
     handlePartPurchaseEventCreation: () => void
     handleDateChange: (name: string) => (_: DateTimePickerEvent, date?: Date) => void
     handleMaintenanceReportFormChange: (name: string, value: string) => void
@@ -22,11 +22,14 @@ interface MaintenanceFormProps {
     showDeleteFeatures: boolean
     partPurchaseEventId?: string
     partPurchaseEvents: PartPurchaseEventType[]
+    maintenanceReportFormData: MaintenanceReportType
+    maintenanceReportDates: { [key in "start_date" | "end_date" | "purchase_date"]: Date }
+
 
 }
 
 const MaintenanceForm = ({
-                             handleEditPartPurchaseEvent,
+                             handlePartPurchaseEventEdition,
                              handleDateChange,
                              handleMaintenanceReportFormChange,
                              handleMaintenanceReportSubmission,
@@ -37,6 +40,8 @@ const MaintenanceForm = ({
                              showDeleteFeatures,
                              partPurchaseEventId,
                              partPurchaseEvents,
+                             maintenanceReportFormData,
+                             maintenanceReportDates
                          }: MaintenanceFormProps) => {
     const {generalData} = useGlobalContext();
     return (
@@ -47,18 +52,21 @@ const MaintenanceForm = ({
                     <Text className={"font-open-sans text-txt text-sm"}>Fill details below.</Text>
                 </View>
                 <View className={"flex-1"}>
-                    {partPurchaseEvents.map((partPurchaseEvent, idx) => {
+                    {partPurchaseEvents.map((partPurchaseEvent) => {
                         const part = generalData.parts.find((part) => partPurchaseEvent.part.toString() === part.id?.toString());
                         const partProvider = generalData.part_providers.find((partsProvider) => partPurchaseEvent.provider === partsProvider.id);
                         return (
-                            <Pressable onPress={() => handleEditPartPurchaseEvent(partPurchaseEvent)} key={uuidv4()}
+                            <Pressable onPress={() => handlePartPurchaseEventEdition(partPurchaseEvent)} key={uuidv4()}
                                        onLongPress={() => handlePartPurchaseEventOnLongPress(partPurchaseEvent.id?.toString())}>
                                 <View
                                     className={`flex-1 p-[16px] bg-white rounded shadow mb-3 ${showDeleteFeatures && partPurchaseEventId === partPurchaseEvent.id?.toString() ? "shadow-error" : ""}`}>
                                     <ListItemDetail label={"Part name"} value={part?.name} textStyle={"text-txt"}/>
-                                    <ListItemDetail label={"Provider name"} value={partProvider?.name} textStyle={"text-txt"}/>
-                                    <ListItemDetail label={"Purchase date"} value={partPurchaseEvent.purchase_date} textStyle={"text-txt"}/>
-                                    <ListItemDetail label={"Cost"} value={partPurchaseEvent.cost} textStyle={"text-txt"}/>
+                                    <ListItemDetail label={"Provider name"} value={partProvider?.name}
+                                                    textStyle={"text-txt"}/>
+                                    <ListItemDetail label={"Purchase date"} value={partPurchaseEvent.purchase_date}
+                                                    textStyle={"text-txt"}/>
+                                    <ListItemDetail label={"Cost"} value={partPurchaseEvent.cost}
+                                                    textStyle={"text-txt"}/>
                                 </View>
                             </Pressable>
                         )
@@ -70,22 +78,43 @@ const MaintenanceForm = ({
                     <MaintenancePicker containerStyles={"mb-3"}
                                        title={"Pick service provider"}
                                        name={"service_provider"}
-                                       value={"value"}
-                                       items={generalData.service_providers.map((serviceProvider) => ({label: serviceProvider.name, value: serviceProvider.id}))}
-                                       handleItemChange={() => console.log("service provider picked")}
-                                       buttonTitle={"Create service Provider"}
+                                       value={maintenanceReportFormData.service_provider}
+                                       items={generalData.service_providers.map((serviceProvider) => ({
+                                           label: serviceProvider.name,
+                                           value: serviceProvider.id
+                                       }))}
+                                       handleItemChange={handleMaintenanceReportFormChange}
+                    />
+                    <MaintenancePicker containerStyles={"mb-3"}
+                                       title={"Select maintenance type"}
+                                       name={"maintenance_type"}
+                                       value={maintenanceReportFormData.maintenance_type}
+                                       items={[{label: "Preventive", value: "PREVENTIVE"}, {
+                                           label: "Curative",
+                                           value: "CURATIVE"
+                                       }]}
+                                       handleItemChange={handleMaintenanceReportFormChange}
                     />
                     <View className={"flex-row"}>
-                        <CustomDatePicker date={new Date()} handleChange={handleDateChange} label={"Start date"} name={"start_date"}/>
-                        <CustomDatePicker date={new Date()} handleChange={handleDateChange} label={"End date"} name={"end_date"}/>
+                        <CustomDatePicker date={maintenanceReportDates.start_date} handleChange={handleDateChange}
+                                          label={"Start date"} name={"start_date"}/>
+                        <CustomDatePicker date={maintenanceReportDates.end_date} handleChange={handleDateChange}
+                                          label={"End date"} name={"end_date"}/>
                     </View>
-                    <ThemedInputText placeholder={"Enter the Cost"} value={"0"} onChange={handleMaintenanceReportFormChange} name={'cost'} containerStyles={"bg-background p-5"}/>
-                    <ThemedInputText placeholder={"Enter Mileage"} value={"0"} onChange={handleMaintenanceReportFormChange} name={'mileage'} containerStyles={"bg-background p-5"}/>
-                    <ThemedInputText placeholder={"Notes"} value={"0"} onChange={handleMaintenanceReportFormChange} name={'mileage'} containerStyles={"bg-background p-5"}/>
+                    <ThemedInputText placeholder={"Enter the Cost"} value={maintenanceReportFormData.cost}
+                                     onChange={handleMaintenanceReportFormChange} name={'cost'}
+                                     containerStyles={"bg-background p-5"}/>
+                    <ThemedInputText placeholder={"Enter Mileage"} value={maintenanceReportFormData.mileage}
+                                     onChange={handleMaintenanceReportFormChange} name={'mileage'}
+                                     containerStyles={"bg-background p-5"}/>
+                    <ThemedInputText placeholder={"Description"} value={maintenanceReportFormData.description}
+                                     onChange={handleMaintenanceReportFormChange} name={'description'}
+                                     containerStyles={"bg-background p-5"}/>
                     {showDeleteFeatures && <ThemedButton
                         title={"Delete purchase event"}
                         handlePress={handlePartPurchaseEventDeletion}
-                        containerStyles={"bg-error p-5 rounded-[50%] mt-3"} textStyles={"text-white text-base font-semibold"}/>
+                        containerStyles={"bg-error p-5 rounded-[50%] mt-3"}
+                        textStyles={"text-white text-base font-semibold"}/>
                     }
                     <ThemedButton title={"Create part purchase event"}
                                   handlePress={handlePartPurchaseEventCreation}

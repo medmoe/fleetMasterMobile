@@ -9,7 +9,7 @@ export interface PercentageProps {
 
 const Percentage = ({percentage, icon, color}: PercentageProps ) => {
     return (
-        <View className={"flex-row items-center flex-1"}>
+        <View className={"flex-row items-center justify-end"}>
             <Image source={icon} resizeMode={"contain"} className={"w-5 h-5"} style={{tintColor: color}}/>
             <Text style={{color: color, fontSize: 12}}>{percentage}</Text>
         </View>

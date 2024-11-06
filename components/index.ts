@@ -21,3 +21,4 @@ export {default as PartPurchaseForm} from "./forms/PartPurchaseForm";
 export {default as PartForm} from "./forms/PartForm";
 export {default as DeleteButton} from "./DeleteButton";
 export {default as MaintenanceForm} from "./forms/MaintenanceForm"
+export {default as RangeCard} from "./RangeCard";
