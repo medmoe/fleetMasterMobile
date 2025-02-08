@@ -12,9 +12,7 @@ function ListItemDetail({label, value, containerStyle, textStyle}: ListItemDetai
     return (
         <View className={`${containerStyle}`}>
             <Text className={`text-sm font-open-sans ${textStyle}`}>
-                <Text className={"text-default text-sm font-open-sans"}>{label}:</Text>
-                {value}
-            </Text>
+                <Text className={"text-default text-sm font-open-sans"}>{label}:</Text> {value}</Text>
         </View>
     );
 }

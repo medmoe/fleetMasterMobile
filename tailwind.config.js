@@ -1,19 +1,20 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
-    theme: {
-        extend: {
-            colors: {
+  // NOTE: Update this to include the paths to all of your component files.
+  content: ["./app/**/*.{js,jsx,ts,tsx}", "./components/**/*.{js,jsx,ts,tsx}"],
+  presets: [require("nativewind/preset")],
+  theme: {
+    extend: {
+       colors: {
                 primary: "#3f51b5",
                 secondary: "#ff9800",
                 accent: "#9c27b0",
                 background: "#f5f5f5",
                 txt: "#263238",
-                win: "#57b269",
+                success: "#57b269",
                 error: "#e93c0c",
                 warning: "#ffc107",
                 default: "#9BA1A6",
-
             },
             fontFamily: {
                 'merriweather-bold': ['MerriweatherBold'],
@@ -24,7 +25,8 @@ module.exports = {
                 'roboto-italic': ['RobotoItalic'],
                 'source-code-pro': ['SourceCodePro'],
             },
-        },
-        plugins: [],
-    }
+
+    },
+  },
+  plugins: [],
 }

@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Pressable, SafeAreaView, ScrollView, Text, View} from 'react-native';
+import {Alert, Pressable, SafeAreaView, ScrollView, Text, View} from 'react-native';
 import ServiceProviderForm from "@/components/forms/ServiceProviderForm";
 import {ServiceProviderType} from "@/types/maintenance";
 import {router} from "expo-router";
@@ -26,9 +26,24 @@ const ServiceProvider = () => {
             [name]: value
         }))
     }
+    const areServiceProviderFormDataValid = () => {
+        if (serviceProviderFormData.name === "") {
+            Alert.alert("Error", "Please fill the name field")
+            return false;
+        }
+        if (serviceProviderFormData.phone_number === "") {
+            Alert.alert("Error", "Please fill the phone number field")
+            return false;
+        }
+        return true
+
+    }
     const handleServiceProviderSubmission = async () => {
         setIsLoading(true)
         try {
+            if (!areServiceProviderFormDataValid()) {
+                return
+            }
             const url = !isUpdate ? `${API}maintenance/service-providers/` : `${API}maintenance/service-providers/${serviceProviderFormData.id}/`
             const response = !isUpdate ? await axios.post(url, serviceProviderFormData, options) : await axios.put(url, serviceProviderFormData, options)
             const filteredServiceProviders = generalData.service_providers.filter((serviceProvider) => serviceProvider.id !== serviceProviderFormData.id);
@@ -37,7 +52,6 @@ const ServiceProvider = () => {
                 service_providers: [...filteredServiceProviders, response.data]
             })
             setShowServiceProviderCreationForm(false);
-
         } catch (error) {
             console.log(error)
         } finally {
@@ -45,9 +59,13 @@ const ServiceProvider = () => {
         }
     }
     const handleServiceProviderEdition = (serviceProvider: ServiceProviderType) => {
-        setShowServiceProviderCreationForm(true);
-        setServiceProviderFormData(serviceProvider);
-        setIsUpdate(true);
+        if (showDeleteFeatures) {
+            setShowDeleteFeatures(false);
+        } else {
+            setShowServiceProviderCreationForm(true);
+            setServiceProviderFormData(serviceProvider);
+            setIsUpdate(true);
+        }
 
     }
     const handleServiceProviderCreation = () => {
@@ -56,7 +74,11 @@ const ServiceProvider = () => {
         setServiceProviderFormData(initialState);
     }
     const handleServiceProviderAdditionCancellation = () => {
-        router.replace('/maintenance/maintenance-report');
+        if (showDeleteFeatures) {
+            setShowDeleteFeatures(false);
+        } else {
+            router.replace('/maintenance/maintenance-report');
+        }
     }
     const handleServiceProviderDeletion = async () => {
         setIsLoading(true)
@@ -88,7 +110,8 @@ const ServiceProvider = () => {
     return (
         <SafeAreaView>
             <ScrollView>
-                {isLoading ? <View className={"w-full justify-center items-center h-full px-4"}><Spinner isVisible={isLoading}/></View> :
+                {isLoading ?
+                    <View className={"w-full justify-center items-center h-full px-4"}><Spinner isVisible={isLoading}/></View> :
                     showServiceProviderCreationForm ?
                         <ServiceProviderForm handleServiceProviderSubmission={handleServiceProviderSubmission}
                                              handleServiceProviderCreationCancellation={handleServiceProviderCreationCancellation}
@@ -100,19 +123,29 @@ const ServiceProvider = () => {
                             <View className={"w-[94%] bg-white rounded p-5"}>
                                 <View className={"gap-2"}>
                                     <Text className={"font-semibold text-base text-txt"}>Service providers' list</Text>
-                                    <Text className={"font-open-sans text-txt text-sm"}>Here is the list of service providers</Text>
+                                    <Text className={"font-open-sans text-txt text-sm"}>Here is the list of service
+                                        providers</Text>
                                 </View>
                                 <View>
                                     {generalData.service_providers.map((serviceProvider, idx) => {
                                         return (
-                                            <Pressable onPress={() => handleServiceProviderEdition(serviceProvider)} key={idx} onLongPress={() => handleServiceProviderLongPress(serviceProvider)}>
+                                            <Pressable onPress={() => handleServiceProviderEdition(serviceProvider)}
+                                                       key={idx}
+                                                       onLongPress={() => handleServiceProviderLongPress(serviceProvider)}>
                                                 <View
                                                     className={`flex-row p-[16px] bg-white rounded shadow mt-3 ${showDeleteFeatures && serviceProvider.id === serviceProviderFormData.id ? "shadow-error" : ""}`}>
                                                     <View className={"flex-1"}>
-                                                        <ListItemDetail label={"Name"} value={serviceProvider.name} textStyle={"text-txt"}/>
-                                                        <ListItemDetail label={"Phone number"} value={serviceProvider.phone_number} textStyle={"text-txt"}/>
-                                                        <ListItemDetail label={"Address"} value={serviceProvider.address} textStyle={"text-txt"}/>
-                                                        <ListItemDetail label={"Type"} value={serviceProvider.service_type.toLowerCase()} textStyle={"text-text"}/>
+                                                        <ListItemDetail label={"Name"} value={serviceProvider.name}
+                                                                        textStyle={"text-txt"}/>
+                                                        <ListItemDetail label={"Phone number"}
+                                                                        value={serviceProvider.phone_number}
+                                                                        textStyle={"text-txt"}/>
+                                                        <ListItemDetail label={"Address"}
+                                                                        value={serviceProvider.address}
+                                                                        textStyle={"text-txt"}/>
+                                                        <ListItemDetail label={"Type"}
+                                                                        value={serviceProvider.service_type.toLowerCase()}
+                                                                        textStyle={"text-text"}/>
                                                     </View>
                                                 </View>
                                             </Pressable>
@@ -122,18 +155,18 @@ const ServiceProvider = () => {
                                 <View className={"w-full pt-5"}>
                                     <ThemedButton title={"Create Service Provider"}
                                                   handlePress={handleServiceProviderCreation}
-                                                  containerStyles={"bg-primary p-5 rounded-[50%]"}
+                                                  containerStyles={"bg-primary p-5 rounded"}
                                                   textStyles={"font-semibold text-base text-white"}
                                     />
                                     {showDeleteFeatures && <ThemedButton title={"Delete Service Provider"}
                                                                          handlePress={handleServiceProviderDeletion}
-                                                                         containerStyles={"bg-error p-5 rounded-[50%] mt-3"}
+                                                                         containerStyles={"bg-error p-5 rounded mt-3"}
                                                                          textStyles={"font-semibold text-base text-white"}
                                     />
                                     }
                                     <ThemedButton title={"Cancel"}
                                                   handlePress={handleServiceProviderAdditionCancellation}
-                                                  containerStyles={"bg-default p-5 rounded-[50%] mt-3"}
+                                                  containerStyles={"bg-default p-5 rounded mt-3"}
                                                   textStyles={"font-semibold text-base text-white"}
                                     />
                                 </View>

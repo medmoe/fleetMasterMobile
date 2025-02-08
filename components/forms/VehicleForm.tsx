@@ -34,9 +34,11 @@ const VehicleForm = ({vehicleData, handleChange, handleDateChange, dates, submit
                     <Text className={"font-open-sans text-txt text-sm"}>Fill in vehicle's details below.</Text>
                 </View>
                 <View className={"mt-[25px]"}>
-                    {createFirstInputTextPropsBlock(vehicleData, handleChange).map(({placeholder, value, onChange, name}, idx) => {
-                        return <ThemedInputText placeholder={placeholder} value={value} onChange={onChange} name={name} containerStyles={"bg-background p-5"} key={idx}/>
-                    })}
+                    <View className={"flex flex-col gap-2"}>
+                        {createFirstInputTextPropsBlock(vehicleData, handleChange).map(({placeholder, value, onChange, name}, idx) => {
+                            return <ThemedInputText placeholder={placeholder} value={value} onChange={onChange} name={name} containerStyles={"bg-background p-5"} key={idx}/>
+                        })}
+                    </View>
                     <CustomPicker name={"type"} value={vehicleData.type} items={vehicleTypes} handleChange={handleChange}/>
                     <CustomPicker name={"status"} value={vehicleData.status} items={vehicleStatuses} handleChange={handleChange}/>
                     <View className={"flex-row"}>
@@ -49,14 +51,16 @@ const VehicleForm = ({vehicleData, handleChange, handleDateChange, dates, submit
                         <CustomDatePicker date={dates.insurance_expiry_date} handleChange={handleDateChange} label={"Insurance expiry date"} name={"insurance_expiry_date"}/>
                         <CustomDatePicker date={dates.license_expiry_date} handleChange={handleDateChange} label={"License expiry date"} name={"license_expiry_date"}/>
                     </View>
-                    {createSecondInputTextPropsBlock(vehicleData, handleChange).map(({placeholder, value, onChange, name}, idx) => {
-                        return <ThemedInputText placeholder={placeholder} value={value} onChange={onChange} name={name} containerStyles={"bg-background p-5"} key={idx}/>
-                    })}
+                    <View className={"flex flex-col gap-2"}>
+                        {createSecondInputTextPropsBlock(vehicleData, handleChange).map(({placeholder, value, onChange, name}, idx) => {
+                            return <ThemedInputText placeholder={placeholder} value={value} onChange={onChange} name={name} containerStyles={"bg-background p-5"} key={idx}/>
+                        })}
+                    </View>
 
                 </View>
                 <View className={"mt-3"}>
-                    <ThemedButton title={"Submit"} handlePress={submitForm} containerStyles={"w-full bg-primary p-5 rounded-[50%]"} textStyles={"text-white font-semibold text-base"}/>
-                    <ThemedButton title={"Cancel"} handlePress={cancelSubmission} containerStyles={"w-full bg-default p-5 rounded-[50%] mt-[10px]"} textStyles={"text-white font-semibold text-base"}/>
+                    <ThemedButton title={"Submit"} handlePress={submitForm} containerStyles={"w-full bg-primary p-5 rounded"} textStyles={"text-white font-semibold text-base"}/>
+                    <ThemedButton title={"Cancel"} handlePress={cancelSubmission} containerStyles={"w-full bg-default p-5 rounded mt-[10px]"} textStyles={"text-white font-semibold text-base"}/>
                 </View>
             </View>
         </View>

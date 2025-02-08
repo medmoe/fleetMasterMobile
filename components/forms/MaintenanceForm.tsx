@@ -7,12 +7,14 @@ import CustomDatePicker from "../CustomDatePicker";
 import ThemedInputText from "../ThemedInputText";
 import {useGlobalContext} from "@/context/GlobalProvider";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
-import {MaintenanceReportType, PartPurchaseEventType} from "@/types/maintenance";
+import {DetailedPartPurchaseEventType, MaintenanceReportType, PartPurchaseEventType} from "@/types/maintenance";
 import {v4 as uuidv4} from 'uuid';
+import {PartPurchaseEventCard, ServiceProviderEventCard} from "@/components";
 
 interface MaintenanceFormProps {
     handlePartPurchaseEventEdition: (partPurchaseEvent: PartPurchaseEventType) => void
     handlePartPurchaseEventCreation: () => void
+    handleServiceProviderEventCreation: () => void
     handleDateChange: (name: string) => (_: DateTimePickerEvent, date?: Date) => void
     handleMaintenanceReportFormChange: (name: string, value: string) => void
     handleMaintenanceReportSubmission: () => void
@@ -21,7 +23,7 @@ interface MaintenanceFormProps {
     handlePartPurchaseEventDeletion: () => void
     showDeleteFeatures: boolean
     partPurchaseEventId?: string
-    partPurchaseEvents: PartPurchaseEventType[]
+    partPurchaseEvents: DetailedPartPurchaseEventType[]
     maintenanceReportFormData: MaintenanceReportType
     maintenanceReportDates: { [key in "start_date" | "end_date" | "purchase_date"]: Date }
 
@@ -30,6 +32,7 @@ interface MaintenanceFormProps {
 
 const MaintenanceForm = ({
                              handlePartPurchaseEventEdition,
+                             handleServiceProviderEventCreation,
                              handleDateChange,
                              handleMaintenanceReportFormChange,
                              handleMaintenanceReportSubmission,
@@ -53,15 +56,13 @@ const MaintenanceForm = ({
                 </View>
                 <View className={"flex-1"}>
                     {partPurchaseEvents.map((partPurchaseEvent) => {
-                        const part = generalData.parts.find((part) => partPurchaseEvent.part.toString() === part.id?.toString());
-                        const partProvider = generalData.part_providers.find((partsProvider) => partPurchaseEvent.provider === partsProvider.id);
                         return (
                             <Pressable onPress={() => handlePartPurchaseEventEdition(partPurchaseEvent)} key={uuidv4()}
                                        onLongPress={() => handlePartPurchaseEventOnLongPress(partPurchaseEvent.id?.toString())}>
                                 <View
                                     className={`flex-1 p-[16px] bg-white rounded shadow mb-3 ${showDeleteFeatures && partPurchaseEventId === partPurchaseEvent.id?.toString() ? "shadow-error" : ""}`}>
-                                    <ListItemDetail label={"Part name"} value={part?.name} textStyle={"text-txt"}/>
-                                    <ListItemDetail label={"Provider name"} value={partProvider?.name}
+                                    <ListItemDetail label={"Part name"} value={partPurchaseEvent.part_details.name} textStyle={"text-txt"}/>
+                                    <ListItemDetail label={"Provider name"} value={partPurchaseEvent.provider_details.name}
                                                     textStyle={"text-txt"}/>
                                     <ListItemDetail label={"Purchase date"} value={partPurchaseEvent.purchase_date}
                                                     textStyle={"text-txt"}/>
@@ -71,20 +72,8 @@ const MaintenanceForm = ({
                             </Pressable>
                         )
                     })}
-
                 </View>
-
                 <View>
-                    <MaintenancePicker containerStyles={"mb-3"}
-                                       title={"Pick service provider"}
-                                       name={"service_provider"}
-                                       value={maintenanceReportFormData.service_provider}
-                                       items={generalData.service_providers.map((serviceProvider) => ({
-                                           label: serviceProvider.name,
-                                           value: serviceProvider.id
-                                       }))}
-                                       handleItemChange={handleMaintenanceReportFormChange}
-                    />
                     <MaintenancePicker containerStyles={"mb-3"}
                                        title={"Select maintenance type"}
                                        name={"maintenance_type"}
@@ -101,34 +90,50 @@ const MaintenanceForm = ({
                         <CustomDatePicker date={maintenanceReportDates.end_date} handleChange={handleDateChange}
                                           label={"End date"} name={"end_date"}/>
                     </View>
-                    <ThemedInputText placeholder={"Enter the Cost"} value={maintenanceReportFormData.cost}
-                                     onChange={handleMaintenanceReportFormChange} name={'cost'}
-                                     containerStyles={"bg-background p-5"}/>
                     <ThemedInputText placeholder={"Enter Mileage"} value={maintenanceReportFormData.mileage}
                                      onChange={handleMaintenanceReportFormChange} name={'mileage'}
-                                     containerStyles={"bg-background p-5"}/>
+                                     containerStyles={"bg-background p-5 mt-3"}/>
                     <ThemedInputText placeholder={"Description"} value={maintenanceReportFormData.description}
                                      onChange={handleMaintenanceReportFormChange} name={'description'}
-                                     containerStyles={"bg-background p-5"}/>
+                                     containerStyles={"bg-background p-5 mt-3"}/>
+                    <View>
+                        {maintenanceReportFormData.part_purchase_events.map(({part, provider, purchase_date, cost}, index) => {
+                            return (
+                                <PartPurchaseEventCard key={index} onPress={() => console.log("part purchase event pressed")} part={part} partProvider={provider} purchaseDate={purchase_date} cost={cost} />
+                            )
+                        })}
+                    </View>
+                    <View>
+                        {maintenanceReportFormData.service_provider_events.map((event, index) => {
+                            return (
+                                <ServiceProviderEventCard key={index} onPress={() => console.log("Pressed")} event={event} />
+                            )
+                        })}
+                    </View>
                     {showDeleteFeatures && <ThemedButton
                         title={"Delete purchase event"}
                         handlePress={handlePartPurchaseEventDeletion}
-                        containerStyles={"bg-error p-5 rounded-[50%] mt-3"}
+                        containerStyles={"bg-error p-5 rounded mt-3"}
                         textStyles={"text-white text-base font-semibold"}/>
                     }
                     <ThemedButton title={"Create part purchase event"}
                                   handlePress={handlePartPurchaseEventCreation}
-                                  containerStyles={"bg-secondary p-5 rounded-[50%] mt-3"}
+                                  containerStyles={"bg-secondary p-5 rounded mt-3"}
+                                  textStyles={"text-white text-base font-semibold"}
+                    />
+                    <ThemedButton title={"Create service provider event"}
+                                  handlePress={handleServiceProviderEventCreation}
+                                  containerStyles={"bg-secondary p-5 rounded mt-3"}
                                   textStyles={"text-white text-base font-semibold"}
                     />
                     <ThemedButton title={"Submit Report"}
                                   handlePress={handleMaintenanceReportSubmission}
-                                  containerStyles={"bg-primary p-5 rounded-[50%] mt-3"}
+                                  containerStyles={"bg-primary p-5 rounded mt-3"}
                                   textStyles={"text-white text-base font-semibold"}
                     />
                     <ThemedButton title={"Cancel"}
                                   handlePress={handleMaintenanceReportCancellation}
-                                  containerStyles="bg-default p-5 rounded-[50%] mt-3"
+                                  containerStyles="bg-default p-5 rounded mt-3"
                                   textStyles={"text-white font-semibold text-base"}
                     />
                 </View>

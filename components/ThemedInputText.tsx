@@ -3,6 +3,7 @@ import {Image, ImageSourcePropType, Text, TextInput, View} from 'react-native';
 
 export interface ThemedInputTextProps {
     containerStyles?: string,
+    inputContainerStyles?: string,
     placeholder: string,
     value: string,
     onChange: (name: string, value: string) => void,
@@ -10,11 +11,19 @@ export interface ThemedInputTextProps {
     icon?: ImageSourcePropType,
 }
 
-const ThemedInputText = ({containerStyles, placeholder, onChange, value, name, icon}: ThemedInputTextProps) => {
+const ThemedInputText = ({
+                             containerStyles,
+                             inputContainerStyles,
+                             placeholder,
+                             onChange,
+                             value,
+                             name,
+                             icon
+                         }: ThemedInputTextProps) => {
     return (
-        <View className={"mt-2 flex-1"}>
+        <View className={`${containerStyles}`}>
             <Text className={"text-txt text-sm font-open-sans"}>{placeholder}:</Text>
-            <View className={`${containerStyles} rounded flex-row items-center`}>
+            <View className={`${inputContainerStyles} rounded flex-row items-center`}>
                 {icon && <Image source={icon} resizeMode={"contain"} className={"w-[25px] h-[25px] mr-[10px]"}/>}
                 <TextInput
                     className={"flex-1"}

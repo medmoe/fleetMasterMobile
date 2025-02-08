@@ -1,32 +1,64 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {Alert, ImageSourcePropType, SafeAreaView, ScrollView, Text, View} from 'react-native';
-import {ListItemDetail, MaintenanceReportForm, PartPurchaseEventViewer, RangeCard, Spinner, StatCard, ThemedButton} from "@/components";
+import {ListItemDetail, MaintenanceReportForm, RangeCard, Spinner, StatCard, ThemedButton} from "@/components";
 
 import {useGlobalContext} from "@/context/GlobalProvider";
 import {VehicleType} from "@/types/types";
 import {vehicleStatusMapping} from "@/constants/forms/vehicle";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 import {icons} from "@/constants/icons";
-import {partPurchaseEvents} from "@/constants/fixtures";
 import axios from "axios";
 import {API} from "@/constants/endpoints";
-import {MaintenanceOverviewType, MaintenanceReportType, OverviewType, PartPurchaseEventType} from "@/types/maintenance";
+import {
+    MaintenanceOverviewType,
+    MaintenanceReportType,
+    MaintenanceSummaryType,
+    PartPurchaseEventType,
+    ServiceProviderEventType,
+    ServiceProviderType
+} from "@/types/maintenance";
 import {router} from "expo-router";
 import {getLocalDateString, isPositiveInteger} from "@/utils/helpers";
+import ServiceProviderEventForm from "@/components/forms/ServiceProviderEventForm";
+
 
 const MaintenanceReport = () => {
-    const {generalData, setGeneralData} = useGlobalContext();
+    const {generalData, setGeneralData, currentItem} = useGlobalContext();
     const partPurchaseEventFormInitialState: PartPurchaseEventType = {
-        part: "",
-        provider: generalData.part_providers[0]?.id || "",
-        purchase_date: getLocalDateString(new Date()),
-        cost: "0"
+        part: {
+            name: "",
+            description: "",
+        },
+        provider: {
+            name: "",
+            address: "",
+            phone_number: "",
+        },
+        purchase_date: "",
+        cost: "",
     }
-    const [partPurchaseFormData, setPartPurchaseFormData] = useState<PartPurchaseEventType>(partPurchaseEventFormInitialState);
+    const ServiceProviderEventFormInitialState: ServiceProviderEventType = {
+        service_provider: {
+            name: "",
+            phone_number: "",
+            address: "",
+            service_type: "MECHANIC"
+        },
+        service_date: "",
+        cost: "",
+        description: ""
+    }
+    const [partPurchaseEventFormData, setPartPurchaseEventFormData] = useState<PartPurchaseEventType>(partPurchaseEventFormInitialState);
+    const [serviceProviderEventFormData, setServiceProviderEventFormData] = useState<ServiceProviderEventType>(ServiceProviderEventFormInitialState);
+    const [showServiceProviderEventForm, setShowServiceProviderEventForm] = useState(false);
     const [maintenanceReportDates, setMaintenanceReportDates] = useState({
         "start_date": new Date(),
         "end_date": new Date(),
         "purchase_date": new Date()
+    })
+    const [eventsDates, setEventsDates] = useState({
+        "purchase_date": new Date(),
+        "service_date": new Date(),
     })
     const [searchTerm, setSearchTerm] = useState("");
     const [isPartSelected, setIsSelected] = useState(false);
@@ -35,14 +67,16 @@ const MaintenanceReport = () => {
         setIsSelected(isSelected);
     }, [])
     const [showMaintenanceForm, setShowMaintenanceForm] = useState<boolean>(false);
-    const {currentItem} = useGlobalContext();
     const vehicle = currentItem as VehicleType
     const [style, label] = vehicleStatusMapping[vehicle.status];
-    const [maintenanceReport, setMaintenanceReport] = useState<OverviewType>({previous_report: {}, current_report: {}})
-    const statData: [string, string, string, string, ImageSourcePropType][] = Object.keys(maintenanceReport.previous_report).map((key): any => {
+    const [maintenanceReport, setMaintenanceReport] = useState<MaintenanceOverviewType>({
+        previous_report: {},
+        current_report: {},
+    })
+    const statData: [string, string, string, string, ImageSourcePropType][] = Object.keys(maintenanceReport.previous_report || {}).map((key): any => {
         const label = key.replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
-        const previousValue = maintenanceReport.previous_report[key as keyof MaintenanceOverviewType];
-        const currentValue = maintenanceReport.current_report[key as keyof MaintenanceOverviewType];
+        const previousValue = maintenanceReport.previous_report[key as keyof MaintenanceSummaryType];
+        const currentValue = maintenanceReport.current_report[key as keyof MaintenanceSummaryType];
         const currentValueNum = parseFloat(currentValue || "0");
         const previousValueNum = parseFloat(previousValue || "0");
         let percentageChange;
@@ -69,40 +103,33 @@ const MaintenanceReport = () => {
         pairStatData.push(statData.slice(i, i + 2));
     }
     const maintenanceReportFormInitialState: MaintenanceReportType = {
-        vehicle: vehicle.id || "",
-        service_provider: (generalData.service_providers?.[0]?.id) || "",
-        parts: [],
         maintenance_type: "PREVENTIVE",
         start_date: "",
         end_date: "",
-        cost: "0",
         mileage: vehicle.mileage,
-        description: ""
+        description: "",
+        part_purchase_events: [],
+        service_provider_events: [],
+        vehicle_events: [],
     }
     const [maintenanceReportFormData, setMaintenanceReportFormData] = useState(maintenanceReportFormInitialState)
     const [activeFilter, setActiveFilter] = useState(0);
     const searchingFilterLabels: string[] = ["7D", "2W", "4W", "3M", "1Y"]
+    const [showDeleteFeaturesForPartPurchaseEvent, setShowDeleteFeaturesForPartPurchaseEvent] = useState<boolean>(false);
+    const [isLoadingGeneral, setIsLoadingGeneral] = useState(false);
+    const [isLoadingMaintenance, setIsLoadingMaintenance] = useState(false);
+
     useEffect(() => {
-        const fetchGeneralData = async () => {
-            setIsLoading(true);
+        const fetchMaintenanceReport = async () => {
             try {
-                const [generalDataResponse, maintenanceReportResponse] = await Promise.all([
-                    axios.get(`${API}maintenance/general-data/`, {withCredentials: true}),
-                    axios.get(`${API}maintenance/overview/`, {
-                        withCredentials: true,
-                        params: {range: searchingFilterLabels[activeFilter].toLowerCase()}
-                    }),
-                ])
-                setGeneralData(generalDataResponse.data);
-                setMaintenanceReport(maintenanceReportResponse.data);
-            } catch (error) {
-                console.log(error)
-            } finally {
-                setIsLoading(false);
+                const response = await axios.get(`${API}maintenance/overview/`, {withCredentials: true});
+                setMaintenanceReport(response.data);
+            } catch (error: any) {
+                console.error("Error fetching maintenance report:", error);
             }
         }
-        fetchGeneralData();
-    }, [showMaintenanceForm, activeFilter]);
+        fetchMaintenanceReport();
+    }, []);
 
     function formatValue(num: number): string {
         if (num >= 1000) {
@@ -127,9 +154,12 @@ const MaintenanceReport = () => {
     }
     const selectPart = (name: string, id: string) => {
         setSearchTerm(name);
-        setPartPurchaseFormData(prevState => ({
+        setPartPurchaseEventFormData(prevState => ({
             ...prevState,
-            part: id
+            part: {
+                ...prevState.part,
+                id: +id
+            }
         }))
         setIsSelected(true);
     }
@@ -148,14 +178,6 @@ const MaintenanceReport = () => {
     }
     const validateMaintenanceReportData = () => {
         // validate Data
-        if (!maintenanceReportFormData.vehicle || !isPositiveInteger(maintenanceReportFormData.vehicle)) {
-            Alert.alert("Error", "You must select a valid vehicle!")
-            return false
-        }
-        if (!maintenanceReportFormData.service_provider || !isPositiveInteger(maintenanceReportFormData.service_provider)) {
-            Alert.alert("Error", "You must select a valid service provider!")
-            return false
-        }
         if (!maintenanceReportDates.start_date) {
             Alert.alert("Error", "You must select a valid start date!")
             return false
@@ -164,9 +186,9 @@ const MaintenanceReport = () => {
             Alert.alert("Error", "You must select a valid end date!")
             return false
         }
-        if (!isPositiveInteger(maintenanceReportFormData.cost)) {
-            Alert.alert("Error", "You must select a valid cost!")
-            return false
+        if (new Date(maintenanceReportDates.end_date) <= new Date(maintenanceReportDates.start_date)) {
+            Alert.alert("Error", "End date must be greater than start date!");
+            return false;
         }
         if (!isPositiveInteger(maintenanceReportFormData.mileage)) {
             Alert.alert("Error", "You must select a valid mileage!")
@@ -196,11 +218,31 @@ const MaintenanceReport = () => {
     const handleMaintenanceReportCancellation = () => {
         setShowMaintenanceForm(false);
     }
-    const handlePartPurchaseFormChange = (name: string, value: string) => {
-        setPartPurchaseFormData(prevState => ({
+    const handlePartPurchaseEventFormChange = (name: string, value: string) => {
+        setPartPurchaseEventFormData(prevState => ({
             ...prevState,
             [name]: value
         }))
+    }
+    const handleServiceProviderEventFormChange = (name: string, value: string) => {
+        setServiceProviderEventFormData((prevState) => {
+            if (name === "service_provider") {
+                const keyValuePairs = value.split(",")
+                const serviceProvider: ServiceProviderType = {name: "", phone_number: "", address: "", service_type: "MECHANIC"}
+                keyValuePairs.forEach((pair) => {
+                    const [key, value] = pair.split(":")
+                    serviceProvider[key as keyof ServiceProviderType] = value as any
+                })
+                return {
+                    ...prevState,
+                    service_provider: serviceProvider
+                }
+            }
+            return {
+                ...prevState,
+                [name]: value,
+            }
+        })
     }
     const handlePartInputChange = (name: string, value: string) => {
         setSearchTerm(value);
@@ -213,6 +255,29 @@ const MaintenanceReport = () => {
     }
     const handleNewServiceProviderAddition = () => {
         router.replace('/forms/service-provider')
+    }
+    const removePartPurchaseEventsOnCancel = async () => {
+
+    }
+    const handlePartPurchaseEventAddition = () => {
+        setMaintenanceReportFormData(prevState => ({
+            ...prevState,
+            part_purchase_events: [...prevState.part_purchase_events, partPurchaseEventFormData]
+        }))
+    }
+    const handleServiceProviderEventAddition = () => {
+        setMaintenanceReportFormData(prevState => ({
+            ...prevState,
+            service_provider_events: [...prevState.service_provider_events, serviceProviderEventFormData]
+        }))
+        setShowServiceProviderEventForm(false);
+    }
+
+    const handleEventsDateChange = (name: string) => (_: DateTimePickerEvent, date?: Date) => {
+        setEventsDates(prevState => ({
+            ...prevState,
+            [name]: date
+        }))
     }
     return (
         <SafeAreaView>
@@ -266,54 +331,66 @@ const MaintenanceReport = () => {
                                 <View className={"mt-5 flex-1 bg-white shadow p-2"}>
                                     <View><Text className={"font-semibold text-base text-txt"}>Auto Parts
                                         Breakdown</Text></View>
-                                    {partPurchaseEvents.map((obj, idx) => <PartPurchaseEventViewer name={obj.name}
-                                                                                                   provider={obj.provider}
-                                                                                                   cost={obj.cost}
-                                                                                                   key={idx}/>)}
+                                    {/*{maintenanceReport.part_purchase_events?.map((obj, idx) => (<PartPurchaseEventViewer*/}
+                                    {/*    name={obj.part_details.name}*/}
+                                    {/*    provider={obj.provider_details.name}*/}
+                                    {/*    cost={obj.cost}*/}
+                                    {/*    purchase_date={obj.purchase_date}*/}
+                                    {/*    key={idx}/>)) || []}*/}
                                 </View>
                                 <ThemedButton title={"Add New Part"}
                                               handlePress={handleNewPartAddition}
-                                              containerStyles={"bg-secondary w-full p-5 rounded-[50%] mt-3"}
+                                              containerStyles={"bg-secondary w-full p-5 rounded mt-3"}
                                               textStyles={"text-white font-semibold text-base"}
                                 />
                                 <ThemedButton title={"Add New Service Provider"}
                                               handlePress={handleNewServiceProviderAddition}
-                                              containerStyles={"bg-secondary w-full p-5 rounded-[50%] mt-3"}
+                                              containerStyles={"bg-secondary w-full p-5 rounded mt-3"}
                                               textStyles={"text-white font-semibold text-base"}
                                 />
                                 <ThemedButton title={"Add New Parts Provider"}
                                               handlePress={handleNewPartsProviderAddition}
-                                              containerStyles={"bg-secondary w-full p-5 rounded-[50%] mt-3"}
+                                              containerStyles={"bg-secondary w-full p-5 rounded mt-3"}
                                               textStyles={"text-white font-semibold text-base"}
                                 />
                                 <ThemedButton title={"Record maintenance"}
                                               handlePress={startRecordingMaintenance}
-                                              containerStyles={"bg-primary w-full p-5 rounded-[50%] mt-3"}
+                                              containerStyles={"bg-primary w-full p-5 rounded mt-3"}
                                               textStyles={"text-white font-semibold text-base"}/>
                                 <ThemedButton title={"Cancel"}
                                               handlePress={cancelRecordingMaintenance}
-                                              containerStyles={"bg-default w-full p-5 rounded-[50%] mt-3"}
+                                              containerStyles={"bg-default w-full p-5 rounded mt-3"}
                                               textStyles={"text-white font-semibold text-base"}
                                 />
                             </View>
                         </View>
                         :
-                        <MaintenanceReportForm isPartSelected={isPartSelected}
-                                               setIsPartSelected={setIsPartSelected}
-                                               selectPart={selectPart}
-                                               searchTerm={searchTerm}
+                        <MaintenanceReportForm eventsDates={eventsDates}
                                                handleDateChange={handleDateChange}
+                                               handleEventsDateChange={handleEventsDateChange}
+                                               handleMaintenanceReportCancellation={handleMaintenanceReportCancellation}
                                                handleMaintenanceReportFormChange={handleMaintenanceReportFormChange}
                                                handleMaintenanceReportSubmission={handleMaintenanceReportSubmission}
-                                               handleMaintenanceReportCancellation={handleMaintenanceReportCancellation}
-                                               handlePartPurchaseFormChange={handlePartPurchaseFormChange}
-                                               partPurchaseFormData={partPurchaseFormData}
                                                handlePartInputChange={handlePartInputChange}
-                                               setPartPurchaseFormData={setPartPurchaseFormData}
-                                               setSearchTerm={setSearchTerm}
+                                               handlePartPurchaseEventAddition={handlePartPurchaseEventAddition}
+                                               handlePartPurchaseFormChange={handlePartPurchaseEventFormChange}
+                                               handleServiceProviderEventAddition={handleServiceProviderEventAddition}
+                                               handleServiceProviderEventFormChange={handleServiceProviderEventFormChange}
+                                               isPartSelected={isPartSelected}
                                                maintenanceReportDates={maintenanceReportDates}
                                                maintenanceReportFormData={maintenanceReportFormData}
+                                               partPurchaseFormData={partPurchaseEventFormData}
+                                               searchTerm={searchTerm}
+                                               selectPart={selectPart}
+                                               serviceProviderEventFormData={serviceProviderEventFormData}
+                                               setIsPartSelected={setIsPartSelected}
                                                setMaintenanceReportFormData={setMaintenanceReportFormData}
+                                               setPartPurchaseFormData={setPartPurchaseEventFormData}
+                                               setSearchTerm={setSearchTerm}
+                                               setShowDeleteFeaturesForPartPurchaseEvent={setShowDeleteFeaturesForPartPurchaseEvent}
+                                               setShowServiceProviderEventForm={setShowServiceProviderEventForm}
+                                               showDeleteFeaturesForPartPurchaseEvent={showDeleteFeaturesForPartPurchaseEvent}
+                                               showServiceProviderEventForm={showServiceProviderEventForm}
                         />}
             </ScrollView>
         </SafeAreaView>

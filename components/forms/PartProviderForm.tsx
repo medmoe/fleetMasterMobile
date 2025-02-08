@@ -36,17 +36,21 @@ const PartProviderFrom = (
                                      value={partProvider.phone_number}
                                      onChange={handlePartProviderInputChange}
                                      name={'phone_number'}
-                                     containerStyles={"bg-background p-5"}
+                                     containerStyles={"bg-background p-5 mt-3"}
                     />
                     <ThemedInputText placeholder={"Enter address"}
                                      value={partProvider.address}
                                      onChange={handlePartProviderInputChange}
                                      name={'address'}
-                                     containerStyles={"bg-background p-5"}
+                                     containerStyles={"bg-background p-5 mt-3"}
                     />
                 </View>
-                <ThemedButton title={"Submit"} handlePress={handlePartProviderSubmission} containerStyles={"w-full bg-primary p-5 rounded-[50%] mt-3"} textStyles={"text-white font-semibold text-base"} />
-                <ThemedButton title={"Cancel"} handlePress={handlePartProviderCancellation} containerStyles={"w-full bg-default p-5 rounded-[50%] mt-3"} textStyles={"text-white font-semibold text-base"} />
+                <ThemedButton title={"Submit"} handlePress={handlePartProviderSubmission}
+                              containerStyles={"w-full bg-primary p-5 rounded mt-3"}
+                              textStyles={"text-white font-semibold text-base"}/>
+                <ThemedButton title={"Cancel"} handlePress={handlePartProviderCancellation}
+                              containerStyles={"w-full bg-default p-5 rounded mt-3"}
+                              textStyles={"text-white font-semibold text-base"}/>
             </View>
         </View>
     );

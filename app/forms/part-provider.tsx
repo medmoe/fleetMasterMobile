@@ -54,7 +54,11 @@ const PartProvider = () => {
         setShowPartProviderForm(false);
     }
     const handleCancelPartProviderAddition = () => {
-        router.replace("/maintenance/maintenance-report");
+        if (showDeleteFeatures) {
+            setShowDeleteFeatures(false);
+        } else {
+            router.replace("/maintenance/maintenance-report");
+        }
 
     }
     const handlePartsProviderLongPress = (partsProvider: PartProviderType) => {
@@ -105,12 +109,14 @@ const PartProvider = () => {
                                     <View>
                                         {generalData.part_providers.map((partProvider, idx) => {
                                             return (
-                                                <Pressable onPress={() => handlePartsProviderEdition(partProvider)} key={idx} onLongPress={() => handlePartsProviderLongPress(partProvider)}>
+                                                <Pressable onPress={() => handlePartsProviderEdition(partProvider)} key={idx}
+                                                           onLongPress={() => handlePartsProviderLongPress(partProvider)}>
                                                     <View
                                                         className={`flex-row p-[16px] bg-white rounded shadow mt-3 ${showDeleteFeatures && partProviderFormData.id === partProvider.id ? "shadow-error" : ""}`}>
                                                         <View className={"flex-1"}>
                                                             <ListItemDetail label={"Name"} value={partProvider.name} textStyle={"text-txt"}/>
-                                                            <ListItemDetail label={"Phone number"} value={partProvider.phone_number} textStyle={"text-txt"}/>
+                                                            <ListItemDetail label={"Phone number"} value={partProvider.phone_number}
+                                                                            textStyle={"text-txt"}/>
                                                             <ListItemDetail label={"Address"} value={partProvider.address} textStyle={"text-txt"}/>
                                                         </View>
                                                     </View>
@@ -121,19 +127,19 @@ const PartProvider = () => {
                                     <View className={"w-full pt-5"}>
                                         <ThemedButton title={"Add part provider"}
                                                       handlePress={handlePartsProviderCreation}
-                                                      containerStyles={"bg-primary p-5 rounded-[50%]"}
+                                                      containerStyles={"bg-primary p-5 rounded"}
                                                       textStyles={"font-semibold text-base text-white"}
                                         />
                                         {showDeleteFeatures && <ThemedButton
                                             title={"Delete Parts Provider"}
                                             handlePress={handlePartsProviderDeletion}
-                                            containerStyles={"bg-error p-5 rounded-[50%] mt-3"}
+                                            containerStyles={"bg-error p-5 rounded mt-3"}
                                             textStyles={"font-semibold text-base text-white"}
                                         />
                                         }
                                         <ThemedButton title={"Cancel"}
                                                       handlePress={handleCancelPartProviderAddition}
-                                                      containerStyles={"bg-default p-5 rounded-[50%] mt-3"}
+                                                      containerStyles={"bg-default p-5 rounded mt-3"}
                                                       textStyles={"font-semibold text-base text-white"}
                                         />
                                     </View>

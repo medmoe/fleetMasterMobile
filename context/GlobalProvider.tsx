@@ -4,7 +4,7 @@ import {driverStatus} from "@/constants/forms/driver";
 import {vehicleStatus, vehicleTypes} from "@/constants/forms/vehicle";
 import {PartProviderType, PartType, ServiceProviderType} from "@/types/maintenance";
 
-type GeneralDataType = { parts: PartType[], part_providers: PartProviderType[], service_providers: ServiceProviderType[] }
+export type GeneralDataType = { parts: PartType[], part_providers: PartProviderType[], service_providers: ServiceProviderType[] }
 
 type GlobalProviderProps = {
     children: ReactNode
@@ -41,6 +41,11 @@ export const responseDataInitialState: ResponseDataType = {
         email: "",
     }
 }
+export const generalDataInitialState: GeneralDataType = {
+    parts: [],
+    part_providers: [],
+    service_providers: [],
+}
 
 const GlobalContext = createContext<ContextProps>({
     setResponseData: () => {
@@ -52,9 +57,9 @@ const GlobalContext = createContext<ContextProps>({
     setCurrentItem: () => {
     },
     currentItem: currentVehicleInitialState,
-    generalData: {parts: [], part_providers: [], service_providers: []},
     setGeneralData: () => {
-    }
+    },
+    generalData: generalDataInitialState,
 })
 
 export const useGlobalContext = () => useContext(GlobalContext);
@@ -64,18 +69,18 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({children}) => {
     const [responseData, setResponseData] = useState<ResponseDataType>(responseDataInitialState);
     const [isPostRequest, setIsPostRequest] = useState(true);
     const [currentItem, setCurrentItem] = useState<VehicleType | DriverType>(currentVehicleInitialState)
-    const [generalData, setGeneralData] = useState<GeneralDataType>({parts: [], service_providers: [], part_providers: []})
+    const [generalData, setGeneralData] = useState<GeneralDataType>(generalDataInitialState)
     return (
         <GlobalContext.Provider
             value={{
                 responseData,
                 setResponseData,
-                setIsPostRequest,
                 isPostRequest,
-                setCurrentItem,
+                setIsPostRequest,
                 currentItem,
-                setGeneralData,
+                setCurrentItem,
                 generalData,
+                setGeneralData,
             }}
         >
             {children}

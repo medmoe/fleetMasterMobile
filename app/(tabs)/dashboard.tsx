@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {SafeAreaView} from "react-native-safe-area-context";
 import {ScrollView, Text, View} from "react-native";
 import {maintenanceData} from "@/constants/fixtures";
@@ -6,12 +6,19 @@ import TableEntry from "@/components/TableEntry";
 import {useGlobalContext} from "@/context/GlobalProvider";
 import {driverStatus} from "@/constants/forms/driver";
 import {vehicleStatus} from "@/constants/forms/vehicle";
+import axios from "axios";
+import {API} from "@/constants/endpoints";
 
 const Dashboard = () => {
-    const {responseData} = useGlobalContext()
-    const handlePress = () => {
+    const {responseData, setGeneralData} = useGlobalContext()
+    useEffect(() => {
+        const fetchGeneralData = async () => {
+            const response = await axios.get(`${API}maintenance/general-data/`, {withCredentials: true})
+            setGeneralData(response.data);
+        }
+        fetchGeneralData();
+    }, []);
 
-    }
     return (
         <SafeAreaView>
             <ScrollView>

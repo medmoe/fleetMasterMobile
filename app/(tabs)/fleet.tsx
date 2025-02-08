@@ -43,7 +43,7 @@ const Fleet = () => {
                         <View className={"w-full pt-5"}>
                             <ThemedButton title={"Add vehicle"}
                                           handlePress={addVehicle}
-                                          containerStyles={"bg-secondary w-[40%] p-5 rounded-[50%]"}
+                                          containerStyles={"bg-secondary w-[40%] p-5 rounded"}
                                           textStyles={"font-semibold text-base text-white"}
                             />
                         </View>

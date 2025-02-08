@@ -1,5 +1,4 @@
 import * as SecureStore from "expo-secure-store";
-import {err} from "react-native-svg";
 
 const UNKNOWN_ERROR_MESSAGE = "An error occurred. Please try again"
 

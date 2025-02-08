@@ -37,10 +37,16 @@ const Part = () => {
         setSubtitle("Fill in the fields below.")
     }
     const handleCancelPartCreation = () => {
-        router.replace("/maintenance/maintenance-report")
+        if (showDeleteFeatures) {
+            setShowDeleteFeatures(false);
+        } else if (searchTerm) {
+            setSearchTerm("")
+            setPart({name: "", description: ""})
+        } else {
+            router.replace("/maintenance/maintenance-report")
+        }
     }
     const handlePartInputChange = (name: string, value: string) => {
-        console.log(partFormData);
         setPartFormData(prevState => ({
             ...prevState,
             [name]: value
@@ -49,7 +55,7 @@ const Part = () => {
     const handlePartSubmission = async () => {
         setIsLoading(true);
         try {
-            const url = !isUpdate ? `${API}maintenance/parts/` : `${API}/maintenance/parts/${part.id}/`
+            const url = !isUpdate ? `${API}maintenance/parts/` : `${API}maintenance/parts/${part.id}/`
 
             const response = !isUpdate ? await axios.post(url, partFormData, options) : await axios.put(url, partFormData, options);
             if (!isUpdate) {
@@ -75,9 +81,13 @@ const Part = () => {
     }
     const handlePartCancellation = () => {
         setShowPartCreationForm(false);
+        setIsSelected(true);
     }
     const handleSearchPartInputChange = (name: string, value: string) => {
         setSearchTerm(value);
+        if (part.name !== value) {
+            setPart({name: "", description: ""})
+        }
     }
 
     const selectPart = (name: string, id: string) => {
@@ -101,6 +111,7 @@ const Part = () => {
             setShowDeleteFeatures(false)
             setPart({name: "", description: ""})
             setPartFormData({name: "", description: ""})
+            setSearchTerm("");
         } catch (error) {
             console.log(error)
         } finally {
@@ -120,7 +131,8 @@ const Part = () => {
     return (
         <SafeAreaView>
             <ScrollView>
-                {isLoading ? <View className={"w-full justify-center items-center h-full px-4"}><Spinner isVisible={isLoading}/></View> :
+                {isLoading ?
+                    <View className={"w-full justify-center items-center h-full px-4"}><Spinner isVisible={isLoading}/></View> :
                     showPartCreationForm ?
                         <PartForm part={partFormData}
                                   handlePartInputChange={handlePartInputChange}
@@ -133,7 +145,8 @@ const Part = () => {
                             <View className={"w-[94%] bg-white rounded p-5"}>
                                 <View className={"gap-2"}>
                                     <Text className={"font-semibold text-base text-txt"}>Part's list</Text>
-                                    <Text className={"font-open-sans text-txt text-sm"}>Start typing to find auto part.</Text>
+                                    <Text className={"font-open-sans text-txt text-sm"}>Start typing to find auto
+                                        part.</Text>
                                 </View>
                                 <View className={"flex-1"}>
                                     <AutoPartInput parts={generalData.parts}
@@ -144,11 +157,15 @@ const Part = () => {
                                                    setIsPartSelected={setIsPartSelected}
                                     />
                                     {
-                                        part.name ? <Pressable onPress={() => handleEditPart(part)} onLongPress={() => handlePartLongPress(part)}>
-                                            <View className={`flex-row p-[16px] bg-white rounded shadow mt-3 ${showDeleteFeatures ? "shadow-error" : ""}`}>
+                                        part.name ? <Pressable onPress={() => handleEditPart(part)}
+                                                               onLongPress={() => handlePartLongPress(part)}>
+                                            <View
+                                                className={`flex-row p-[16px] bg-white rounded shadow mt-3 ${showDeleteFeatures ? "shadow-error" : ""}`}>
                                                 <View className={"flex-1"}>
-                                                    <ListItemDetail label={"Part name"} value={part.name} textStyle={"text-txt"}/>
-                                                    <ListItemDetail label={"Description"} value={part.description} textStyle={"text-txt"}/>
+                                                    <ListItemDetail label={"Part name"} value={part.name}
+                                                                    textStyle={"text-txt"}/>
+                                                    <ListItemDetail label={"Description"} value={part.description}
+                                                                    textStyle={"text-txt"}/>
                                                 </View>
                                             </View>
                                         </Pressable> : <></>
@@ -157,18 +174,18 @@ const Part = () => {
                                 <View className={"w-full pt-5"}>
                                     <ThemedButton title={"Add part"}
                                                   handlePress={handlePartCreation}
-                                                  containerStyles={"bg-primary p-5 rounded-[50%]"}
+                                                  containerStyles={"bg-primary p-5 rounded"}
                                                   textStyles={"font-semibold text-base text-white"}
                                     />
                                     {showDeleteFeatures && <ThemedButton title={"Delete Part"}
                                                                          handlePress={handlePartDeletion}
-                                                                         containerStyles={"bg-error p-5 rounded-[50%] mt-3"}
+                                                                         containerStyles={"bg-error p-5 rounded mt-3"}
                                                                          textStyles={"font-semibold text-base text-white"}
                                     />
                                     }
                                     <ThemedButton title={"Cancel"}
                                                   handlePress={handleCancelPartCreation}
-                                                  containerStyles={"bg-default p-5 rounded-[50%] mt-3"}
+                                                  containerStyles={"bg-default p-5 rounded mt-3"}
                                                   textStyles={"font-semibold text-base text-white"}
                                     />
                                 </View>
