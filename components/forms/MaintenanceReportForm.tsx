@@ -2,15 +2,15 @@ import React, {useState} from 'react';
 import {Alert, View} from 'react-native';
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 import {useGlobalContext} from "@/context/GlobalProvider";
-import PartPurchaseEventForm from "@/components/forms/PartPurchaseEventForm";
+import PartPurchaseEventForm from "../forms/PartPurchaseEventForm";
 import axios from "axios";
 import {API} from "@/constants/endpoints";
-import MaintenanceForm from "@/components/forms/MaintenanceForm";
+import MaintenanceForm from "../forms/MaintenanceForm";
 import {router} from "expo-router";
 import {DetailedPartPurchaseEventType, MaintenanceReportType, PartPurchaseEventType, ServiceProviderEventType} from "@/types/maintenance";
 import {isPositiveInteger} from "@/utils/helpers";
 import Spinner from "../Spinner";
-import ServiceProviderEventForm from "@/components/forms/ServiceProviderEventForm";
+import ServiceProviderEventForm from "../forms/ServiceProviderEventForm";
 
 
 interface MaintenanceFormProps {
@@ -23,9 +23,13 @@ interface MaintenanceFormProps {
     handlePartInputChange: (name: string, value: string) => void
     handlePartPurchaseEventAddition: () => void
     handlePartPurchaseFormChange: (name: string, value: string) => void
-    handleServiceProviderEventAddition: () => void
+    handleServiceProviderEventAddition: (index: number | undefined) => void
+    handleServiceProviderEventDeletion: (index: number) => void
+    handleServiceProviderEventEdition: (index: number) => void
     handleServiceProviderEventFormChange: (name: string, value: string) => void
+    indexOfServiceProviderEventToEdit: number | undefined
     isPartSelected: boolean
+    isServiceProviderEventFormDataEdition: boolean
     maintenanceReportDates: { [key in "start_date" | "end_date" | "purchase_date"]: Date }
     maintenanceReportFormData: MaintenanceReportType
     partPurchaseFormData: PartPurchaseEventType
@@ -54,8 +58,12 @@ const MaintenanceReportForm = ({
                                    handlePartPurchaseEventAddition,
                                    handlePartPurchaseFormChange,
                                    handleServiceProviderEventAddition,
+                                   handleServiceProviderEventDeletion,
+                                   handleServiceProviderEventEdition,
                                    handleServiceProviderEventFormChange,
+                                   indexOfServiceProviderEventToEdit,
                                    isPartSelected,
+                                   isServiceProviderEventFormDataEdition,
                                    maintenanceReportDates,
                                    maintenanceReportFormData,
                                    partPurchaseFormData,
@@ -209,9 +217,12 @@ const MaintenanceReportForm = ({
                                                                                handleServiceProviderEventFormChange={handleServiceProviderEventFormChange}
                                                                                handleServiceProviderEventAddition={handleServiceProviderEventAddition}
                                                                                handleServiceProviderEventCancellation={handleServiceProviderEventCancellation}
+                                                                               isServiceProviderEventFormDataEdition={isServiceProviderEventFormDataEdition}
+                                                                               indexOfServiceProviderEventToEdit={indexOfServiceProviderEventToEdit}
                         /> :
                         <MaintenanceForm handlePartPurchaseEventEdition={handlePartPurchaseEventEdition}
                                          handleServiceProviderEventCreation={handleServiceProviderEventCreation}
+                                         handleServiceProviderEventEdition={handleServiceProviderEventEdition}
                                          handlePartPurchaseEventCreation={handlePartPurchaseEventCreation}
                                          handleDateChange={handleDateChange}
                                          handleMaintenanceReportFormChange={handleMaintenanceReportFormChange}
@@ -224,6 +235,7 @@ const MaintenanceReportForm = ({
                                          partPurchaseEvents={partPurchaseEvents}
                                          maintenanceReportFormData={maintenanceReportFormData}
                                          maintenanceReportDates={maintenanceReportDates}
+                                         handleServiceProviderEventDeletion={handleServiceProviderEventDeletion}
                         />
             }
         </View>

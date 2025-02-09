@@ -19,7 +19,6 @@ import {
 } from "@/types/maintenance";
 import {router} from "expo-router";
 import {getLocalDateString, isPositiveInteger} from "@/utils/helpers";
-import ServiceProviderEventForm from "@/components/forms/ServiceProviderEventForm";
 
 
 const MaintenanceReport = () => {
@@ -51,6 +50,8 @@ const MaintenanceReport = () => {
     const [partPurchaseEventFormData, setPartPurchaseEventFormData] = useState<PartPurchaseEventType>(partPurchaseEventFormInitialState);
     const [serviceProviderEventFormData, setServiceProviderEventFormData] = useState<ServiceProviderEventType>(ServiceProviderEventFormInitialState);
     const [showServiceProviderEventForm, setShowServiceProviderEventForm] = useState(false);
+    const [isServiceProviderEventFormDataEdition, setIsServiceProviderEventFormDataEdition] = useState(false);
+    const [indexOfServiceProviderEventToEdit, setIndexOfServiceProviderEventToEdit] = useState<number | undefined>();
     const [maintenanceReportDates, setMaintenanceReportDates] = useState({
         "start_date": new Date(),
         "end_date": new Date(),
@@ -265,12 +266,43 @@ const MaintenanceReport = () => {
             part_purchase_events: [...prevState.part_purchase_events, partPurchaseEventFormData]
         }))
     }
-    const handleServiceProviderEventAddition = () => {
+    const handleServiceProviderEventAddition = (index: number | undefined) => {
+        if (index === undefined) {
+            setMaintenanceReportFormData(prevState => ({
+                ...prevState,
+                service_provider_events: [...prevState.service_provider_events, serviceProviderEventFormData]
+            }))
+        } else {
+            setMaintenanceReportFormData(prevState => ({
+                ...prevState,
+                service_provider_events: [
+                    ...prevState.service_provider_events.slice(0, index),
+                    serviceProviderEventFormData,
+                    ...prevState.service_provider_events.slice(index + 1)
+                ]
+            }))
+            setIndexOfServiceProviderEventToEdit(undefined);
+            setIsServiceProviderEventFormDataEdition(false);
+            setServiceProviderEventFormData(ServiceProviderEventFormInitialState);
+        }
+        setShowServiceProviderEventForm(false);
+    }
+    const handleServiceProviderEventDeletion = (index: number) => {
         setMaintenanceReportFormData(prevState => ({
             ...prevState,
-            service_provider_events: [...prevState.service_provider_events, serviceProviderEventFormData]
+            service_provider_events: [
+                ...prevState.service_provider_events.slice(0, index),
+                ...prevState.service_provider_events.slice(index + 1)
+            ]
         }))
-        setShowServiceProviderEventForm(false);
+        setServiceProviderEventFormData(ServiceProviderEventFormInitialState);
+        setIsServiceProviderEventFormDataEdition(false);
+    }
+    const handleServiceProviderEventEdition = (index: number) => {
+        setServiceProviderEventFormData(maintenanceReportFormData.service_provider_events[index])
+        setShowServiceProviderEventForm(true);
+        setIsServiceProviderEventFormDataEdition(true);
+        setIndexOfServiceProviderEventToEdit(index);
     }
 
     const handleEventsDateChange = (name: string) => (_: DateTimePickerEvent, date?: Date) => {
@@ -375,8 +407,11 @@ const MaintenanceReport = () => {
                                                handlePartPurchaseEventAddition={handlePartPurchaseEventAddition}
                                                handlePartPurchaseFormChange={handlePartPurchaseEventFormChange}
                                                handleServiceProviderEventAddition={handleServiceProviderEventAddition}
+                                               handleServiceProviderEventEdition={handleServiceProviderEventEdition}
                                                handleServiceProviderEventFormChange={handleServiceProviderEventFormChange}
+                                               indexOfServiceProviderEventToEdit={indexOfServiceProviderEventToEdit}
                                                isPartSelected={isPartSelected}
+                                               isServiceProviderEventFormDataEdition={isServiceProviderEventFormDataEdition}
                                                maintenanceReportDates={maintenanceReportDates}
                                                maintenanceReportFormData={maintenanceReportFormData}
                                                partPurchaseFormData={partPurchaseEventFormData}
@@ -391,6 +426,7 @@ const MaintenanceReport = () => {
                                                setShowServiceProviderEventForm={setShowServiceProviderEventForm}
                                                showDeleteFeaturesForPartPurchaseEvent={showDeleteFeaturesForPartPurchaseEvent}
                                                showServiceProviderEventForm={showServiceProviderEventForm}
+                                               handleServiceProviderEventDeletion={handleServiceProviderEventDeletion}
                         />}
             </ScrollView>
         </SafeAreaView>

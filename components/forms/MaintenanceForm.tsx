@@ -9,12 +9,15 @@ import {useGlobalContext} from "@/context/GlobalProvider";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 import {DetailedPartPurchaseEventType, MaintenanceReportType, PartPurchaseEventType} from "@/types/maintenance";
 import {v4 as uuidv4} from 'uuid';
-import {PartPurchaseEventCard, ServiceProviderEventCard} from "@/components";
+import PartPurchaseEventCard from "../PartPurchaseEventCard";
+import ServiceProviderEventCard from "../ServiceProviderEventCard";
 
 interface MaintenanceFormProps {
     handlePartPurchaseEventEdition: (partPurchaseEvent: PartPurchaseEventType) => void
     handlePartPurchaseEventCreation: () => void
     handleServiceProviderEventCreation: () => void
+    handleServiceProviderEventDeletion: (index: number) => void
+    handleServiceProviderEventEdition: (index: number) => void
     handleDateChange: (name: string) => (_: DateTimePickerEvent, date?: Date) => void
     handleMaintenanceReportFormChange: (name: string, value: string) => void
     handleMaintenanceReportSubmission: () => void
@@ -33,6 +36,7 @@ interface MaintenanceFormProps {
 const MaintenanceForm = ({
                              handlePartPurchaseEventEdition,
                              handleServiceProviderEventCreation,
+                             handleServiceProviderEventDeletion,
                              handleDateChange,
                              handleMaintenanceReportFormChange,
                              handleMaintenanceReportSubmission,
@@ -44,7 +48,8 @@ const MaintenanceForm = ({
                              partPurchaseEventId,
                              partPurchaseEvents,
                              maintenanceReportFormData,
-                             maintenanceReportDates
+                             maintenanceReportDates,
+                             handleServiceProviderEventEdition
                          }: MaintenanceFormProps) => {
     const {generalData} = useGlobalContext();
     return (
@@ -97,16 +102,24 @@ const MaintenanceForm = ({
                                      onChange={handleMaintenanceReportFormChange} name={'description'}
                                      containerStyles={"bg-background p-5 mt-3"}/>
                     <View>
+                        <Text
+                            className={"font-open-sans text-base text-txt"}>{maintenanceReportFormData.part_purchase_events.length !== 0 ? "Part Purchase Events" : ""}</Text>
                         {maintenanceReportFormData.part_purchase_events.map(({part, provider, purchase_date, cost}, index) => {
                             return (
-                                <PartPurchaseEventCard key={index} onPress={() => console.log("part purchase event pressed")} part={part} partProvider={provider} purchaseDate={purchase_date} cost={cost} />
+                                <PartPurchaseEventCard key={index} onPress={() => console.log("part purchase event pressed")} part={part}
+                                                       partProvider={provider} purchaseDate={purchase_date} cost={cost}/>
                             )
                         })}
                     </View>
                     <View>
+                        <Text
+                            className={"font-open-sans text-base text-txt"}>{maintenanceReportFormData.service_provider_events.length !== 0 ? "Service Provider Events" : ""}</Text>
                         {maintenanceReportFormData.service_provider_events.map((event, index) => {
                             return (
-                                <ServiceProviderEventCard key={index} onPress={() => console.log("Pressed")} event={event} />
+                                <ServiceProviderEventCard key={index}
+                                                          onPress={() => handleServiceProviderEventEdition(index)}
+                                                          onLongPress={() => handleServiceProviderEventDeletion(index)}
+                                                          event={event}/>
                             )
                         })}
                     </View>

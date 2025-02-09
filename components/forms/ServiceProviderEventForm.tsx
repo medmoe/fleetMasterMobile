@@ -13,8 +13,10 @@ interface ServiceProviderEventFormProps {
     handleChange: (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => void
     serviceProviderEventFormData: ServiceProviderEventType
     handleServiceProviderEventFormChange: (name: string, value: string) => void
-    handleServiceProviderEventAddition: () => void
+    handleServiceProviderEventAddition: (index: number | undefined) => void
     handleServiceProviderEventCancellation: () => void
+    isServiceProviderEventFormDataEdition: boolean;
+    indexOfServiceProviderEventToEdit: number | undefined;
 
 
 }
@@ -27,6 +29,8 @@ const ServiceProviderEventForm = ({
                                       handleServiceProviderEventFormChange,
                                       handleServiceProviderEventAddition,
                                       handleServiceProviderEventCancellation,
+                                      isServiceProviderEventFormDataEdition,
+                                      indexOfServiceProviderEventToEdit,
                                   }: ServiceProviderEventFormProps) => {
     const {id, service_type, name, phone_number, address} = serviceProviderEventFormData.service_provider
     return (
@@ -55,8 +59,8 @@ const ServiceProviderEventForm = ({
                              name={"description"}
                              containerStyles={"bg-background p-5 mt-3"}
             />
-            <ThemedButton title={"Add service event"}
-                          handlePress={handleServiceProviderEventAddition}
+            <ThemedButton title={isServiceProviderEventFormDataEdition ? "Edit Service Provider Event" : "Add Service Provider Event"}
+                          handlePress={() => handleServiceProviderEventAddition(indexOfServiceProviderEventToEdit)}
                           containerStyles={"bg-primary p-5 rounded mt-3"}
                           textStyles={"text-white font-semibold text-base"}
             />
