@@ -78,7 +78,7 @@ const AutoPartInput = ({handlePartInputChange, parts, searchTerm, selectPart, is
             />
             {showSuggestions && suggestions.map((part, idx) => {
                 return (
-                    <Pressable key={idx} className={"bg-white rounded shadow p-4 m-2"} onPress={() => selectPart(part.name, part.id)}>
+                    <Pressable key={idx} className={"bg-white rounded shadow p-5 m-2"} onPress={() => selectPart(part.name, part.id)}>
                         <Text>{part.name}</Text>
                     </Pressable>
                 )

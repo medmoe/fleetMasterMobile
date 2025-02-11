@@ -4,11 +4,11 @@ import ThemedButton from "../ThemedButton";
 import MaintenancePicker from "../MaintenancePicker";
 import CustomDatePicker from "../CustomDatePicker";
 import ThemedInputText from "../ThemedInputText";
-import {useGlobalContext} from "@/context/GlobalProvider";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 import {MaintenanceReportType} from "@/types/maintenance";
 import PartPurchaseEventCard from "../PartPurchaseEventCard";
 import ServiceProviderEventCard from "../ServiceProviderEventCard";
+import Divider from "../Divider";
 
 interface MaintenanceFormProps {
     handleDateChange: (name: string) => (_: DateTimePickerEvent, date?: Date) => void
@@ -39,7 +39,7 @@ const MaintenanceForm = ({
                              maintenanceReportDates,
                              maintenanceReportFormData,
                          }: MaintenanceFormProps) => {
-    const {generalData} = useGlobalContext();
+    const {part_purchase_events, service_provider_events} = maintenanceReportFormData;
     return (
         <View className={"w-full justify-center items-center"}>
             <View className={"w-[94%] bg-white rounded p-5"}>
@@ -72,10 +72,10 @@ const MaintenanceForm = ({
                     <ThemedInputText placeholder={"Description"} value={maintenanceReportFormData.description}
                                      onChange={handleMaintenanceReportFormChange} name={'description'}
                                      containerStyles={"bg-background p-5 mt-3"}/>
-                    <View>
-                        <Text
-                            className={"font-open-sans text-base text-txt"}>{maintenanceReportFormData.part_purchase_events.length !== 0 ? "Part Purchase Events" : ""}</Text>
-                        {maintenanceReportFormData.part_purchase_events.map((partPurchaseEvent, index) => {
+                    {(part_purchase_events.length !== 0 || service_provider_events.length !== 0) && <Divider/>}
+                    {part_purchase_events.length !== 0 && <View className={"mt-3"}>
+                        <Text className={"font-semibold text-base text-txt"}>Part Purchase Events</Text>
+                        {part_purchase_events.map((partPurchaseEvent, index) => {
                             return (
                                 <PartPurchaseEventCard key={index}
                                                        onPress={() => handlePartPurchaseEventEdition(index)}
@@ -84,11 +84,10 @@ const MaintenanceForm = ({
                                 />
                             )
                         })}
-                    </View>
-                    <View>
-                        <Text
-                            className={"font-open-sans text-base text-txt"}>{maintenanceReportFormData.service_provider_events.length !== 0 ? "Service Provider Events" : ""}</Text>
-                        {maintenanceReportFormData.service_provider_events.map((event, index) => {
+                    </View>}
+                    {service_provider_events.length !== 0 && <View className={"mt-3"}>
+                        <Text className={"font-semibold text-base text-txt"}>Service Provider Events</Text>
+                        {service_provider_events.map((event, index) => {
                             return (
                                 <ServiceProviderEventCard key={index}
                                                           onPress={() => handleServiceProviderEventEdition(index)}
@@ -96,27 +95,30 @@ const MaintenanceForm = ({
                                                           serviceProviderEvent={event}/>
                             )
                         })}
+                    </View>}
+
+                    <View className={"mt-3"}>
+                        <ThemedButton title={"Create part purchase event"}
+                                      handlePress={handlePartPurchaseEventCreation}
+                                      containerStyles={"bg-secondary p-5 rounded"}
+                                      textStyles={"text-white text-base font-semibold"}
+                        />
+                        <ThemedButton title={"Create service provider event"}
+                                      handlePress={handleServiceProviderEventCreation}
+                                      containerStyles={"bg-secondary p-5 rounded mt-3"}
+                                      textStyles={"text-white text-base font-semibold"}
+                        />
+                        <ThemedButton title={"Submit Report"}
+                                      handlePress={handleMaintenanceReportSubmission}
+                                      containerStyles={"bg-primary p-5 rounded mt-3"}
+                                      textStyles={"text-white text-base font-semibold"}
+                        />
+                        <ThemedButton title={"Cancel"}
+                                      handlePress={handleMaintenanceReportCancellation}
+                                      containerStyles="bg-default p-5 rounded mt-3"
+                                      textStyles={"text-white font-semibold text-base"}
+                        />
                     </View>
-                    <ThemedButton title={"Create part purchase event"}
-                                  handlePress={handlePartPurchaseEventCreation}
-                                  containerStyles={"bg-secondary p-5 rounded mt-3"}
-                                  textStyles={"text-white text-base font-semibold"}
-                    />
-                    <ThemedButton title={"Create service provider event"}
-                                  handlePress={handleServiceProviderEventCreation}
-                                  containerStyles={"bg-secondary p-5 rounded mt-3"}
-                                  textStyles={"text-white text-base font-semibold"}
-                    />
-                    <ThemedButton title={"Submit Report"}
-                                  handlePress={handleMaintenanceReportSubmission}
-                                  containerStyles={"bg-primary p-5 rounded mt-3"}
-                                  textStyles={"text-white text-base font-semibold"}
-                    />
-                    <ThemedButton title={"Cancel"}
-                                  handlePress={handleMaintenanceReportCancellation}
-                                  containerStyles="bg-default p-5 rounded mt-3"
-                                  textStyles={"text-white font-semibold text-base"}
-                    />
                 </View>
             </View>
         </View>

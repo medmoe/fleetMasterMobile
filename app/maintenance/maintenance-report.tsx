@@ -23,7 +23,7 @@ import {getLocalDateString, isPositiveInteger} from "@/utils/helpers";
 
 
 const MaintenanceReport = () => {
-    const {generalData, setGeneralData, currentItem} = useGlobalContext();
+    const {currentItem} = useGlobalContext();
     const partPurchaseEventFormInitialState: PartPurchaseEventType = {
         part: {
             name: "",
@@ -34,8 +34,8 @@ const MaintenanceReport = () => {
             address: "",
             phone_number: "",
         },
-        purchase_date: "",
-        cost: "",
+        purchase_date: getLocalDateString(new Date()),
+        cost: "0",
     }
     const ServiceProviderEventFormInitialState: ServiceProviderEventType = {
         service_provider: {
@@ -44,8 +44,8 @@ const MaintenanceReport = () => {
             address: "",
             service_type: "MECHANIC"
         },
-        service_date: "",
-        cost: "",
+        service_date: getLocalDateString(new Date()),
+        cost: "0",
         description: ""
     }
     const [partPurchaseEventFormData, setPartPurchaseEventFormData] = useState<PartPurchaseEventType>(partPurchaseEventFormInitialState);
@@ -120,7 +120,6 @@ const MaintenanceReport = () => {
     const [maintenanceReportFormData, setMaintenanceReportFormData] = useState(maintenanceReportFormInitialState)
     const [activeFilter, setActiveFilter] = useState(0);
     const searchingFilterLabels: string[] = ["7D", "2W", "4W", "3M", "1Y"]
-
     useEffect(() => {
         const fetchMaintenanceReport = async () => {
             try {
@@ -209,7 +208,7 @@ const MaintenanceReport = () => {
             maintenanceReportFormData.end_date = getLocalDateString(maintenanceReportDates.end_date)
             const url = `${API}maintenance/reports/`
             const options = {headers: {"Content-Type": "application/json"}, withCredentials: true}
-            const response = await axios.post(url, maintenanceReportFormData, options)
+            await axios.post(url, maintenanceReportFormData, options)
             setShowMaintenanceForm(false);
 
         } catch (error: any) {
@@ -261,7 +260,7 @@ const MaintenanceReport = () => {
             }
         })
     }
-    const handlePartInputChange = (name: string, value: string) => {
+    const handlePartInputChange = (_: string, value: string) => {
         setSearchTerm(value);
     }
     const handleNewPartAddition = () => {
@@ -273,10 +272,26 @@ const MaintenanceReport = () => {
     const handleNewServiceProviderAddition = () => {
         router.replace('/forms/service-provider')
     }
-    const removePartPurchaseEventsOnCancel = async () => {
-
+    const validatePartPurchaseEventFormData = (partPurchaseEventFormData: PartPurchaseEventType): boolean => {
+        const {part, provider, purchase_date} = partPurchaseEventFormData;
+        if (!part.name) {
+            Alert.alert("Error", "You must select an available part!")
+            return false
+        }
+        if (!provider.name) {
+            Alert.alert("Error", "You must select a provider!")
+            return false
+        }
+        if (!purchase_date) {
+            Alert.alert("Error", "You must select a purchase date!")
+            return false
+        }
+        return true;
     }
     const handlePartPurchaseEventAddition = (index: number | undefined) => {
+        if (!validatePartPurchaseEventFormData(partPurchaseEventFormData)) {
+            return
+        }
         if (index === undefined) {
             setMaintenanceReportFormData(prevState => ({
                 ...prevState,
@@ -296,6 +311,7 @@ const MaintenanceReport = () => {
         }
         setShowPartPurchaseEventForm(false)
         setPartPurchaseEventFormData(partPurchaseEventFormInitialState);
+        setSearchTerm("");
     }
     const handlePartPurchaseEventDeletion = (index: number) => {
         setMaintenanceReportFormData(prevState => ({
@@ -312,7 +328,22 @@ const MaintenanceReport = () => {
         setIsPartPurchaseEventFormDataEdition(true);
         setIndexOfPartPurchaseEventToEdit(index);
     }
+    const validateServiceProviderEventFormData = (serviceProviderEventFormData: ServiceProviderEventType): boolean => {
+        const {service_provider, service_date} = serviceProviderEventFormData;
+        if (!service_provider.name) {
+            Alert.alert("Error", "You must select a service provider!")
+            return false
+        }
+        if (!service_date) {
+            Alert.alert("Error", "You must select a service date!")
+            return false
+        }
+        return true;
+    }
     const handleServiceProviderEventAddition = (index: number | undefined) => {
+        if (!validateServiceProviderEventFormData(serviceProviderEventFormData)) {
+            return;
+        }
         if (index === undefined) {
             setMaintenanceReportFormData(prevState => ({
                 ...prevState,
@@ -356,6 +387,17 @@ const MaintenanceReport = () => {
             ...prevState,
             [name]: date
         }))
+        if (name === "service_date") {
+            setServiceProviderEventFormData(prevState => ({
+                ...prevState,
+                service_date: getLocalDateString(date)
+            }))
+        } else if (name === "purchase_date") {
+            setPartPurchaseEventFormData(prevState => ({
+                ...prevState,
+                purchase_date: getLocalDateString(date)
+            }))
+        }
     }
     return (
         <SafeAreaView>

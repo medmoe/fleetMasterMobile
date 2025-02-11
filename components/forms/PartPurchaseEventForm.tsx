@@ -67,7 +67,7 @@ const PartPurchaseEventForm = ({
                 />
             </View>
 
-            <View className={"flex-row mt-3"}>
+            <View className={"mt-3"}>
                 <CustomDatePicker date={purchaseDate}
                                   handleChange={handleEventsDateChange}
                                   label={"Purchase Date"}
