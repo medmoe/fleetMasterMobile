@@ -10,7 +10,7 @@ import ThemedButton from "@/components/ThemedButton";
 interface ServiceProviderEventFormProps {
     serviceProviders: ServiceProviderType[];
     service_date: Date
-    handleChange: (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => void
+    handleEventsDateChange: (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => void
     serviceProviderEventFormData: ServiceProviderEventType
     handleServiceProviderEventFormChange: (name: string, value: string) => void
     handleServiceProviderEventAddition: (index: number | undefined) => void
@@ -24,7 +24,7 @@ interface ServiceProviderEventFormProps {
 const ServiceProviderEventForm = ({
                                       serviceProviders,
                                       service_date,
-                                      handleChange,
+                                      handleEventsDateChange,
                                       serviceProviderEventFormData,
                                       handleServiceProviderEventFormChange,
                                       handleServiceProviderEventAddition,
@@ -46,7 +46,7 @@ const ServiceProviderEventForm = ({
                                }))}
                                handleItemChange={handleServiceProviderEventFormChange}
             />
-            <CustomDatePicker date={service_date} handleChange={handleChange} label={"Service Date"} name={"service_date"}/>
+            <CustomDatePicker date={service_date} handleChange={handleEventsDateChange} label={"Service Date"} name={"service_date"}/>
             <ThemedInputText placeholder={"Enter cost"}
                              value={serviceProviderEventFormData.cost}
                              onChange={handleServiceProviderEventFormChange}

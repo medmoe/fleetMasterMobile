@@ -11,44 +11,50 @@ import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 import {PartPurchaseEventType} from "@/types/maintenance";
 
 interface PartPurchaseFormProps {
-    partPurchaseFormData: PartPurchaseEventType
-    handlePartPurchaseFormChange: (name: string, value: string) => void
+    handleEventsDateChange: (name: string) => (_: DateTimePickerEvent, date?: Date) => void
     handlePartInputChange: (name: string, value: string) => void
+    handlePartPurchaseEventAddition: (index: number | undefined) => void
+    handlePartPurchaseEventCancellation: () => void
+    handlePartPurchaseEventFormChange: (name: string, value: string) => void
+    indexOfPartPurchaseEventToEdit: number | undefined
+    isPartPurchaseEventFormDataEdition: boolean
+    isPartSelected: boolean
+    partPurchaseFormData: PartPurchaseEventType
+    purchaseDate: Date
     searchTerm: string
     selectPart: (name: string, value: string) => void
     setIsPartSelected: (value: boolean) => void
-    isPartSelected: boolean
-    handleDateChange: (name: string) => (_: DateTimePickerEvent, date?: Date) => void
-    handlePartPurchaseEventCancellation: () => void
-    handlePartPurchaseEventAddition: () => void
-    maintenanceReportDates: { [key in "start_date" | "end_date" | "purchase_date"]: Date }
-
-
 }
 
 const PartPurchaseEventForm = ({
-                              partPurchaseFormData,
-                              handlePartPurchaseFormChange,
-                              handlePartInputChange,
-                              searchTerm,
-                              selectPart,
-                              setIsPartSelected,
-                              isPartSelected,
-                              handleDateChange,
-                              handlePartPurchaseEventCancellation,
-                              handlePartPurchaseEventAddition,
-                              maintenanceReportDates,
-                          }: PartPurchaseFormProps) => {
+                                   handleEventsDateChange,
+                                   handlePartInputChange,
+                                   handlePartPurchaseEventAddition,
+                                   handlePartPurchaseEventCancellation,
+                                   handlePartPurchaseEventFormChange,
+                                   indexOfPartPurchaseEventToEdit,
+                                   isPartPurchaseEventFormDataEdition,
+                                   isPartSelected,
+                                   partPurchaseFormData,
+                                   purchaseDate,
+                                   searchTerm,
+                                   selectPart,
+                                   setIsPartSelected,
+                               }: PartPurchaseFormProps) => {
     const {generalData} = useGlobalContext();
+    const {id, name, address, phone_number} = partPurchaseFormData.provider
     return (
         <View className={"w-[94%] bg-white rounded p-5"}>
             <Text className={"font-semibold text-txt text-sm"}>Part Purchase Event Form</Text>
             <MaintenancePicker containerStyles={"mb-3"}
                                title={"Pick parts provider"}
                                name={"provider"}
-                               value={partPurchaseFormData.provider.id || ""}
-                               items={generalData.part_providers.map((partProvider) => ({label: partProvider.name, value: partProvider.id}))}
-                               handleItemChange={handlePartPurchaseFormChange}
+                               value={`id:${id},name:${name},address:${address},phone_number:${phone_number}`}
+                               items={generalData.part_providers.map((partProvider) => ({
+                                   label: partProvider.name,
+                                   value: `id:${partProvider.id},name:${partProvider.name},address:${partProvider.address},phone_number:${partProvider.phone_number}`
+                               }))}
+                               handleItemChange={handlePartPurchaseEventFormChange}
             />
             <View className={"flex-1"}>
                 <AutoPartInput parts={generalData.parts}
@@ -62,20 +68,20 @@ const PartPurchaseEventForm = ({
             </View>
 
             <View className={"flex-row mt-3"}>
-                <CustomDatePicker date={maintenanceReportDates.purchase_date}
-                                  handleChange={handleDateChange}
+                <CustomDatePicker date={purchaseDate}
+                                  handleChange={handleEventsDateChange}
                                   label={"Purchase Date"}
                                   name={"purchase_date"}
                 />
-                <ThemedInputText onChange={handlePartPurchaseFormChange}
+                <ThemedInputText onChange={handlePartPurchaseEventFormChange}
                                  containerStyles={"bg-background p-5 flex-1"}
                                  placeholder={"Enter cost"}
                                  name={"cost"}
                                  value={partPurchaseFormData.cost}
                 />
             </View>
-            <ThemedButton title={"Submit purchase form"}
-                          handlePress={handlePartPurchaseEventAddition}
+            <ThemedButton title={isPartPurchaseEventFormDataEdition ? "Edit Part Purchase Event" : "Add Part Purchase Event"}
+                          handlePress={() => handlePartPurchaseEventAddition(indexOfPartPurchaseEventToEdit)}
                           containerStyles="bg-primary p-5 rounded mt-[10px]"
                           textStyles={"text-white font-semibold text-base"}
             />

@@ -74,7 +74,11 @@ const Part = () => {
             setSearchTerm("")
             setPart({name: "", description: ""})
         } catch (error: any) {
-            console.log(error.response.data);
+            if (error.status === 401) {
+                router.replace("/");
+            } else {
+                console.log(error)
+            }
         } finally {
             setIsLoading(false);
         }

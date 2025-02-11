@@ -13,6 +13,7 @@ import {
     MaintenanceOverviewType,
     MaintenanceReportType,
     MaintenanceSummaryType,
+    PartProviderType,
     PartPurchaseEventType,
     ServiceProviderEventType,
     ServiceProviderType
@@ -48,6 +49,9 @@ const MaintenanceReport = () => {
         description: ""
     }
     const [partPurchaseEventFormData, setPartPurchaseEventFormData] = useState<PartPurchaseEventType>(partPurchaseEventFormInitialState);
+    const [showPartPurchaseEventForm, setShowPartPurchaseEventForm] = useState(false);
+    const [isPartPurchaseEventFormDataEdition, setIsPartPurchaseEventFormDataEdition] = useState(false);
+    const [indexOfPartPurchaseEventToEdit, setIndexOfPartPurchaseEventToEdit] = useState<number | undefined>();
     const [serviceProviderEventFormData, setServiceProviderEventFormData] = useState<ServiceProviderEventType>(ServiceProviderEventFormInitialState);
     const [showServiceProviderEventForm, setShowServiceProviderEventForm] = useState(false);
     const [isServiceProviderEventFormDataEdition, setIsServiceProviderEventFormDataEdition] = useState(false);
@@ -116,9 +120,6 @@ const MaintenanceReport = () => {
     const [maintenanceReportFormData, setMaintenanceReportFormData] = useState(maintenanceReportFormInitialState)
     const [activeFilter, setActiveFilter] = useState(0);
     const searchingFilterLabels: string[] = ["7D", "2W", "4W", "3M", "1Y"]
-    const [showDeleteFeaturesForPartPurchaseEvent, setShowDeleteFeaturesForPartPurchaseEvent] = useState<boolean>(false);
-    const [isLoadingGeneral, setIsLoadingGeneral] = useState(false);
-    const [isLoadingMaintenance, setIsLoadingMaintenance] = useState(false);
 
     useEffect(() => {
         const fetchMaintenanceReport = async () => {
@@ -159,7 +160,8 @@ const MaintenanceReport = () => {
             ...prevState,
             part: {
                 ...prevState.part,
-                id: +id
+                id: +id,
+                name: name
             }
         }))
         setIsSelected(true);
@@ -220,10 +222,24 @@ const MaintenanceReport = () => {
         setShowMaintenanceForm(false);
     }
     const handlePartPurchaseEventFormChange = (name: string, value: string) => {
-        setPartPurchaseEventFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }))
+        setPartPurchaseEventFormData((prevState) => {
+            if (name === "provider") {
+                const keyValuePairs = value.split(",")
+                const partProvider: PartProviderType = {name: "", address: "", phone_number: ""}
+                keyValuePairs.forEach((pair) => {
+                    const [key, value] = pair.split(":")
+                    partProvider[key as keyof PartProviderType] = value
+                })
+                return {
+                    ...prevState,
+                    provider: partProvider
+                }
+            }
+            return {
+                ...prevState,
+                [name]: value,
+            }
+        })
     }
     const handleServiceProviderEventFormChange = (name: string, value: string) => {
         setServiceProviderEventFormData((prevState) => {
@@ -260,11 +276,41 @@ const MaintenanceReport = () => {
     const removePartPurchaseEventsOnCancel = async () => {
 
     }
-    const handlePartPurchaseEventAddition = () => {
+    const handlePartPurchaseEventAddition = (index: number | undefined) => {
+        if (index === undefined) {
+            setMaintenanceReportFormData(prevState => ({
+                ...prevState,
+                part_purchase_events: [...prevState.part_purchase_events, partPurchaseEventFormData]
+            }))
+        } else {
+            setMaintenanceReportFormData(prevState => ({
+                ...prevState,
+                part_purchase_events: [
+                    ...prevState.part_purchase_events.slice(0, index),
+                    partPurchaseEventFormData,
+                    ...prevState.part_purchase_events.slice(index + 1)
+                ]
+            }))
+            setIndexOfPartPurchaseEventToEdit(undefined);
+            setIsPartPurchaseEventFormDataEdition(false);
+        }
+        setShowPartPurchaseEventForm(false)
+        setPartPurchaseEventFormData(partPurchaseEventFormInitialState);
+    }
+    const handlePartPurchaseEventDeletion = (index: number) => {
         setMaintenanceReportFormData(prevState => ({
             ...prevState,
-            part_purchase_events: [...prevState.part_purchase_events, partPurchaseEventFormData]
+            part_purchase_events: [
+                ...prevState.part_purchase_events.slice(0, index),
+                ...prevState.part_purchase_events.slice(index + 1)
+            ]
         }))
+    }
+    const handlePartPurchaseEventEdition = (index: number) => {
+        setPartPurchaseEventFormData(maintenanceReportFormData.part_purchase_events[index])
+        setShowPartPurchaseEventForm(true);
+        setIsPartPurchaseEventFormDataEdition(true);
+        setIndexOfPartPurchaseEventToEdit(index);
     }
     const handleServiceProviderEventAddition = (index: number | undefined) => {
         if (index === undefined) {
@@ -283,8 +329,8 @@ const MaintenanceReport = () => {
             }))
             setIndexOfServiceProviderEventToEdit(undefined);
             setIsServiceProviderEventFormDataEdition(false);
-            setServiceProviderEventFormData(ServiceProviderEventFormInitialState);
         }
+        setServiceProviderEventFormData(ServiceProviderEventFormInitialState);
         setShowServiceProviderEventForm(false);
     }
     const handleServiceProviderEventDeletion = (index: number) => {
@@ -360,16 +406,6 @@ const MaintenanceReport = () => {
                                     )
 
                                 })}
-                                <View className={"mt-5 flex-1 bg-white shadow p-2"}>
-                                    <View><Text className={"font-semibold text-base text-txt"}>Auto Parts
-                                        Breakdown</Text></View>
-                                    {/*{maintenanceReport.part_purchase_events?.map((obj, idx) => (<PartPurchaseEventViewer*/}
-                                    {/*    name={obj.part_details.name}*/}
-                                    {/*    provider={obj.provider_details.name}*/}
-                                    {/*    cost={obj.cost}*/}
-                                    {/*    purchase_date={obj.purchase_date}*/}
-                                    {/*    key={idx}/>)) || []}*/}
-                                </View>
                                 <ThemedButton title={"Add New Part"}
                                               handlePress={handleNewPartAddition}
                                               containerStyles={"bg-secondary w-full p-5 rounded mt-3"}
@@ -397,36 +433,38 @@ const MaintenanceReport = () => {
                             </View>
                         </View>
                         :
-                        <MaintenanceReportForm eventsDates={eventsDates}
-                                               handleDateChange={handleDateChange}
-                                               handleEventsDateChange={handleEventsDateChange}
-                                               handleMaintenanceReportCancellation={handleMaintenanceReportCancellation}
-                                               handleMaintenanceReportFormChange={handleMaintenanceReportFormChange}
-                                               handleMaintenanceReportSubmission={handleMaintenanceReportSubmission}
-                                               handlePartInputChange={handlePartInputChange}
-                                               handlePartPurchaseEventAddition={handlePartPurchaseEventAddition}
-                                               handlePartPurchaseFormChange={handlePartPurchaseEventFormChange}
-                                               handleServiceProviderEventAddition={handleServiceProviderEventAddition}
-                                               handleServiceProviderEventEdition={handleServiceProviderEventEdition}
-                                               handleServiceProviderEventFormChange={handleServiceProviderEventFormChange}
-                                               indexOfServiceProviderEventToEdit={indexOfServiceProviderEventToEdit}
-                                               isPartSelected={isPartSelected}
-                                               isServiceProviderEventFormDataEdition={isServiceProviderEventFormDataEdition}
-                                               maintenanceReportDates={maintenanceReportDates}
-                                               maintenanceReportFormData={maintenanceReportFormData}
-                                               partPurchaseFormData={partPurchaseEventFormData}
-                                               searchTerm={searchTerm}
-                                               selectPart={selectPart}
-                                               serviceProviderEventFormData={serviceProviderEventFormData}
-                                               setIsPartSelected={setIsPartSelected}
-                                               setMaintenanceReportFormData={setMaintenanceReportFormData}
-                                               setPartPurchaseFormData={setPartPurchaseEventFormData}
-                                               setSearchTerm={setSearchTerm}
-                                               setShowDeleteFeaturesForPartPurchaseEvent={setShowDeleteFeaturesForPartPurchaseEvent}
-                                               setShowServiceProviderEventForm={setShowServiceProviderEventForm}
-                                               showDeleteFeaturesForPartPurchaseEvent={showDeleteFeaturesForPartPurchaseEvent}
-                                               showServiceProviderEventForm={showServiceProviderEventForm}
-                                               handleServiceProviderEventDeletion={handleServiceProviderEventDeletion}
+                        <MaintenanceReportForm
+                            eventsDates={eventsDates}
+                            handleDateChange={handleDateChange}
+                            handleEventsDateChange={handleEventsDateChange}
+                            handleMaintenanceReportCancellation={handleMaintenanceReportCancellation}
+                            handleMaintenanceReportFormChange={handleMaintenanceReportFormChange}
+                            handleMaintenanceReportSubmission={handleMaintenanceReportSubmission}
+                            handlePartInputChange={handlePartInputChange}
+                            handlePartPurchaseEventAddition={handlePartPurchaseEventAddition}
+                            handlePartPurchaseEventDeletion={handlePartPurchaseEventDeletion}
+                            handlePartPurchaseEventEdition={handlePartPurchaseEventEdition}
+                            handlePartPurchaseEventFormChange={handlePartPurchaseEventFormChange}
+                            handleServiceProviderEventAddition={handleServiceProviderEventAddition}
+                            handleServiceProviderEventDeletion={handleServiceProviderEventDeletion}
+                            handleServiceProviderEventEdition={handleServiceProviderEventEdition}
+                            handleServiceProviderEventFormChange={handleServiceProviderEventFormChange}
+                            indexOfPartPurchaseEventToEdit={indexOfPartPurchaseEventToEdit}
+                            indexOfServiceProviderEventToEdit={indexOfServiceProviderEventToEdit}
+                            isPartPurchaseEventFormDataEdition={isPartPurchaseEventFormDataEdition}
+                            isPartSelected={isPartSelected}
+                            isServiceProviderEventFormDataEdition={isServiceProviderEventFormDataEdition}
+                            maintenanceReportDates={maintenanceReportDates}
+                            maintenanceReportFormData={maintenanceReportFormData}
+                            partPurchaseFormData={partPurchaseEventFormData}
+                            searchTerm={searchTerm}
+                            selectPart={selectPart}
+                            serviceProviderEventFormData={serviceProviderEventFormData}
+                            setIsPartSelected={setIsPartSelected}
+                            setShowPartPurchaseEventForm={setShowPartPurchaseEventForm}
+                            setShowServiceProviderEventForm={setShowServiceProviderEventForm}
+                            showPartPurchaseEventForm={showPartPurchaseEventForm}
+                            showServiceProviderEventForm={showServiceProviderEventForm}
                         />}
             </ScrollView>
         </SafeAreaView>
