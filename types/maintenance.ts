@@ -4,14 +4,8 @@ export interface PartProviderType {
     phone_number: string
     address: string
 }
-
-export interface DetailedPartPurchaseEventType extends PartPurchaseEventType {
-    part_details: PartType
-    provider_details: PartProviderType
-}
-
 export interface PartType {
-    id?: number
+    id?: string
     name: string
     description: string
 }
@@ -43,6 +37,11 @@ export interface PartPurchaseEventType {
     purchase_date: string
     cost: string
 }
+
+export type PartPurchaseEventWithNumbersType = Omit<PartPurchaseEventType, 'part' | 'provider'> & {part: string, provider: string}
+export type ServiceProviderEventWithNumbersType = Omit<ServiceProviderEventType, 'service_provider'> & {service_provider: string}
+export type MaintenanceReportWithStringsType = Omit<MaintenanceReportType, 'part_purchase_events' | 'service_provider_events'> & {
+    part_purchase_events: PartPurchaseEventWithNumbersType[], service_provider_events: ServiceProviderEventWithNumbersType[]}
 
 export interface ServiceProviderEventType {
     id?: string

@@ -12,6 +12,7 @@ import {API} from "@/constants/endpoints";
 import {
     MaintenanceOverviewType,
     MaintenanceReportType,
+    MaintenanceReportWithStringsType,
     MaintenanceSummaryType,
     PartProviderType,
     PartPurchaseEventType,
@@ -159,7 +160,7 @@ const MaintenanceReport = () => {
             ...prevState,
             part: {
                 ...prevState.part,
-                id: +id,
+                id: id,
                 name: name
             }
         }))
@@ -178,38 +179,71 @@ const MaintenanceReport = () => {
             [name]: value
         }))
     }
-    const validateMaintenanceReportData = () => {
+    const validateMaintenanceReportData = (formatedMaintenanceReportFormData: MaintenanceReportWithStringsType) => {
         // validate Data
-        if (!maintenanceReportDates.start_date) {
+        if (!formatedMaintenanceReportFormData.start_date) {
             Alert.alert("Error", "You must select a valid start date!")
             return false
         }
-        if (!maintenanceReportDates.end_date) {
+        if (!formatedMaintenanceReportFormData.end_date) {
             Alert.alert("Error", "You must select a valid end date!")
             return false
         }
-        if (new Date(maintenanceReportDates.end_date) <= new Date(maintenanceReportDates.start_date)) {
+        if (new Date(formatedMaintenanceReportFormData.end_date) < new Date(formatedMaintenanceReportFormData.start_date)) {
             Alert.alert("Error", "End date must be greater than start date!");
             return false;
         }
-        if (!isPositiveInteger(maintenanceReportFormData.mileage)) {
+        if (!isPositiveInteger(formatedMaintenanceReportFormData.mileage)) {
             Alert.alert("Error", "You must select a valid mileage!")
             return false
         }
-        return true;
+        if (formatedMaintenanceReportFormData.service_provider_events.length === 0) {
+            Alert.alert("Error", "You must create a service provider event")
+            return false
+        }
+        return true
+    }
+    const formatMaintenanceReportFormData = (): MaintenanceReportWithStringsType => {
+        setMaintenanceReportFormData(prevState => ({
+            ...prevState,
+            start_date: getLocalDateString(maintenanceReportDates.start_date),
+            end_date: getLocalDateString(maintenanceReportDates.end_date),
+        }))
+        return {
+            ...maintenanceReportFormData,
+            part_purchase_events: maintenanceReportFormData.part_purchase_events.map((partPurchaseEvent) => {
+                if (!partPurchaseEvent.part.id || !partPurchaseEvent.provider.id) {
+                    throw new Error("Either Part or Provider are not given!")
+                }
+                return {
+                    ...partPurchaseEvent,
+                    part: partPurchaseEvent.part.id,
+                    provider: partPurchaseEvent.provider.id
+                }
+            }),
+            service_provider_events: maintenanceReportFormData.service_provider_events.map((serviceProviderEvent) => {
+                if (!serviceProviderEvent.service_provider.id) {
+                    throw new Error("Service Provider is not given!")
+                }
+                return {
+                    ...serviceProviderEvent,
+                    service_provider: serviceProviderEvent.service_provider.id
+                }
+            }),
+        }
     }
     const handleMaintenanceReportSubmission = async () => {
         setIsLoading(true)
         try {
-            if (!validateMaintenanceReportData()) {
+            const formatedMaintenanceReportFormData = formatMaintenanceReportFormData();
+            if (!validateMaintenanceReportData(formatedMaintenanceReportFormData)) {
                 return
             }
-            maintenanceReportFormData.start_date = getLocalDateString(maintenanceReportDates.start_date)
-            maintenanceReportFormData.end_date = getLocalDateString(maintenanceReportDates.end_date)
             const url = `${API}maintenance/reports/`
             const options = {headers: {"Content-Type": "application/json"}, withCredentials: true}
-            await axios.post(url, maintenanceReportFormData, options)
+            const response = await axios.post(url, formatedMaintenanceReportFormData, options)
             setShowMaintenanceForm(false);
+            console.log(response.data);
 
         } catch (error: any) {
             console.log(error.response.data)
