@@ -20,6 +20,7 @@ export interface ServiceProviderType {
 
 export interface MaintenanceReportType {
     id?: string
+    vehicle?: string
     maintenance_type: "PREVENTIVE" | "CURATIVE"
     start_date: string
     end_date: string

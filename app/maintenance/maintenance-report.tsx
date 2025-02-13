@@ -110,6 +110,7 @@ const MaintenanceReport = () => {
     }
     const maintenanceReportFormInitialState: MaintenanceReportType = {
         maintenance_type: "PREVENTIVE",
+        vehicle: vehicle.id,
         start_date: "",
         end_date: "",
         mileage: vehicle.mileage,
@@ -181,6 +182,10 @@ const MaintenanceReport = () => {
     }
     const validateMaintenanceReportData = (formatedMaintenanceReportFormData: MaintenanceReportWithStringsType) => {
         // validate Data
+        if (!formatedMaintenanceReportFormData.vehicle) {
+            Alert.alert("Error", "You must select a vehicle!")
+            return false
+        }
         if (!formatedMaintenanceReportFormData.start_date) {
             Alert.alert("Error", "You must select a valid start date!")
             return false
