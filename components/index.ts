@@ -24,3 +24,4 @@ export {default as MaintenanceForm} from "./forms/MaintenanceForm"
 export {default as RangeCard} from "./RangeCard";
 export {default as PartPurchaseEventCard} from "./PartPurchaseEventCard";
 export {default as ServiceProviderEventCard} from "./ServiceProviderEventCard";
+export {default as ReportsCalendar} from "./ReportsCalendar";;

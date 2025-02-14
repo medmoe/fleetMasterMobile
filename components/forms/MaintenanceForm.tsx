@@ -100,12 +100,12 @@ const MaintenanceForm = ({
                     <View className={"mt-3"}>
                         <ThemedButton title={"Create part purchase event"}
                                       handlePress={handlePartPurchaseEventCreation}
-                                      containerStyles={"bg-secondary p-5 rounded"}
+                                      containerStyles={"bg-secondary-500 p-5 rounded"}
                                       textStyles={"text-white text-base font-semibold"}
                         />
                         <ThemedButton title={"Create service provider event"}
                                       handlePress={handleServiceProviderEventCreation}
-                                      containerStyles={"bg-secondary p-5 rounded mt-3"}
+                                      containerStyles={"bg-secondary-500 p-5 rounded mt-3"}
                                       textStyles={"text-white text-base font-semibold"}
                         />
                         <ThemedButton title={"Submit Report"}

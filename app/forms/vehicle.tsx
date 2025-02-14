@@ -17,9 +17,9 @@ type VehicleKey = 'purchase_date' | 'last_service_date' | 'next_service_due' | '
 
 
 const Vehicle = () => {
-    const {responseData, setResponseData, currentItem} = useGlobalContext();
+    const {responseData, setResponseData, vehicle} = useGlobalContext();
     const [isLoading, setIsLoading] = useState(false);
-    const [vehicleData, setVehicleData] = useState<VehicleType>(currentItem as VehicleType);
+    const [vehicleData, setVehicleData] = useState<VehicleType>(vehicle as VehicleType);
     const [dates, setDates] = useState<VehicleDatesType>({
         purchase_date: new Date(),
         last_service_date: new Date(),

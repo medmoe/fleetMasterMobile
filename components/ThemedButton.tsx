@@ -1,5 +1,5 @@
 import React from 'react';
-import {Image, ImageSourcePropType, Text, TouchableOpacity, View} from 'react-native';
+import {Image, ImageSourcePropType, Pressable, Text, TouchableOpacity, View} from 'react-native';
 
 interface ThemedButtonProps {
     title: string,
@@ -14,10 +14,9 @@ interface ThemedButtonProps {
 
 const ThemedButton = ({title, handlePress, containerStyles, textStyles, isLoading, icon, iconStyles, imageStyles}: ThemedButtonProps) => {
     return (
-        <TouchableOpacity
+        <Pressable
             className={`justify-center items-center flex-row ${containerStyles} ${isLoading ? 'opacity-50' : ''}`}
             onPress={handlePress}
-            activeOpacity={0.7}
             disabled={isLoading}
         >
             {icon ?
@@ -26,7 +25,7 @@ const ThemedButton = ({title, handlePress, containerStyles, textStyles, isLoadin
                 </View> : <></>
             }
             <Text className={`${textStyles}`}>{title}</Text>
-        </TouchableOpacity>
+        </Pressable>
     );
 };
 

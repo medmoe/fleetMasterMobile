@@ -1,9 +1,8 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {Alert, ImageSourcePropType, SafeAreaView, ScrollView, Text, View} from 'react-native';
+import {Alert, ImageSourcePropType, Pressable, SafeAreaView, ScrollView, Text, View} from 'react-native';
 import {ListItemDetail, MaintenanceReportForm, RangeCard, Spinner, StatCard, ThemedButton} from "@/components";
 
 import {useGlobalContext} from "@/context/GlobalProvider";
-import {VehicleType} from "@/types/types";
 import {vehicleStatusMapping} from "@/constants/forms/vehicle";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 import {icons} from "@/constants/icons";
@@ -21,10 +20,11 @@ import {
 } from "@/types/maintenance";
 import {router} from "expo-router";
 import {getLocalDateString, isPositiveInteger} from "@/utils/helpers";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 
 const MaintenanceReport = () => {
-    const {currentItem} = useGlobalContext();
+    const {vehicle, setMaintenanceReports, maintenanceReports} = useGlobalContext();
     const partPurchaseEventFormInitialState: PartPurchaseEventType = {
         part: {
             name: "",
@@ -73,7 +73,6 @@ const MaintenanceReport = () => {
         setIsSelected(isSelected);
     }, [])
     const [showMaintenanceForm, setShowMaintenanceForm] = useState<boolean>(false);
-    const vehicle = currentItem as VehicleType
     const [style, label] = vehicleStatusMapping[vehicle.status];
     const [maintenanceReport, setMaintenanceReport] = useState<MaintenanceOverviewType>({
         previous_report: {},
@@ -248,7 +247,7 @@ const MaintenanceReport = () => {
             const options = {headers: {"Content-Type": "application/json"}, withCredentials: true}
             const response = await axios.post(url, formatedMaintenanceReportFormData, options)
             setShowMaintenanceForm(false);
-            console.log(response.data);
+            setMaintenanceReports([...maintenanceReports, response.data])
 
         } catch (error: any) {
             console.log(error.response.data)
@@ -438,6 +437,9 @@ const MaintenanceReport = () => {
             }))
         }
     }
+    const showMaintenanceReports = () => {
+        router.replace('/details/maintenance-reports-details');
+    }
     return (
         <SafeAreaView>
             <ScrollView>
@@ -448,17 +450,26 @@ const MaintenanceReport = () => {
                             <View className={"w-[94%] bg-white rounded p-3"}>
                                 <View className={"w-full bg-white rounded shadow p-2"}>
                                     <View className={"flex-row"}>
-                                        <View className={"flex-1"}>
-                                            <Text className={"font-semibold text-base text-txt"}>Vehicle's
-                                                information</Text>
-                                            <ListItemDetail label={"Vehicle's name"}
-                                                            value={`${vehicle.make} ${vehicle.model} ${vehicle.year}`}
-                                                            textStyle={"text-txt"}/>
-                                            <ListItemDetail label={"Purchase date"} value={vehicle.purchase_date}
-                                                            textStyle={"text-txt"}/>
-                                            <ListItemDetail label={"Mileage"} value={vehicle.mileage}
-                                                            textStyle={"text-txt"}/>
-                                            <ListItemDetail label={"Status"} value={label} textStyle={style}/>
+                                        <View className={"flex-1 flex-row"}>
+                                            <View className={"flex-1"}>
+                                                <Text className={"font-semibold text-base text-txt"}>Vehicle's
+                                                    information</Text>
+                                                <ListItemDetail label={"Vehicle's name"}
+                                                                value={`${vehicle.make} ${vehicle.model} ${vehicle.year}`}
+                                                                textStyle={"text-txt"}/>
+                                                <ListItemDetail label={"Purchase date"} value={vehicle.purchase_date}
+                                                                textStyle={"text-txt"}/>
+                                                <ListItemDetail label={"Mileage"} value={vehicle.mileage}
+                                                                textStyle={"text-txt"}/>
+                                                <ListItemDetail label={"Status"} value={label} textStyle={style}/>
+                                            </View>
+                                            <View className={"justify-center items-center ml-4"}>
+                                                <Pressable onPress={showMaintenanceReports}
+                                                           className={"p-4 bg-secondary-100 rounded-lg shadow-md"}>
+                                                    <FontAwesome name={'files-o'} size={48} color={"#ef6c00"}/>
+                                                    <Text className={"text-secondary-800 font-semibold text-base mt-2"}>Reports</Text>
+                                                </Pressable>
+                                            </View>
                                         </View>
                                     </View>
                                 </View>
@@ -489,17 +500,17 @@ const MaintenanceReport = () => {
                                 })}
                                 <ThemedButton title={"Add New Part"}
                                               handlePress={handleNewPartAddition}
-                                              containerStyles={"bg-secondary w-full p-5 rounded mt-3"}
+                                              containerStyles={"bg-secondary-500 w-full p-5 rounded mt-3"}
                                               textStyles={"text-white font-semibold text-base"}
                                 />
                                 <ThemedButton title={"Add New Service Provider"}
                                               handlePress={handleNewServiceProviderAddition}
-                                              containerStyles={"bg-secondary w-full p-5 rounded mt-3"}
+                                              containerStyles={"bg-secondary-500 w-full p-5 rounded mt-3"}
                                               textStyles={"text-white font-semibold text-base"}
                                 />
                                 <ThemedButton title={"Add New Parts Provider"}
                                               handlePress={handleNewPartsProviderAddition}
-                                              containerStyles={"bg-secondary w-full p-5 rounded mt-3"}
+                                              containerStyles={"bg-secondary-500 w-full p-5 rounded mt-3"}
                                               textStyles={"text-white font-semibold text-base"}
                                 />
                                 <ThemedButton title={"Record maintenance"}

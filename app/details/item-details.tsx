@@ -31,26 +31,26 @@ const isDriver = (item: DriverType | VehicleType): boolean => "phone_number" in 
 
 
 const ItemDetails = () => {
-    const {currentItem, responseData, setResponseData, setIsPostRequest} = useGlobalContext();
+    const {vehicle, responseData, setResponseData, setIsPostRequest} = useGlobalContext();
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const details = getItemDetails(currentItem, responseData.vehicles);
-    const title = isDriver(currentItem) ? "Driver's Detail" : "Vehicle's Detail";
-    const subtitle = `Here are the details of the current ${isDriver(currentItem) ? "driver" : "vehicle"}`;
-    const endpoint = isDriver(currentItem) ? "drivers/" : "vehicles/";
+    const details = getItemDetails(vehicle, responseData.vehicles);
+    const title = isDriver(vehicle) ? "Driver's Detail" : "Vehicle's Detail";
+    const subtitle = `Here are the details of the current ${isDriver(vehicle) ? "driver" : "vehicle"}`;
+    const endpoint = isDriver(vehicle) ? "drivers/" : "vehicles/";
 
     const handleUpdate = () => {
         setIsPostRequest(false);
-        router.replace(isDriver(currentItem) ? "/forms/driver" : "/forms/vehicle")
+        router.replace(isDriver(vehicle) ? "/forms/driver" : "/forms/vehicle")
     }
     const handleDelete = async () => {
         setIsLoading(true);
         try {
-            await axios.delete(`${API}${endpoint}${currentItem.id}/`)
-            const itemKey = isDriver(currentItem) ? "drivers" : "vehicles";
+            await axios.delete(`${API}${endpoint}${vehicle.id}/`)
+            const itemKey = isDriver(vehicle) ? "drivers" : "vehicles";
             const items = responseData[itemKey]
-            const filteredItems = items?.filter(item => item.id !== currentItem.id)
-            updateResponseData(setResponseData, responseData, currentItem, filteredItems);
-            router.replace(isDriver(currentItem) ? "/drivers" : "/fleet")
+            const filteredItems = items?.filter(item => item.id !== vehicle.id)
+            updateResponseData(setResponseData, responseData, vehicle, filteredItems);
+            router.replace(isDriver(vehicle) ? "/drivers" : "/fleet")
         } catch (error) {
             const errorMessage: string = handleAuthenticationErrors(error);
             Alert.alert("Error", errorMessage);
@@ -59,7 +59,7 @@ const ItemDetails = () => {
         }
     }
     const handleCancel = () => {
-        router.replace(isDriver(currentItem) ? "/drivers" : "/fleet");
+        router.replace(isDriver(vehicle) ? "/drivers" : "/fleet");
     }
 
     return (
@@ -78,5 +78,6 @@ const ItemDetails = () => {
     );
 };
 
-
 export default ItemDetails;
+
+
