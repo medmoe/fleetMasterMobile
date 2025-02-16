@@ -6,8 +6,8 @@ import CustomDatePicker from "../CustomDatePicker";
 import ThemedInputText from "../ThemedInputText";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 import {MaintenanceReportType} from "@/types/maintenance";
-import PartPurchaseEventCard from "../PartPurchaseEventCard";
-import ServiceProviderEventCard from "../ServiceProviderEventCard";
+import PartPurchaseEventCard from "../cards/PartPurchaseEventCard";
+import ServiceProviderEventCard from "../cards/ServiceProviderEventCard";
 import Divider from "../Divider";
 
 interface MaintenanceFormProps {
@@ -110,7 +110,7 @@ const MaintenanceForm = ({
                         />
                         <ThemedButton title={"Submit Report"}
                                       handlePress={handleMaintenanceReportSubmission}
-                                      containerStyles={"bg-primary p-5 rounded mt-3"}
+                                      containerStyles={"bg-primary-500 p-5 rounded mt-3"}
                                       textStyles={"text-white text-base font-semibold"}
                         />
                         <ThemedButton title={"Cancel"}

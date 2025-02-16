@@ -3,7 +3,7 @@ import {SafeAreaView, ScrollView, Text, View} from 'react-native';
 import {ThemedButton} from "@/components";
 import {router} from "expo-router";
 import {currentVehicleInitialState, useGlobalContext} from "@/context/GlobalProvider";
-import VehicleCardComponent from "@/components/VehicleCardComponent";
+import VehicleCardComponent from "@/components/cards/VehicleCardComponent";
 import {VehicleType} from "@/types/types";
 
 const Fleet = () => {

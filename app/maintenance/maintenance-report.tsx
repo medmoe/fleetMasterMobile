@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {Alert, ImageSourcePropType, Pressable, SafeAreaView, ScrollView, Text, View} from 'react-native';
-import {ListItemDetail, MaintenanceReportForm, RangeCard, Spinner, StatCard, ThemedButton} from "@/components";
+import {ErrorNotificationBar, ListItemDetail, MaintenanceReportForm, RangeCard, Spinner, StatCard, ThemedButton} from "@/components";
 
 import {useGlobalContext} from "@/context/GlobalProvider";
 import {vehicleStatusMapping} from "@/constants/forms/vehicle";
@@ -120,6 +120,8 @@ const MaintenanceReport = () => {
     }
     const [maintenanceReportFormData, setMaintenanceReportFormData] = useState(maintenanceReportFormInitialState)
     const [activeFilter, setActiveFilter] = useState(0);
+    const [isVisible, setIsVisible] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
     const searchingFilterLabels: string[] = ["7D", "2W", "4W", "3M", "1Y"]
     useEffect(() => {
         const fetchMaintenanceReport = async () => {
@@ -127,6 +129,12 @@ const MaintenanceReport = () => {
                 const response = await axios.get(`${API}maintenance/overview/`, {withCredentials: true});
                 setMaintenanceReport(response.data);
             } catch (error: any) {
+                if (error.response.status === 401) {
+                    router.replace('/');
+                } else {
+                    setIsVisible(true);
+                    setErrorMessage("Error fetching maintenance overview !");
+                }
                 console.error("Error fetching maintenance report:", error);
             }
         }
@@ -440,6 +448,9 @@ const MaintenanceReport = () => {
     const showMaintenanceReports = () => {
         router.replace('/details/maintenance-reports-details');
     }
+    const handleErrorNotificationDismissal = () => {
+
+    }
     return (
         <SafeAreaView>
             <ScrollView>
@@ -515,7 +526,7 @@ const MaintenanceReport = () => {
                                 />
                                 <ThemedButton title={"Record maintenance"}
                                               handlePress={startRecordingMaintenance}
-                                              containerStyles={"bg-primary w-full p-5 rounded mt-3"}
+                                              containerStyles={"bg-primary-500 w-full p-5 rounded mt-3"}
                                               textStyles={"text-white font-semibold text-base"}/>
                                 <ThemedButton title={"Cancel"}
                                               handlePress={cancelRecordingMaintenance}
@@ -523,6 +534,7 @@ const MaintenanceReport = () => {
                                               textStyles={"text-white font-semibold text-base"}
                                 />
                             </View>
+                            <ErrorNotificationBar isVisible={isVisible} errorMessage={errorMessage} onDismiss={handleErrorNotificationDismissal} />
                         </View>
                         :
                         <MaintenanceReportForm

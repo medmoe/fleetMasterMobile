@@ -96,13 +96,13 @@ const App = () => {
                         <ThemedButton
                             title="Log in"
                             handlePress={submitForm}
-                            containerStyles="w-full bg-primary p-5 rounded mt-[50px]"
+                            containerStyles="w-full bg-primary-500 p-5 rounded mt-[50px]"
                             textStyles={"text-white font-semibold text-base"}
                         />
                         <View className={"mt-[25px]"}>
                             <Text className={"text-txt font-open-sans"}>
                                 Don't have an account? <Link href={"/signup"}
-                                                             className={"text-secondary font-open-sans"}>Create
+                                                             className={"text-secondary-500 font-open-sans"}>Create
                                 account</Link>
                             </Text>
                         </View>

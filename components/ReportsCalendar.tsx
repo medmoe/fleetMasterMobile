@@ -6,7 +6,7 @@ import {MaintenanceReportWithStringsType} from "@/types/maintenance";
 interface ReportsCalendarProps {
     maintenanceReports: MaintenanceReportWithStringsType[]
     onMonthChange: (month: DateData) => void
-    onDayPressed: () => void
+    onDayPressed: (date: DateData) => void
     displayLoadingIndicator: boolean
 }
 
@@ -29,7 +29,6 @@ LocaleConfig.locales['en'] = {
 LocaleConfig.defaultLocale = 'en';
 
 const ReportsCalendar = ({maintenanceReports, onDayPressed, onMonthChange, displayLoadingIndicator}: ReportsCalendarProps) => {
-    console.log(maintenanceReports);
     const markedDates: MarkedDates = {};
     maintenanceReports.forEach(report => {
         markedDates[report.start_date] = {marked: true, dotColor: 'red', activeOpacity: 0.8, count: 1};
@@ -43,7 +42,8 @@ const ReportsCalendar = ({maintenanceReports, onDayPressed, onMonthChange, displ
                       hideExtraDays={true}
                       dayComponent={({date, state, marking}) => {
                           return (
-                              <Pressable className={marking?.marked? "p-3 bg-red-300 rounded-[100%]" : "p-3"} onPress={onDayPressed}>
+                              <Pressable className={marking?.marked? "p-3 bg-red-300 rounded-[100%]" : "p-3"}
+                                         onPress={() => date && onDayPressed(date)}>
                                   <Text className={state === "disabled"? "grey" : "black"}>{date?.day}</Text>
                               </Pressable>
                           )

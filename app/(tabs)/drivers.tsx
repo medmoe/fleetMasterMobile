@@ -7,14 +7,14 @@ import {currentDriverInitialState, useGlobalContext} from "@/context/GlobalProvi
 import {DriverType} from "@/types/types";
 
 const Drivers = () => {
-    const {responseData, setVehicle, setIsPostRequest} = useGlobalContext();
+    const {responseData, setVehicle, setIsPostRequest, setDriver} = useGlobalContext();
     const addDriver = () => {
         setIsPostRequest(true);
-        setVehicle(currentDriverInitialState);
+        setDriver(currentDriverInitialState);
         router.replace("/forms/driver")
     }
     const handlePress = (driver: DriverType): void => {
-        setVehicle(driver)
+        setDriver(driver)
         router.replace("/details/item-details");
     }
     return (

@@ -11,7 +11,7 @@ const RangeCard = ({title, handlePress, isActive}: RangeCardProps) => {
     let pressableStyles;
     let textStyles;
     if (isActive) {
-        pressableStyles = 'bg-primary text-white rounded';
+        pressableStyles = 'bg-primary-500 text-white rounded';
         textStyles = 'text-white bold';
     } else {
         pressableStyles = 'bg-white rounded border-2 border-default';

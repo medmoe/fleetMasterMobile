@@ -150,18 +150,18 @@ const SignUp = () => {
                             <View className="mt-[15px]">
                                 <Text className={"text-txt font-open-sans"}>
                                     By continuing you agree to Fleet Master's
-                                    <Text className="text-secondary"> Terms of service </Text> and
-                                    <Text className="text-secondary"> privacy policy</Text>
+                                    <Text className="text-secondary-500"> Terms of service </Text> and
+                                    <Text className="text-secondary-500"> privacy policy</Text>
                                 </Text>
                             </View>
                             <ThemedButton
                                 title={"Continue"}
                                 handlePress={submitForm}
-                                containerStyles={"w-full mt-[15px] bg-primary p-5 rounded"}
+                                containerStyles={"w-full mt-[15px] bg-primary-500 p-5 rounded"}
                                 textStyles={"text-white font-semibold text-base"}
                             />
                             <View className={"mt-[25px]"}>
-                                <Text>Already registered? <Link href={"/"} className={"text-secondary font-open-sans"}>Sign
+                                <Text>Already registered? <Link href={"/"} className={"text-secondary-500 font-open-sans"}>Sign
                                     in</Link></Text>
                             </View>
                         </View>

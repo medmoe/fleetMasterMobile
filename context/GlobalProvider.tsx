@@ -17,6 +17,8 @@ interface ContextProps {
     setIsPostRequest: (isPostRequest: boolean) => void
     vehicle: VehicleType
     setVehicle: (vehicle: VehicleType) => void
+    driver: DriverType
+    setDriver: (driver: DriverType) => void
     generalData: GeneralDataType
     setGeneralData: (generalData: GeneralDataType) => void
     maintenanceReports: MaintenanceReportWithStringsType[]
@@ -61,6 +63,9 @@ const GlobalContext = createContext<ContextProps>({
     setVehicle: () => {
     },
     vehicle: currentVehicleInitialState,
+    setDriver: () => {
+    },
+    driver: currentDriverInitialState,
     setGeneralData: () => {
     },
     generalData: generalDataInitialState,
@@ -78,6 +83,7 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({children}) => {
     const [vehicle, setVehicle] = useState<VehicleType>(currentVehicleInitialState)
     const [generalData, setGeneralData] = useState<GeneralDataType>(generalDataInitialState)
     const [maintenanceReports, setMaintenanceReports] = useState<MaintenanceReportWithStringsType[]>(maintenanceReportsInitialState)
+    const [driver, setDriver] = useState<DriverType>(currentDriverInitialState)
     return (
         <GlobalContext.Provider
             value={{
@@ -91,6 +97,8 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({children}) => {
                 setGeneralData,
                 maintenanceReports,
                 setMaintenanceReports,
+                driver,
+                setDriver,
             }}
         >
             {children}
