@@ -1,6 +1,6 @@
-import React, {useEffect, useRef} from 'react';
+import React from 'react';
 import {MaintenanceReportWithStringsType} from "@/types/maintenance";
-import {Animated, Easing, Pressable, Text, View} from "react-native";
+import {Animated, Pressable, Text, View} from "react-native";
 import ListItemDetail from "@/components/ListItemDetail";
 import Divider from "@/components/Divider";
 import PartPurchaseEventCard from "@/components/cards/PartPurchaseEventCard";
@@ -14,21 +14,6 @@ interface MaintenanceReportCardProps {
 }
 
 const MaintenanceReportCard = ({maintenanceReport, handleCollapse, expanded}: MaintenanceReportCardProps) => {
-    const animatedHeight = useRef(new Animated.Value(0)).current;
-    useEffect(() => {
-        Animated.timing(animatedHeight, {
-            toValue: expanded ? 1 : 0,
-            duration: 300,
-            easing: Easing.ease,
-            useNativeDriver: false
-        }).start();
-    }, [expanded]);
-    // Calculate the height of the content
-    const totalHeight = maintenanceReport.part_purchase_events.length * 100 + maintenanceReport.service_provider_events.length * 100;
-    const contentHeight = animatedHeight.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, totalHeight]
-    })
     return (
         <Pressable onPress={() => handleCollapse(maintenanceReport.id)}>
             <View className={"flex-row p-[16px] bg-white rounded shadow mt-3"}>
@@ -48,7 +33,7 @@ const MaintenanceReportCard = ({maintenanceReport, handleCollapse, expanded}: Ma
                     <ListItemDetail label={"Mileage"} value={maintenanceReport.mileage}/>
                     <ListItemDetail label={"Description"} value={maintenanceReport.description}/>
                     {maintenanceReport.part_purchase_events.length !== 0 && expanded &&
-                        <Animated.View style={{height: contentHeight}}>
+                        <View>
                             <Divider/>
                             <View>
                                 <Text className={"font-semibold text-txt text-sm"}>Part Purchase Events:</Text>
@@ -66,10 +51,10 @@ const MaintenanceReportCard = ({maintenanceReport, handleCollapse, expanded}: Ma
                                     )
                                 })}
                             </View>
-                        </Animated.View>
+                        </View>
                     }
                     {maintenanceReport.service_provider_events.length !== 0 && expanded &&
-                        <Animated.View style={{height: contentHeight}}>
+                        <View>
                             <Divider/>
                             <View>
                                 <Text className={"font-semibold text-txt text-sm"}>Service Provider Events:</Text>
@@ -87,7 +72,7 @@ const MaintenanceReportCard = ({maintenanceReport, handleCollapse, expanded}: Ma
                                     )
                                 })}
                             </View>
-                        </Animated.View>
+                        </View>
                     }
                 </View>
             </View>

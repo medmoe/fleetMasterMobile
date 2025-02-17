@@ -115,7 +115,7 @@ const MaintenanceReportsDetails = () => {
                                 })}
                             </View>
                             <ThemedButton title={"Cancel"} handlePress={handleMaintenanceReportViewCancellation}
-                                          containerStyles={"bg-default p-2 rounded"}
+                                          containerStyles={"bg-default p-5 rounded mt-3"}
                                           textStyles={"text-white font-semibold text-base"}
                             />
                         </View>

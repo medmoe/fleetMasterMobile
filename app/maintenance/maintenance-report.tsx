@@ -451,6 +451,14 @@ const MaintenanceReport = () => {
     const handleErrorNotificationDismissal = () => {
 
     }
+    const buttons = [
+        {title: "Add New Part", handlePress: handleNewPartAddition, color: "bg-secondary-500"},
+        {title: "Add New Parts Provider", handlePress: handleNewPartsProviderAddition, color: "bg-secondary-500"},
+        {title: "Add New Service Provider", handlePress: handleNewServiceProviderAddition, color: "bg-secondary-500"},
+        {title: "Record Maintenance", handlePress: startRecordingMaintenance, color: "bg-primary-500"},
+        {title: "Cancel", handlePress: cancelRecordingMaintenance, color: "bg-default"},
+    ]
+
     return (
         <SafeAreaView>
             <ScrollView>
@@ -507,34 +515,19 @@ const MaintenanceReport = () => {
                                             })}
                                         </View>
                                     )
-
                                 })}
-                                <ThemedButton title={"Add New Part"}
-                                              handlePress={handleNewPartAddition}
-                                              containerStyles={"bg-secondary-500 w-full p-5 rounded mt-3"}
-                                              textStyles={"text-white font-semibold text-base"}
-                                />
-                                <ThemedButton title={"Add New Service Provider"}
-                                              handlePress={handleNewServiceProviderAddition}
-                                              containerStyles={"bg-secondary-500 w-full p-5 rounded mt-3"}
-                                              textStyles={"text-white font-semibold text-base"}
-                                />
-                                <ThemedButton title={"Add New Parts Provider"}
-                                              handlePress={handleNewPartsProviderAddition}
-                                              containerStyles={"bg-secondary-500 w-full p-5 rounded mt-3"}
-                                              textStyles={"text-white font-semibold text-base"}
-                                />
-                                <ThemedButton title={"Record maintenance"}
-                                              handlePress={startRecordingMaintenance}
-                                              containerStyles={"bg-primary-500 w-full p-5 rounded mt-3"}
-                                              textStyles={"text-white font-semibold text-base"}/>
-                                <ThemedButton title={"Cancel"}
-                                              handlePress={cancelRecordingMaintenance}
-                                              containerStyles={"bg-default w-full p-5 rounded mt-3"}
-                                              textStyles={"text-white font-semibold text-base"}
-                                />
+                                {buttons.map(({title, handlePress, color}, idx) => {
+                                    return (
+                                        <ThemedButton title={title}
+                                                      handlePress={handlePress}
+                                                      containerStyles={`${color} w-full p-5 rounded mt-3`}
+                                                      textStyles={"text-white font-semibold text-base"}
+                                                      key={idx}
+                                        />
+                                    )
+                                })}
                             </View>
-                            <ErrorNotificationBar isVisible={isVisible} errorMessage={errorMessage} onDismiss={handleErrorNotificationDismissal} />
+                            <ErrorNotificationBar isVisible={isVisible} errorMessage={errorMessage} onDismiss={handleErrorNotificationDismissal}/>
                         </View>
                         :
                         <MaintenanceReportForm
