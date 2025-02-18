@@ -61,7 +61,7 @@ const ServiceProviderEventForm = ({
             />
             <ThemedButton title={isServiceProviderEventFormDataEdition ? "Edit Service Provider Event" : "Add Service Provider Event"}
                           handlePress={() => handleServiceProviderEventAddition(indexOfServiceProviderEventToEdit)}
-                          containerStyles={"bg-primary p-5 rounded mt-3"}
+                          containerStyles={"bg-primary-500 p-5 rounded mt-3"}
                           textStyles={"text-white font-semibold text-base"}
             />
             <ThemedButton title={"Cancel"}

@@ -13,6 +13,7 @@ const MaintenanceReportsDetails = () => {
     const {vehicle} = useGlobalContext();
     const [month, setMonth] = useState((new Date().getMonth() + 1).toString());
     const [year, setYear] = useState(new Date().getFullYear().toString());
+    const [currentDate, setCurrentDate] = useState(`${year}-${month}-01`)
     const [maintenanceReports, setMaintenanceReports] = useState<MaintenanceReportWithStringsType[]>([])
     const [displayLoadingIndicator, setDisplayLoadingIndicator] = useState(false)
     const [showSelectedReports, setShowSelectedReports] = useState(false)
@@ -54,6 +55,7 @@ const MaintenanceReportsDetails = () => {
     }
     const handleMaintenanceReportViewCancellation = () => {
         setShowSelectedReports(false);
+        setCurrentDate(`${year}-${month}-01`);
     }
     const getReports = (date: string): [MaintenanceReportWithStringsType, boolean][] => {
         let left = 0;
@@ -127,6 +129,7 @@ const MaintenanceReportsDetails = () => {
                                              onMonthChange={onMonthChange}
                                              onDayPressed={onDayPressed}
                                              displayLoadingIndicator={displayLoadingIndicator}
+                                             current={currentDate}
 
                             />
                             <ThemedButton title={"Cancel"}

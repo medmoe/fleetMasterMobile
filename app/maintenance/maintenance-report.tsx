@@ -258,7 +258,13 @@ const MaintenanceReport = () => {
             setMaintenanceReports([...maintenanceReports, response.data])
 
         } catch (error: any) {
-            console.log(error.response.data)
+            if (error.response.status === 401) {
+                router.replace('/');
+            }
+            setErrorMessage("Error creating maintenance report !");
+            setIsVisible(true);
+            console.error("Error creating maintenance report:", error);
+
         } finally {
             setIsLoading(false)
         }
@@ -530,39 +536,43 @@ const MaintenanceReport = () => {
                             <ErrorNotificationBar isVisible={isVisible} errorMessage={errorMessage} onDismiss={handleErrorNotificationDismissal}/>
                         </View>
                         :
-                        <MaintenanceReportForm
-                            eventsDates={eventsDates}
-                            handleDateChange={handleDateChange}
-                            handleEventsDateChange={handleEventsDateChange}
-                            handleMaintenanceReportCancellation={handleMaintenanceReportCancellation}
-                            handleMaintenanceReportFormChange={handleMaintenanceReportFormChange}
-                            handleMaintenanceReportSubmission={handleMaintenanceReportSubmission}
-                            handlePartInputChange={handlePartInputChange}
-                            handlePartPurchaseEventAddition={handlePartPurchaseEventAddition}
-                            handlePartPurchaseEventDeletion={handlePartPurchaseEventDeletion}
-                            handlePartPurchaseEventEdition={handlePartPurchaseEventEdition}
-                            handlePartPurchaseEventFormChange={handlePartPurchaseEventFormChange}
-                            handleServiceProviderEventAddition={handleServiceProviderEventAddition}
-                            handleServiceProviderEventDeletion={handleServiceProviderEventDeletion}
-                            handleServiceProviderEventEdition={handleServiceProviderEventEdition}
-                            handleServiceProviderEventFormChange={handleServiceProviderEventFormChange}
-                            indexOfPartPurchaseEventToEdit={indexOfPartPurchaseEventToEdit}
-                            indexOfServiceProviderEventToEdit={indexOfServiceProviderEventToEdit}
-                            isPartPurchaseEventFormDataEdition={isPartPurchaseEventFormDataEdition}
-                            isPartSelected={isPartSelected}
-                            isServiceProviderEventFormDataEdition={isServiceProviderEventFormDataEdition}
-                            maintenanceReportDates={maintenanceReportDates}
-                            maintenanceReportFormData={maintenanceReportFormData}
-                            partPurchaseFormData={partPurchaseEventFormData}
-                            searchTerm={searchTerm}
-                            selectPart={selectPart}
-                            serviceProviderEventFormData={serviceProviderEventFormData}
-                            setIsPartSelected={setIsPartSelected}
-                            setShowPartPurchaseEventForm={setShowPartPurchaseEventForm}
-                            setShowServiceProviderEventForm={setShowServiceProviderEventForm}
-                            showPartPurchaseEventForm={showPartPurchaseEventForm}
-                            showServiceProviderEventForm={showServiceProviderEventForm}
-                        />}
+                        <View>
+                            <MaintenanceReportForm
+                                eventsDates={eventsDates}
+                                handleDateChange={handleDateChange}
+                                handleEventsDateChange={handleEventsDateChange}
+                                handleMaintenanceReportCancellation={handleMaintenanceReportCancellation}
+                                handleMaintenanceReportFormChange={handleMaintenanceReportFormChange}
+                                handleMaintenanceReportSubmission={handleMaintenanceReportSubmission}
+                                handlePartInputChange={handlePartInputChange}
+                                handlePartPurchaseEventAddition={handlePartPurchaseEventAddition}
+                                handlePartPurchaseEventDeletion={handlePartPurchaseEventDeletion}
+                                handlePartPurchaseEventEdition={handlePartPurchaseEventEdition}
+                                handlePartPurchaseEventFormChange={handlePartPurchaseEventFormChange}
+                                handleServiceProviderEventAddition={handleServiceProviderEventAddition}
+                                handleServiceProviderEventDeletion={handleServiceProviderEventDeletion}
+                                handleServiceProviderEventEdition={handleServiceProviderEventEdition}
+                                handleServiceProviderEventFormChange={handleServiceProviderEventFormChange}
+                                indexOfPartPurchaseEventToEdit={indexOfPartPurchaseEventToEdit}
+                                indexOfServiceProviderEventToEdit={indexOfServiceProviderEventToEdit}
+                                isPartPurchaseEventFormDataEdition={isPartPurchaseEventFormDataEdition}
+                                isPartSelected={isPartSelected}
+                                isServiceProviderEventFormDataEdition={isServiceProviderEventFormDataEdition}
+                                maintenanceReportDates={maintenanceReportDates}
+                                maintenanceReportFormData={maintenanceReportFormData}
+                                partPurchaseFormData={partPurchaseEventFormData}
+                                searchTerm={searchTerm}
+                                selectPart={selectPart}
+                                serviceProviderEventFormData={serviceProviderEventFormData}
+                                setIsPartSelected={setIsPartSelected}
+                                setShowPartPurchaseEventForm={setShowPartPurchaseEventForm}
+                                setShowServiceProviderEventForm={setShowServiceProviderEventForm}
+                                showPartPurchaseEventForm={showPartPurchaseEventForm}
+                                showServiceProviderEventForm={showServiceProviderEventForm}
+                            />
+                            <ErrorNotificationBar isVisible={isVisible} errorMessage={errorMessage} onDismiss={handleErrorNotificationDismissal}/>
+                        </View>
+                }
             </ScrollView>
         </SafeAreaView>
     );

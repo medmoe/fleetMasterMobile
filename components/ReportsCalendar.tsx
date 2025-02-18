@@ -8,6 +8,7 @@ interface ReportsCalendarProps {
     onMonthChange: (month: DateData) => void
     onDayPressed: (date: DateData) => void
     displayLoadingIndicator: boolean
+    current: string
 }
 
 interface MarkedDates {
@@ -28,7 +29,12 @@ LocaleConfig.locales['en'] = {
 }
 LocaleConfig.defaultLocale = 'en';
 
-const ReportsCalendar = ({maintenanceReports, onDayPressed, onMonthChange, displayLoadingIndicator}: ReportsCalendarProps) => {
+const ReportsCalendar = ({
+                             maintenanceReports,
+                             onDayPressed,
+                             onMonthChange,
+                             displayLoadingIndicator,
+                             current}: ReportsCalendarProps) => {
     const markedDates: MarkedDates = {};
     maintenanceReports.forEach(report => {
         markedDates[report.start_date] = {marked: true, dotColor: 'red', activeOpacity: 0.8, count: 1};
@@ -40,6 +46,7 @@ const ReportsCalendar = ({maintenanceReports, onDayPressed, onMonthChange, displ
                       markedDates={markedDates}
                       onMonthChange={(month) => onMonthChange(month)}
                       hideExtraDays={true}
+                      current={current}
                       dayComponent={({date, state, marking}) => {
                           return (
                               <Pressable className={marking?.marked? "p-3 bg-red-300 rounded-[100%]" : "p-3"}
