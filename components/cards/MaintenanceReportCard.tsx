@@ -42,7 +42,12 @@ const MaintenanceReportCard = ({maintenanceReport, handleCollapse, expanded}: Ma
                                 {maintenanceReport.part_purchase_events.map((partPurchaseEvent, idx) => {
                                     return (
                                         <PartPurchaseEventCard key={idx}
-                                                               partPurchaseEvent={partPurchaseEvent}
+                                                               part_name={partPurchaseEvent.part_details?.name || "N/A"}
+                                                               provider_name={partPurchaseEvent.provider_details?.name || "N/A"}
+                                                               provider_address={partPurchaseEvent.provider_details?.address || "N/A"}
+                                                               provider_phone={partPurchaseEvent.provider_details?.phone_number || "N/A"}
+                                                               purchase_date={partPurchaseEvent.purchase_date}
+                                                               cost={partPurchaseEvent.cost}
                                                                onPress={() => {
                                                                }}
                                                                onLongPress={() => {
@@ -63,7 +68,13 @@ const MaintenanceReportCard = ({maintenanceReport, handleCollapse, expanded}: Ma
                                 {maintenanceReport.service_provider_events.map((serviceEvent, idx) => {
                                     return (
                                         <ServiceProviderEventCard key={idx}
-                                                                  serviceProviderEvent={serviceEvent}
+                                                                  cost={serviceEvent.cost}
+                                                                  description={serviceEvent.description}
+                                                                  service_date={serviceEvent.service_date}
+                                                                  service_provider_address={serviceEvent.service_provider_details?.address || "N/A"}
+                                                                  service_provider_name={serviceEvent.service_provider_details?.name || "N/A"}
+                                                                  service_provider_phone={serviceEvent.service_provider_details?.phone_number || "N/A"}
+                                                                  service_provider_type={serviceEvent.service_provider_details?.service_type || "N/A"}
                                                                   onPress={() => {
                                                                   }}
                                                                   onLongPress={() => {

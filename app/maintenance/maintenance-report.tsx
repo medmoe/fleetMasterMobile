@@ -24,7 +24,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 
 const MaintenanceReport = () => {
-    const {vehicle, setMaintenanceReports, maintenanceReports} = useGlobalContext();
+    const {setVehicle, vehicle, setMaintenanceReports, maintenanceReports} = useGlobalContext();
     const partPurchaseEventFormInitialState: PartPurchaseEventType = {
         part: {
             name: "",
@@ -112,7 +112,7 @@ const MaintenanceReport = () => {
         vehicle: vehicle.id,
         start_date: "",
         end_date: "",
-        mileage: vehicle.mileage,
+        mileage: vehicle.mileage.toString(),
         description: "",
         part_purchase_events: [],
         service_provider_events: [],
@@ -189,6 +189,7 @@ const MaintenanceReport = () => {
     }
     const validateMaintenanceReportData = (formatedMaintenanceReportFormData: MaintenanceReportWithStringsType) => {
         // validate Data
+        console.log("Validation", formatedMaintenanceReportFormData)
         if (!formatedMaintenanceReportFormData.vehicle) {
             Alert.alert("Error", "You must select a vehicle!")
             return false
@@ -216,13 +217,10 @@ const MaintenanceReport = () => {
         return true
     }
     const formatMaintenanceReportFormData = (): MaintenanceReportWithStringsType => {
-        setMaintenanceReportFormData(prevState => ({
-            ...prevState,
-            start_date: getLocalDateString(maintenanceReportDates.start_date),
-            end_date: getLocalDateString(maintenanceReportDates.end_date),
-        }))
         return {
             ...maintenanceReportFormData,
+            start_date: getLocalDateString(maintenanceReportDates.start_date),
+            end_date: getLocalDateString(maintenanceReportDates.end_date),
             part_purchase_events: maintenanceReportFormData.part_purchase_events.map((partPurchaseEvent) => {
                 if (!partPurchaseEvent.part.id || !partPurchaseEvent.provider.id) {
                     throw new Error("Either Part or Provider are not given!")
@@ -242,7 +240,7 @@ const MaintenanceReport = () => {
                     service_provider: serviceProviderEvent.service_provider.id
                 }
             }),
-        }
+        };
     }
     const handleMaintenanceReportSubmission = async () => {
         setIsLoading(true)
@@ -256,6 +254,7 @@ const MaintenanceReport = () => {
             const response = await axios.post(url, formatedMaintenanceReportFormData, options)
             setShowMaintenanceForm(false);
             setMaintenanceReports([...maintenanceReports, response.data])
+            setVehicle(response.data.vehicle_details);
 
         } catch (error: any) {
             if (error.response.status === 401) {
@@ -464,7 +463,6 @@ const MaintenanceReport = () => {
         {title: "Record Maintenance", handlePress: startRecordingMaintenance, color: "bg-primary-500"},
         {title: "Cancel", handlePress: cancelRecordingMaintenance, color: "bg-default"},
     ]
-
     return (
         <SafeAreaView>
             <ScrollView>

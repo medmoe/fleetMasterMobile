@@ -17,7 +17,7 @@ type VehicleKey = 'purchase_date' | 'last_service_date' | 'next_service_due' | '
 
 
 const Vehicle = () => {
-    const {responseData, setResponseData, vehicle} = useGlobalContext();
+    const {responseData, setResponseData, vehicle, isPostRequest} = useGlobalContext();
     const [isLoading, setIsLoading] = useState(false);
     const [vehicleData, setVehicleData] = useState<VehicleType>(vehicle as VehicleType);
     const [dates, setDates] = useState<VehicleDatesType>({
@@ -66,19 +66,23 @@ const Vehicle = () => {
         for (let key of keys) {
             vehicleData[key] = dates[key].toLocaleDateString("en-CA", {year: "numeric", month: "2-digit", day: "2-digit"})
         }
+        const url = isPostRequest ? `${API}vehicles/` : `${API}vehicles/${vehicleData.id}/`;
+        const options = {headers: {"Content-Type": "application/json"}, withCredentials: true};
         try {
-            const response = await axios.post(
-                `${API}vehicles/`,
-                vehicleData,
-                {
-                    headers: {'Content-Type': 'application/json'},
-                    withCredentials: true,
-                }
-            )
-            setResponseData({
-                ...responseData,
-                vehicles: responseData.vehicles ? [...responseData.vehicles, response.data] : [response.data],
-            })
+            const response = isPostRequest ? await axios.post(url, vehicleData, options) : await axios.put(url, vehicleData, options);
+            if (isPostRequest) {
+                setResponseData({
+                    ...responseData,
+                    vehicles: [...(responseData.vehicles || []), response.data]
+                })
+            } else {
+                const filteredVehicles = responseData.vehicles?.filter((vehicle) => vehicle.id !== vehicle.id) || [];
+                filteredVehicles.push(response.data);
+                setResponseData({
+                    ...responseData,
+                    vehicles: filteredVehicles,
+                })
+            }
             router.replace("/fleet");
         } catch (error) {
             Alert.alert(handleAuthenticationErrors(error));
@@ -93,7 +97,13 @@ const Vehicle = () => {
         <SafeAreaView>
             <ScrollView>
                 {isLoading ? <View className={"w-full justify-center items-center h-full px-4"}><Spinner isVisible={isLoading}/></View> :
-                    <VehicleForm vehicleData={vehicleData} handleChange={handleChange} handleDateChange={handleDateChange} submitForm={submitForm} cancelSubmission={cancelSubmission} dates={dates}/>
+                    <VehicleForm vehicleData={vehicleData}
+                                 handleChange={handleChange}
+                                 handleDateChange={handleDateChange}
+                                 submitForm={submitForm}
+                                 cancelSubmission={cancelSubmission}
+                                 dates={dates}
+                    />
                 }
             </ScrollView>
         </SafeAreaView>

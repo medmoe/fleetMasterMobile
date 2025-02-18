@@ -1,3 +1,5 @@
+import {VehicleType} from "@/types/types";
+
 export interface PartProviderType {
     id?: string
     name: string
@@ -30,6 +32,7 @@ export interface MaintenanceReportType {
     part_purchase_events: PartPurchaseEventType[]
     service_provider_events: ServiceProviderEventType[]
     vehicle_events: VehicleEventType[]
+    vehicle_details?: VehicleType
 }
 
 export interface PartPurchaseEventType {

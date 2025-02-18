@@ -41,7 +41,7 @@ const Drivers = () => {
                             <ThemedButton
                                 title={"Add driver"}
                                 handlePress={addDriver}
-                                containerStyles={"bg-secondary w-[40%] p-5 rounded-[50%]"}
+                                containerStyles={"bg-secondary-500 w-[40%] p-5 rounded"}
                                 textStyles={"font-semibold text-base text-white"}
                             />
                         </View>

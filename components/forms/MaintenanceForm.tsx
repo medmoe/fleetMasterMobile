@@ -39,7 +39,7 @@ const MaintenanceForm = ({
                              maintenanceReportDates,
                              maintenanceReportFormData,
                          }: MaintenanceFormProps) => {
-    const {part_purchase_events, service_provider_events} = maintenanceReportFormData;
+    const {part_purchase_events, service_provider_events, maintenance_type, mileage, description} = maintenanceReportFormData;
     return (
         <View className={"w-full justify-center items-center"}>
             <View className={"w-[94%] bg-white rounded p-5"}>
@@ -53,7 +53,7 @@ const MaintenanceForm = ({
                     <MaintenancePicker containerStyles={"mb-3"}
                                        title={"Select maintenance type"}
                                        name={"maintenance_type"}
-                                       value={maintenanceReportFormData.maintenance_type}
+                                       value={maintenance_type}
                                        items={[{label: "Preventive", value: "PREVENTIVE"}, {
                                            label: "Curative",
                                            value: "CURATIVE"
@@ -66,10 +66,10 @@ const MaintenanceForm = ({
                         <CustomDatePicker date={maintenanceReportDates.end_date} handleChange={handleDateChange}
                                           label={"End date"} name={"end_date"}/>
                     </View>
-                    <ThemedInputText placeholder={"Enter Mileage"} value={maintenanceReportFormData.mileage}
+                    <ThemedInputText placeholder={"Enter Mileage"} value={mileage}
                                      onChange={handleMaintenanceReportFormChange} name={'mileage'}
                                      containerStyles={"bg-background p-5 mt-3"}/>
-                    <ThemedInputText placeholder={"Description"} value={maintenanceReportFormData.description}
+                    <ThemedInputText placeholder={"Description"} value={description}
                                      onChange={handleMaintenanceReportFormChange} name={'description'}
                                      containerStyles={"bg-background p-5 mt-3"}/>
                     {(part_purchase_events.length !== 0 || service_provider_events.length !== 0) && <Divider/>}
@@ -77,10 +77,16 @@ const MaintenanceForm = ({
                         <Text className={"font-semibold text-base text-txt"}>Part Purchase Events</Text>
                         {part_purchase_events.map((partPurchaseEvent, index) => {
                             return (
-                                <PartPurchaseEventCard key={index}
-                                                       onPress={() => handlePartPurchaseEventEdition(index)}
-                                                       onLongPress={() => handlePartPurchaseEventDeletion(index)}
-                                                       partPurchaseEvent={partPurchaseEvent}
+                                <PartPurchaseEventCard
+                                    cost={partPurchaseEvent.cost}
+                                    onLongPress={() => handlePartPurchaseEventDeletion(index)}
+                                    onPress={() => handlePartPurchaseEventEdition(index)}
+                                    part_name={partPurchaseEvent.part.name}
+                                    provider_address={partPurchaseEvent.provider.address}
+                                    provider_name={partPurchaseEvent.provider.name}
+                                    provider_phone={partPurchaseEvent.provider.phone_number}
+                                    purchase_date={partPurchaseEvent.purchase_date}
+                                    key={index}
                                 />
                             )
                         })}
@@ -89,10 +95,18 @@ const MaintenanceForm = ({
                         <Text className={"font-semibold text-base text-txt"}>Service Provider Events</Text>
                         {service_provider_events.map((event, index) => {
                             return (
-                                <ServiceProviderEventCard key={index}
-                                                          onPress={() => handleServiceProviderEventEdition(index)}
-                                                          onLongPress={() => handleServiceProviderEventDeletion(index)}
-                                                          serviceProviderEvent={event}/>
+                                <ServiceProviderEventCard
+                                    cost={event.cost}
+                                    description={event.description}
+                                    onLongPress={() => handleServiceProviderEventDeletion(index)}
+                                    onPress={() => handleServiceProviderEventEdition(index)}
+                                    service_date={event.service_date}
+                                    service_provider_address={event.service_provider.address}
+                                    service_provider_name={event.service_provider.name}
+                                    service_provider_phone={event.service_provider.phone_number}
+                                    service_provider_type={event.service_provider.service_type}
+                                    key={index}
+                                />
                             )
                         })}
                     </View>}
