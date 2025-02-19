@@ -8,6 +8,7 @@ import {useEffect, useState} from "react";
 import {API} from "@/constants/endpoints";
 import axios from "axios";
 import {MaintenanceReportWithStringsType} from "@/types/maintenance";
+import MaintenanceReport from "@/app/maintenance/maintenance-report";
 
 const MaintenanceReportsDetails = () => {
     const {vehicle} = useGlobalContext();
@@ -20,6 +21,8 @@ const MaintenanceReportsDetails = () => {
     const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [selectedReports, setSelectedReports] = useState<[MaintenanceReportWithStringsType, boolean][]>([])
+    const [showMaintenanceReport, setShowMaintenanceReport] = useState(false)
+    const [maintenanceReportToEdit, setMaintenanceReportToEdit] = useState<MaintenanceReportWithStringsType | undefined>();
     useEffect(() => {
         const fetchMaintenanceReports = async () => {
             setDisplayLoadingIndicator(true);
@@ -91,58 +94,72 @@ const MaintenanceReportsDetails = () => {
         setIsErrorModalVisible(false);
     }
     const handleCollapse = (id?: string) => {
+        console.log("collapse pressed");
         setSelectedReports(selectedReports.map(([report, expanded]) => [report, id && report.id === id ? !expanded : expanded]));
+    }
+    const handleMaintenanceReportEdition = (id?: string) => {
+        setShowMaintenanceReport(true);
+        const reportToEdit: [MaintenanceReportWithStringsType, boolean] | undefined = selectedReports.find(([report, expanded]) => report.id === id);
+        if (reportToEdit) {
+            setMaintenanceReportToEdit(reportToEdit[0]);
+        }
     }
     return (
         <SafeAreaView>
             <ScrollView>
-                {showSelectedReports ?
-                    <View className={"w-full justify-center items-center"}>
-                        <View className={"w-[94%] bg-white rounded p-5"}>
-                            <View>
-                                <Text className={"font-semibold text-base text-txt"}>Report's List</Text>
+                {showMaintenanceReport ? <MaintenanceReport maintenanceReportFormData={maintenanceReportToEdit}
+                                                            isMaintenanceReportPutRequest={true}
+                                                            showMaintenanceForm={true}
+                    /> :
+                    showSelectedReports ?
+                        <View className={"w-full justify-center items-center"}>
+                            <View className={"w-[94%] bg-white rounded p-5"}>
+                                <View>
+                                    <Text className={"font-semibold text-base text-txt"}>Report's List</Text>
+                                </View>
+                                <View className={"mt-5"}>
+                                    <Text className={"font-open-sans text-txt"}>{`Here is the list of the reports submitted`}</Text>
+                                </View>
+                                <View>
+                                    {selectedReports.map(([report, expanded], idx) => {
+                                        return (
+                                            <MaintenanceReportCard maintenanceReport={report}
+                                                                   key={idx}
+                                                                   handleCollapse={handleCollapse}
+                                                                   expanded={expanded}
+                                                                   handleMaintenanceReportDeletion={() => console.log("trash pressed")}
+                                                                   handleMaintenanceReportEdition={handleMaintenanceReportEdition}
+                                            />
+                                        )
+                                    })}
+                                </View>
+                                <ThemedButton title={"Cancel"} handlePress={handleMaintenanceReportViewCancellation}
+                                              containerStyles={"bg-default p-5 rounded mt-3"}
+                                              textStyles={"text-white font-semibold text-base"}
+                                />
                             </View>
-                            <View className={"mt-5"}>
-                                <Text className={"font-open-sans text-txt"}>{`Here is the list of the reports submitted`}</Text>
-                            </View>
-                            <View>
-                                {selectedReports.map(([report, expanded], idx) => {
-                                    return (
-                                        <MaintenanceReportCard maintenanceReport={report}
-                                                               key={idx}
-                                                               handleCollapse={handleCollapse}
-                                                               expanded={expanded}
-                                        />
-                                    )
-                                })}
-                            </View>
-                            <ThemedButton title={"Cancel"} handlePress={handleMaintenanceReportViewCancellation}
-                                          containerStyles={"bg-default p-5 rounded mt-3"}
-                                          textStyles={"text-white font-semibold text-base"}
-                            />
                         </View>
-                    </View>
-                    :
-                    <View className={"w-full justify-center items-center h-full px-4"}>
-                        <View className={"w-[94%] bg-white rounded p-3"}>
-                            <ReportsCalendar maintenanceReports={maintenanceReports}
-                                             onMonthChange={onMonthChange}
-                                             onDayPressed={onDayPressed}
-                                             displayLoadingIndicator={displayLoadingIndicator}
-                                             current={currentDate}
+                        :
+                        <View className={"w-full justify-center items-center h-full px-4"}>
+                            <View className={"w-[94%] bg-white rounded p-3"}>
+                                <ReportsCalendar maintenanceReports={maintenanceReports}
+                                                 onMonthChange={onMonthChange}
+                                                 onDayPressed={onDayPressed}
+                                                 displayLoadingIndicator={displayLoadingIndicator}
+                                                 current={currentDate}
 
-                            />
-                            <ThemedButton title={"Cancel"}
-                                          handlePress={handleLeavingMaintenanceReportsCalendar}
-                                          containerStyles={"bg-default p-5 rounded mt-3"}
-                                          textStyles={"text-white font-semibold text-base"}
+                                />
+                                <ThemedButton title={"Cancel"}
+                                              handlePress={handleLeavingMaintenanceReportsCalendar}
+                                              containerStyles={"bg-default p-5 rounded mt-3"}
+                                              textStyles={"text-white font-semibold text-base"}
+                                />
+                            </View>
+                            <ErrorNotificationBar isVisible={isErrorModalVisible}
+                                                  errorMessage={errorMessage}
+                                                  onDismiss={handleDismissFetchingReports}
                             />
                         </View>
-                        <ErrorNotificationBar isVisible={isErrorModalVisible}
-                                              errorMessage={errorMessage}
-                                              onDismiss={handleDismissFetchingReports}
-                        />
-                    </View>
                 }
             </ScrollView>
         </SafeAreaView>

@@ -31,7 +31,6 @@ export interface MaintenanceReportType {
     description: string
     part_purchase_events: PartPurchaseEventType[]
     service_provider_events: ServiceProviderEventType[]
-    vehicle_events: VehicleEventType[]
     vehicle_details?: VehicleType
 }
 

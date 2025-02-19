@@ -11,35 +11,63 @@ interface MaintenanceReportCardProps {
     maintenanceReport: MaintenanceReportWithStringsType
     handleCollapse: (id?: string) => void
     expanded: boolean
+    handleMaintenanceReportDeletion: () => void
+    handleMaintenanceReportEdition: (id?: string) => void
 }
 
-const MaintenanceReportCard = ({maintenanceReport, handleCollapse, expanded}: MaintenanceReportCardProps) => {
+const MaintenanceReportCard = ({
+                                   handleMaintenanceReportEdition,
+                                   handleMaintenanceReportDeletion,
+                                   maintenanceReport,
+                                   handleCollapse,
+                                   expanded
+                               }: MaintenanceReportCardProps) => {
+    const {
+        id,
+        maintenance_type,
+        start_date,
+        end_date,
+        mileage,
+        description,
+        part_purchase_events,
+        service_provider_events,
+        vehicle_details
+    } = maintenanceReport;
     return (
-        <Pressable onPress={() => handleCollapse(maintenanceReport.id)}>
+        <View>
             <View className={"flex-row p-[16px] bg-white rounded shadow mt-3"}>
                 <View className={"flex-1"}>
-                    <Pressable onPress={() => handleCollapse(maintenanceReport.id)}
-                               className={"absolute right-0 top-0"}
-                               accessibilityLabel={"Collapse"}>
-                        <Animated.View style={{transform: [{rotate: expanded ? "90deg" : "0deg"}]}}>
-                            <FontAwsome name={"chevron-right"} size={25} color={"#9c27b0"}/>
-                        </Animated.View>
-                    </Pressable>
-                    <ListItemDetail label={"Report ID"} value={maintenanceReport.id}/>
-                    <ListItemDetail label={"Vehicle Details"} value={maintenanceReport.vehicle}/>
-                    <ListItemDetail label={"Maintenance Type"} value={maintenanceReport.maintenance_type}/>
-                    <ListItemDetail label={"Start date"} value={maintenanceReport.start_date}/>
-                    <ListItemDetail label={"End date"} value={maintenanceReport.end_date}/>
-                    <ListItemDetail label={"Mileage"} value={maintenanceReport.mileage}/>
-                    <ListItemDetail label={"Description"} value={maintenanceReport.description}/>
-                    {maintenanceReport.part_purchase_events.length !== 0 && expanded &&
+                    <View className={"absolute right-0 top-0 flex flex-col z-10"}>
+                        <Pressable onPress={() => handleCollapse(id)}
+                                   className={"p-2"}
+                                   accessibilityLabel={"Collapse"}>
+                            <Animated.View style={{transform: [{rotate: expanded ? "90deg" : "0deg"}]}}>
+                                <FontAwsome name={"chevron-right"} size={25} color={"#9c27b0"}/>
+                            </Animated.View>
+                        </Pressable>
+                        <Pressable onPress={() => handleMaintenanceReportEdition(id)} className={"p-2"}>
+                            <FontAwsome name={"edit"} size={25} color={"#9c27b0"}/>
+                        </Pressable>
+                        <Pressable onPress={handleMaintenanceReportDeletion} className={"p-2"}>
+                            <FontAwsome name={"trash"} size={25} color={"#9c27b0"}/>
+                        </Pressable>
+                    </View>
+                    <ListItemDetail label={"Report ID"} value={id}/>
+                    <ListItemDetail label={"Vehicle Details"} value={`${vehicle_details?.make} ${vehicle_details?.model} ${vehicle_details?.year}`}/>
+                    <ListItemDetail label={"Maintenance Type"} value={maintenance_type.toLowerCase()}
+                                    textStyle={maintenance_type === "PREVENTIVE" ? "text-success-500" : "text-error-500"}/>
+                    <ListItemDetail label={"Start date"} value={start_date}/>
+                    <ListItemDetail label={"End date"} value={end_date}/>
+                    <ListItemDetail label={"Mileage"} value={mileage}/>
+                    <ListItemDetail label={"Description"} value={description}/>
+                    {part_purchase_events.length !== 0 && expanded &&
                         <View>
                             <Divider/>
                             <View>
                                 <Text className={"font-semibold text-txt text-sm"}>Part Purchase Events:</Text>
                             </View>
                             <View>
-                                {maintenanceReport.part_purchase_events.map((partPurchaseEvent, idx) => {
+                                {part_purchase_events.map((partPurchaseEvent, idx) => {
                                     return (
                                         <PartPurchaseEventCard key={idx}
                                                                part_name={partPurchaseEvent.part_details?.name || "N/A"}
@@ -48,9 +76,9 @@ const MaintenanceReportCard = ({maintenanceReport, handleCollapse, expanded}: Ma
                                                                provider_phone={partPurchaseEvent.provider_details?.phone_number || "N/A"}
                                                                purchase_date={partPurchaseEvent.purchase_date}
                                                                cost={partPurchaseEvent.cost}
-                                                               onPress={() => {
+                                                               handlePartPurchaseEventEdition={() => {
                                                                }}
-                                                               onLongPress={() => {
+                                                               handlePartPurchaseEventDeletion={() => {
                                                                }}
                                         />
                                     )
@@ -75,9 +103,9 @@ const MaintenanceReportCard = ({maintenanceReport, handleCollapse, expanded}: Ma
                                                                   service_provider_name={serviceEvent.service_provider_details?.name || "N/A"}
                                                                   service_provider_phone={serviceEvent.service_provider_details?.phone_number || "N/A"}
                                                                   service_provider_type={serviceEvent.service_provider_details?.service_type || "N/A"}
-                                                                  onPress={() => {
+                                                                  handleServiceProviderEventDeletion={() => {
                                                                   }}
-                                                                  onLongPress={() => {
+                                                                  handleServiceProviderEventEdition={() => {
                                                                   }}
                                         />
                                     )
@@ -87,7 +115,7 @@ const MaintenanceReportCard = ({maintenanceReport, handleCollapse, expanded}: Ma
                     }
                 </View>
             </View>
-        </Pressable>
+        </View>
     );
 };
 

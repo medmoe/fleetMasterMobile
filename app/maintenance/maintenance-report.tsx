@@ -22,8 +22,13 @@ import {router} from "expo-router";
 import {getLocalDateString, isPositiveInteger} from "@/utils/helpers";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
+interface MaintenanceReportProps {
+    maintenanceReportFormData?: MaintenanceReportWithStringsType;
+    isMaintenanceReportPutRequest?: boolean
+    showMaintenanceForm?: boolean
+}
 
-const MaintenanceReport = () => {
+const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
     const {setVehicle, vehicle, setMaintenanceReports, maintenanceReports} = useGlobalContext();
     const partPurchaseEventFormInitialState: PartPurchaseEventType = {
         part: {
@@ -57,9 +62,10 @@ const MaintenanceReport = () => {
     const [showServiceProviderEventForm, setShowServiceProviderEventForm] = useState(false);
     const [isServiceProviderEventFormDataEdition, setIsServiceProviderEventFormDataEdition] = useState(false);
     const [indexOfServiceProviderEventToEdit, setIndexOfServiceProviderEventToEdit] = useState<number | undefined>();
+    const [isMaintenanceReportPutRequest, setIsMaintenanceReportPutRequest] = useState(props.isMaintenanceReportPutRequest ?? false);
     const [maintenanceReportDates, setMaintenanceReportDates] = useState({
-        "start_date": new Date(),
-        "end_date": new Date(),
+        "start_date": new Date(props.maintenanceReportFormData?.start_date || Date.now()),
+        "end_date": new Date(props.maintenanceReportFormData?.end_date || Date.now()),
         "purchase_date": new Date()
     })
     const [eventsDates, setEventsDates] = useState({
@@ -72,7 +78,7 @@ const MaintenanceReport = () => {
     const setIsPartSelected = useCallback((isSelected: boolean) => {
         setIsSelected(isSelected);
     }, [])
-    const [showMaintenanceForm, setShowMaintenanceForm] = useState<boolean>(false);
+    const [showMaintenanceForm, setShowMaintenanceForm] = useState<boolean>(props.showMaintenanceForm ?? false);
     const [style, label] = vehicleStatusMapping[vehicle.status];
     const [maintenanceReport, setMaintenanceReport] = useState<MaintenanceOverviewType>({
         previous_report: {},
@@ -107,17 +113,18 @@ const MaintenanceReport = () => {
     for (let i = 0; i < statData.length; i += 2) {
         pairStatData.push(statData.slice(i, i + 2));
     }
-    const maintenanceReportFormInitialState: MaintenanceReportType = {
-        maintenance_type: "PREVENTIVE",
-        vehicle: vehicle.id,
-        start_date: "",
-        end_date: "",
-        mileage: vehicle.mileage.toString(),
-        description: "",
-        part_purchase_events: [],
-        service_provider_events: [],
-        vehicle_events: [],
-    }
+    const maintenanceReportFormInitialState: MaintenanceReportType =
+        {
+            id: props.maintenanceReportFormData?.id,
+            maintenance_type: props.maintenanceReportFormData?.maintenance_type || "PREVENTIVE",
+            vehicle: props.maintenanceReportFormData?.vehicle_details?.id || vehicle.id,
+            start_date: props.maintenanceReportFormData?.start_date || "",
+            end_date: props.maintenanceReportFormData?.end_date || "",
+            mileage: props.maintenanceReportFormData?.mileage.toString() || vehicle.mileage,
+            description: props.maintenanceReportFormData?.description || "",
+            part_purchase_events: [],
+            service_provider_events: [],
+        }
     const [maintenanceReportFormData, setMaintenanceReportFormData] = useState(maintenanceReportFormInitialState)
     const [activeFilter, setActiveFilter] = useState(0);
     const [isVisible, setIsVisible] = useState(false)
@@ -158,6 +165,7 @@ const MaintenanceReport = () => {
     }
     const startRecordingMaintenance = () => {
         setShowMaintenanceForm(true);
+        setIsMaintenanceReportPutRequest(false);
     }
     const cancelRecordingMaintenance = () => {
         router.replace('/fleet');
@@ -189,7 +197,6 @@ const MaintenanceReport = () => {
     }
     const validateMaintenanceReportData = (formatedMaintenanceReportFormData: MaintenanceReportWithStringsType) => {
         // validate Data
-        console.log("Validation", formatedMaintenanceReportFormData)
         if (!formatedMaintenanceReportFormData.vehicle) {
             Alert.alert("Error", "You must select a vehicle!")
             return false
@@ -210,7 +217,7 @@ const MaintenanceReport = () => {
             Alert.alert("Error", "You must select a valid mileage!")
             return false
         }
-        if (formatedMaintenanceReportFormData.service_provider_events.length === 0) {
+        if (formatedMaintenanceReportFormData.service_provider_events.length === 0 && !isMaintenanceReportPutRequest) {
             Alert.alert("Error", "You must create a service provider event")
             return false
         }
@@ -249,11 +256,20 @@ const MaintenanceReport = () => {
             if (!validateMaintenanceReportData(formatedMaintenanceReportFormData)) {
                 return
             }
-            const url = `${API}maintenance/reports/`
+            const url = isMaintenanceReportPutRequest ? `${API}maintenance/reports/${formatedMaintenanceReportFormData.id}/` : `${API}maintenance/reports/`
             const options = {headers: {"Content-Type": "application/json"}, withCredentials: true}
-            const response = await axios.post(url, formatedMaintenanceReportFormData, options)
+            const response = isMaintenanceReportPutRequest ? await axios.put(url, formatedMaintenanceReportFormData, options) : await axios.post(url, formatedMaintenanceReportFormData, options)
             setShowMaintenanceForm(false);
-            setMaintenanceReports([...maintenanceReports, response.data])
+            if (!isMaintenanceReportPutRequest) {
+                setMaintenanceReports([...maintenanceReports, response.data])
+            } else {
+                setMaintenanceReports(maintenanceReports.map((report) => {
+                    if (report.id === response.data.id) {
+                        return response.data
+                    }
+                    return report
+                }))
+            }
             setVehicle(response.data.vehicle_details);
 
         } catch (error: any) {
@@ -556,6 +572,7 @@ const MaintenanceReport = () => {
                                 isPartPurchaseEventFormDataEdition={isPartPurchaseEventFormDataEdition}
                                 isPartSelected={isPartSelected}
                                 isServiceProviderEventFormDataEdition={isServiceProviderEventFormDataEdition}
+                                isUpdate={isMaintenanceReportPutRequest}
                                 maintenanceReportDates={maintenanceReportDates}
                                 maintenanceReportFormData={maintenanceReportFormData}
                                 partPurchaseFormData={partPurchaseEventFormData}

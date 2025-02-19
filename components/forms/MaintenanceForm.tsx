@@ -23,6 +23,7 @@ interface MaintenanceFormProps {
     handleServiceProviderEventEdition: (index: number) => void
     maintenanceReportDates: { [key in "start_date" | "end_date" | "purchase_date"]: Date }
     maintenanceReportFormData: MaintenanceReportType
+    isUpdate: boolean
 }
 
 const MaintenanceForm = ({
@@ -38,6 +39,7 @@ const MaintenanceForm = ({
                              handleServiceProviderEventEdition,
                              maintenanceReportDates,
                              maintenanceReportFormData,
+                             isUpdate,
                          }: MaintenanceFormProps) => {
     const {part_purchase_events, service_provider_events, maintenance_type, mileage, description} = maintenanceReportFormData;
     return (
@@ -79,8 +81,8 @@ const MaintenanceForm = ({
                             return (
                                 <PartPurchaseEventCard
                                     cost={partPurchaseEvent.cost}
-                                    onLongPress={() => handlePartPurchaseEventDeletion(index)}
-                                    onPress={() => handlePartPurchaseEventEdition(index)}
+                                    handlePartPurchaseEventEdition={() => handlePartPurchaseEventDeletion(index)}
+                                    handlePartPurchaseEventDeletion={() => handlePartPurchaseEventEdition(index)}
                                     part_name={partPurchaseEvent.part.name}
                                     provider_address={partPurchaseEvent.provider.address}
                                     provider_name={partPurchaseEvent.provider.name}
@@ -98,8 +100,8 @@ const MaintenanceForm = ({
                                 <ServiceProviderEventCard
                                     cost={event.cost}
                                     description={event.description}
-                                    onLongPress={() => handleServiceProviderEventDeletion(index)}
-                                    onPress={() => handleServiceProviderEventEdition(index)}
+                                    handleServiceProviderEventEdition={() => handleServiceProviderEventDeletion(index)}
+                                    handleServiceProviderEventDeletion={() => handleServiceProviderEventEdition(index)}
                                     service_date={event.service_date}
                                     service_provider_address={event.service_provider.address}
                                     service_provider_name={event.service_provider.name}
@@ -122,7 +124,7 @@ const MaintenanceForm = ({
                                       containerStyles={"bg-secondary-500 p-5 rounded mt-3"}
                                       textStyles={"text-white text-base font-semibold"}
                         />
-                        <ThemedButton title={"Submit Report"}
+                        <ThemedButton title={isUpdate ? "Update Report" : "Submit Report"}
                                       handlePress={handleMaintenanceReportSubmission}
                                       containerStyles={"bg-primary-500 p-5 rounded mt-3"}
                                       textStyles={"text-white text-base font-semibold"}

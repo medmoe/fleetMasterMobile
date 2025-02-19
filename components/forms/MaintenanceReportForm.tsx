@@ -29,6 +29,7 @@ interface MaintenanceFormProps {
     isPartPurchaseEventFormDataEdition: boolean
     isPartSelected: boolean
     isServiceProviderEventFormDataEdition: boolean
+    isUpdate: boolean
     maintenanceReportDates: { [key in "start_date" | "end_date" | "purchase_date"]: Date }
     maintenanceReportFormData: MaintenanceReportType
     partPurchaseFormData: PartPurchaseEventType
@@ -64,6 +65,7 @@ const MaintenanceReportForm = ({
                                    isPartPurchaseEventFormDataEdition,
                                    isPartSelected,
                                    isServiceProviderEventFormDataEdition,
+                                   isUpdate,
                                    maintenanceReportDates,
                                    maintenanceReportFormData,
                                    partPurchaseFormData,
@@ -133,6 +135,7 @@ const MaintenanceReportForm = ({
                             handleServiceProviderEventEdition={handleServiceProviderEventEdition}
                             maintenanceReportDates={maintenanceReportDates}
                             maintenanceReportFormData={maintenanceReportFormData}
+                            isUpdate={isUpdate}
                         />
             }
         </View>
