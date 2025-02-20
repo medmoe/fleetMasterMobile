@@ -1,4 +1,4 @@
-import {SafeAreaView, ScrollView, Text, View} from "react-native";
+import {ActivityIndicator, Alert, SafeAreaView, ScrollView, Text, View} from "react-native";
 import ReportsCalendar from "../../components/ReportsCalendar";
 import {ErrorNotificationBar, MaintenanceReportCard, ThemedButton} from "@/components";
 import {router} from "expo-router";
@@ -23,6 +23,7 @@ const MaintenanceReportsDetails = () => {
     const [selectedReports, setSelectedReports] = useState<[MaintenanceReportWithStringsType, boolean][]>([])
     const [showMaintenanceReport, setShowMaintenanceReport] = useState(false)
     const [maintenanceReportToEdit, setMaintenanceReportToEdit] = useState<MaintenanceReportWithStringsType | undefined>();
+    const [isLoading, setIsLoading] = useState(false);
     useEffect(() => {
         const fetchMaintenanceReports = async () => {
             setDisplayLoadingIndicator(true);
@@ -104,6 +105,43 @@ const MaintenanceReportsDetails = () => {
             setMaintenanceReportToEdit(reportToEdit[0]);
         }
     }
+    const handleMaintenanceReportDeletion = (id?: string) => {
+        const proceedWithReportDeletion = async () => {
+            setIsLoading(true);
+            try {
+                const url = `${API}maintenance/reports/${id}/`
+                const options = {headers: {"Content-Type": "application/json"}, withCredentials: true}
+                await axios.delete(url, options)
+                setMaintenanceReports(maintenanceReports.filter(report => report.id !== id));
+                setShowSelectedReports(false);
+            } catch (error: any) {
+                if (error.response.status === 401) {
+                    router.replace("/");
+                } else {
+                    setIsErrorModalVisible(true);
+                    setErrorMessage("Error deleting report !");
+                    console.error("Error deleting report:", error);
+                }
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        Alert.alert("Delete report", "Are you sure you want to delete this report? This action cannot be undone.", [
+                {
+                    text: "Cancel",
+                    onPress: () => {
+                    },
+                    style: "cancel"
+                },
+                {
+                    text: "Delete",
+                    onPress: () => proceedWithReportDeletion(),
+                    style: "destructive"
+                }
+            ],
+            {cancelable: true})
+    }
+    console.log(isLoading, "isLoading");
     return (
         <SafeAreaView>
             <ScrollView>
@@ -114,6 +152,7 @@ const MaintenanceReportsDetails = () => {
                     showSelectedReports ?
                         <View className={"w-full justify-center items-center"}>
                             <View className={"w-[94%] bg-white rounded p-5"}>
+                                {isLoading && <ActivityIndicator size={"large"} color={"#3f51b5"}/>}
                                 <View>
                                     <Text className={"font-semibold text-base text-txt"}>Report's List</Text>
                                 </View>
@@ -127,7 +166,7 @@ const MaintenanceReportsDetails = () => {
                                                                    key={idx}
                                                                    handleCollapse={handleCollapse}
                                                                    expanded={expanded}
-                                                                   handleMaintenanceReportDeletion={() => console.log("trash pressed")}
+                                                                   handleMaintenanceReportDeletion={handleMaintenanceReportDeletion}
                                                                    handleMaintenanceReportEdition={handleMaintenanceReportEdition}
                                             />
                                         )

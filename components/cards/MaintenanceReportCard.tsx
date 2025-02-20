@@ -11,7 +11,7 @@ interface MaintenanceReportCardProps {
     maintenanceReport: MaintenanceReportWithStringsType
     handleCollapse: (id?: string) => void
     expanded: boolean
-    handleMaintenanceReportDeletion: () => void
+    handleMaintenanceReportDeletion: (id?: string) => void
     handleMaintenanceReportEdition: (id?: string) => void
 }
 
@@ -48,7 +48,7 @@ const MaintenanceReportCard = ({
                         <Pressable onPress={() => handleMaintenanceReportEdition(id)} className={"p-2"}>
                             <FontAwsome name={"edit"} size={25} color={"#9c27b0"}/>
                         </Pressable>
-                        <Pressable onPress={handleMaintenanceReportDeletion} className={"p-2"}>
+                        <Pressable onPress={() => handleMaintenanceReportDeletion(id)} className={"p-2"}>
                             <FontAwsome name={"trash"} size={25} color={"#9c27b0"}/>
                         </Pressable>
                     </View>
