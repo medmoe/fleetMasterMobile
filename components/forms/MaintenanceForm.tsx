@@ -100,8 +100,8 @@ const MaintenanceForm = ({
                                 <ServiceProviderEventCard
                                     cost={event.cost}
                                     description={event.description}
-                                    handleServiceProviderEventEdition={() => handleServiceProviderEventDeletion(index)}
-                                    handleServiceProviderEventDeletion={() => handleServiceProviderEventEdition(index)}
+                                    handleServiceProviderEventEdition={() => handleServiceProviderEventEdition(index)}
+                                    handleServiceProviderEventDeletion={() => handleServiceProviderEventDeletion(index)}
                                     service_date={event.service_date}
                                     service_provider_address={event.service_provider.address}
                                     service_provider_name={event.service_provider.name}

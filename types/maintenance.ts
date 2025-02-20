@@ -38,6 +38,7 @@ export interface PartPurchaseEventType {
     id?: string
     part: PartType
     provider: PartProviderType
+    maintenance_report?: string
     purchase_date: string
     cost: string
     part_details?: PartType
@@ -53,14 +54,11 @@ export type MaintenanceReportWithStringsType = Omit<MaintenanceReportType, 'part
 export interface ServiceProviderEventType {
     id?: string
     service_provider: ServiceProviderType
+    maintenance_report?: string
     service_date: string
     cost: string
     description: string
     service_provider_details?: ServiceProviderType
-}
-
-export interface VehicleEventType {
-    vehicle: string
 }
 
 export type MaintenanceOverviewType = {

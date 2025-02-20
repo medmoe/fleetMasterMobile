@@ -269,6 +269,8 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
                     }
                     return report
                 }))
+                router.replace('/details/maintenance-reports-details');
+
             }
             setVehicle(response.data.vehicle_details);
 

@@ -13,6 +13,8 @@ interface MaintenanceReportCardProps {
     expanded: boolean
     handleMaintenanceReportDeletion: (id?: string) => void
     handleMaintenanceReportEdition: (id?: string) => void
+    handleServiceProviderEventEdition: (service_provider_event_id?: string, maintenance_report_id?: string) => void
+    handleServiceProviderEventDeletion: (service_provider_event_id?: string, maintenance_report_id?: string) => void
 }
 
 const MaintenanceReportCard = ({
@@ -20,7 +22,9 @@ const MaintenanceReportCard = ({
                                    handleMaintenanceReportDeletion,
                                    maintenanceReport,
                                    handleCollapse,
-                                   expanded
+                                   expanded,
+                                   handleServiceProviderEventEdition,
+                                   handleServiceProviderEventDeletion,
                                }: MaintenanceReportCardProps) => {
     const {
         id,
@@ -86,14 +90,14 @@ const MaintenanceReportCard = ({
                             </View>
                         </View>
                     }
-                    {maintenanceReport.service_provider_events.length !== 0 && expanded &&
+                    {service_provider_events.length !== 0 && expanded &&
                         <View>
                             <Divider/>
                             <View>
                                 <Text className={"font-semibold text-txt text-sm"}>Service Provider Events:</Text>
                             </View>
                             <View>
-                                {maintenanceReport.service_provider_events.map((serviceEvent, idx) => {
+                                {service_provider_events.map((serviceEvent, idx) => {
                                     return (
                                         <ServiceProviderEventCard key={idx}
                                                                   cost={serviceEvent.cost}
@@ -103,10 +107,8 @@ const MaintenanceReportCard = ({
                                                                   service_provider_name={serviceEvent.service_provider_details?.name || "N/A"}
                                                                   service_provider_phone={serviceEvent.service_provider_details?.phone_number || "N/A"}
                                                                   service_provider_type={serviceEvent.service_provider_details?.service_type || "N/A"}
-                                                                  handleServiceProviderEventDeletion={() => {
-                                                                  }}
-                                                                  handleServiceProviderEventEdition={() => {
-                                                                  }}
+                                                                  handleServiceProviderEventDeletion={() => handleServiceProviderEventDeletion(serviceEvent.id, id)}
+                                                                  handleServiceProviderEventEdition={() => handleServiceProviderEventEdition(serviceEvent.id, id)}
                                         />
                                     )
                                 })}
