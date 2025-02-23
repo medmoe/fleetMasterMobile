@@ -171,6 +171,7 @@ const MaintenanceReportsDetails = () => {
             if (serviceEventToEdit) {
                 if (serviceEventToEdit.service_provider_details) {
                     setServiceProviderEventFormData({
+                        id: serviceEventToEdit.id,
                         service_provider: serviceEventToEdit.service_provider_details,
                         service_date: serviceEventToEdit?.service_date,
                         cost: serviceEventToEdit?.cost,
@@ -235,12 +236,19 @@ const MaintenanceReportsDetails = () => {
     const handleServiceProviderEventEditionCancellation = () => {
         setShowServiceProviderEventForm(false);
     }
+    const formatServiceProviderEventFormData = () => {
+        return {
+            ...serviceProviderEventFormData,
+            service_provider: serviceProviderEventFormData.service_provider.id,
+            service_date: getLocalDateString(eventsDates.service_date),
+        }
+    }
     const handleServiceProviderEventUpdateSubmission = async () => {
         setIsLoading(true);
         try {
             const url = `${API}maintenance/service-provider-events/${serviceProviderEventFormData.id}/`
             const options = {headers: {"Content-Type": "application/json"}, withCredentials: true}
-            const response = await axios.put(url, serviceProviderEventFormData, options)
+            const response = await axios.put(url, formatServiceProviderEventFormData(), options)
             setMaintenanceReports(maintenanceReports.map((report) => {
                 if (report.id === response.data.maintenance_report) {
                     return {
@@ -254,6 +262,21 @@ const MaintenanceReportsDetails = () => {
                     }
                 } else {
                     return report;
+                }
+            }))
+            setSelectedReports(selectedReports.map(([report, expanded]) => {
+                if (report.id === response.data.maintenance_report) {
+                    return [{
+                        ...report,
+                        service_provider_events: report.service_provider_events.map(event => {
+                            if (event.id === response.data.id) {
+                                return response.data
+                            }
+                            return event
+                        })
+                    }, expanded]
+                } else {
+                    return [report, expanded];
                 }
             }))
             setShowServiceProviderEventForm(false);
@@ -281,7 +304,6 @@ const MaintenanceReportsDetails = () => {
                     handleServiceProviderEventAddition={handleServiceProviderEventUpdateSubmission}
                     handleServiceProviderEventCancellation={handleServiceProviderEventEditionCancellation}
                     isServiceProviderEventFormDataEdition={true}
-                    indexOfServiceProviderEventToEdit={-1}
                 />
             )
         } else if (showMaintenanceReport) {
