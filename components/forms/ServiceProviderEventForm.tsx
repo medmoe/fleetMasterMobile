@@ -16,7 +16,7 @@ interface ServiceProviderEventFormProps {
     handleServiceProviderEventAddition: (index: number | undefined) => void
     handleServiceProviderEventCancellation: () => void
     isServiceProviderEventFormDataEdition: boolean;
-    indexOfServiceProviderEventToEdit: number | undefined;
+    indexOfServiceProviderEventToEdit?: number;
 
 
 }
