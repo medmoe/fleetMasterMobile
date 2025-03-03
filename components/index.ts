@@ -28,3 +28,5 @@ export {default as TableEntry} from "./TableEntry";
 export {default as ThemedButton} from "./ThemedButton";
 export {default as ThemedInputText} from "./ThemedInputText";
 export {default as Vehicle} from "./cards/VehicleCardComponent";
+export {default as ServiceProviderEventForm} from "./forms/ServiceProviderEventForm";
+export {default as PartPurchaseEventForm} from "./forms/PartPurchaseEventForm";

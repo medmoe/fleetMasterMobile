@@ -10,13 +10,13 @@ import ThemedButton from "@/components/ThemedButton";
 interface ServiceProviderEventFormProps {
     serviceProviders: ServiceProviderType[];
     service_date: Date
-    handleEventsDateChange: (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => void
     serviceProviderEventFormData: ServiceProviderEventType
     handleServiceProviderEventFormChange: (name: string, value: string) => void
     handleServiceProviderEventAddition: (index: number | undefined) => void
     handleServiceProviderEventCancellation: () => void
     isServiceProviderEventFormDataEdition: boolean;
     indexOfServiceProviderEventToEdit?: number;
+    handleServiceDateChange: (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => void
 
 
 }
@@ -24,13 +24,13 @@ interface ServiceProviderEventFormProps {
 const ServiceProviderEventForm = ({
                                       serviceProviders,
                                       service_date,
-                                      handleEventsDateChange,
                                       serviceProviderEventFormData,
                                       handleServiceProviderEventFormChange,
                                       handleServiceProviderEventAddition,
                                       handleServiceProviderEventCancellation,
                                       isServiceProviderEventFormDataEdition,
                                       indexOfServiceProviderEventToEdit,
+                                      handleServiceDateChange,
                                   }: ServiceProviderEventFormProps) => {
     const {id, service_type, name, phone_number, address} = serviceProviderEventFormData.service_provider
     return (
@@ -46,7 +46,7 @@ const ServiceProviderEventForm = ({
                                }))}
                                handleItemChange={handleServiceProviderEventFormChange}
             />
-            <CustomDatePicker date={service_date} handleChange={handleEventsDateChange} label={"Service Date"} name={"service_date"}/>
+            <CustomDatePicker date={service_date} handleChange={handleServiceDateChange} label={"Service Date"} name={"service_date"}/>
             <ThemedInputText placeholder={"Enter cost"}
                              value={serviceProviderEventFormData.cost}
                              onChange={handleServiceProviderEventFormChange}

@@ -44,6 +44,7 @@ const AutoPartInput = ({handlePartInputChange, parts, searchTerm, selectPart, is
         return suggestions;
     }
     useEffect(() => {
+        console.log(isPartSelected, "is part selected in useEffect");
         if (isPartSelected) {
             setShowSuggestions(false);
             setIsPartSelected(false);
@@ -52,9 +53,9 @@ const AutoPartInput = ({handlePartInputChange, parts, searchTerm, selectPart, is
             setSuggestions(suggestions);
             setShowSuggestions(suggestions.length > 0);
         }
-    }, [searchTerm]);
+    },[searchTerm]);
     const trie: { [key: string]: {} } = {};
-    const addWord = (word: string, id="") => {
+    const addWord = (word: string, id = "") => {
         let currentNode = trie;
         for (let i = 0; i < word.length; i++) {
             const char = word[i];
@@ -78,7 +79,7 @@ const AutoPartInput = ({handlePartInputChange, parts, searchTerm, selectPart, is
             />
             {showSuggestions && suggestions.map((part, idx) => {
                 return (
-                    <Pressable key={idx} className={"bg-white rounded shadow p-5 m-2"} onPress={() => selectPart(part.name, part.id)}>
+                    <Pressable key={idx} className={"bg-white rounded shadow p-6 m-2 z-10"} onPress={() => selectPart(part.name, part.id)}>
                         <Text>{part.name}</Text>
                     </Pressable>
                 )

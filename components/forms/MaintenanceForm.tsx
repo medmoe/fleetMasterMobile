@@ -81,8 +81,8 @@ const MaintenanceForm = ({
                             return (
                                 <PartPurchaseEventCard
                                     cost={partPurchaseEvent.cost}
-                                    handlePartPurchaseEventEdition={() => handlePartPurchaseEventDeletion(index)}
-                                    handlePartPurchaseEventDeletion={() => handlePartPurchaseEventEdition(index)}
+                                    handlePartPurchaseEventEdition={() => handlePartPurchaseEventEdition(index)}
+                                    handlePartPurchaseEventDeletion={() => handlePartPurchaseEventDeletion(index)}
                                     part_name={partPurchaseEvent.part.name}
                                     provider_address={partPurchaseEvent.provider.address}
                                     provider_name={partPurchaseEvent.provider.name}

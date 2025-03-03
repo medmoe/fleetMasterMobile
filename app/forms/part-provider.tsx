@@ -127,7 +127,7 @@ const PartProvider = () => {
                                     <View className={"w-full pt-5"}>
                                         <ThemedButton title={"Add part provider"}
                                                       handlePress={handlePartsProviderCreation}
-                                                      containerStyles={"bg-primary p-5 rounded"}
+                                                      containerStyles={"bg-primary-500 p-5 rounded"}
                                                       textStyles={"font-semibold text-base text-white"}
                                         />
                                         {showDeleteFeatures && <ThemedButton

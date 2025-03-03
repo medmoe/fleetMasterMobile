@@ -41,7 +41,7 @@ const PartForm = ({
                 </View>
                 <ThemedButton title={"Submit"}
                               handlePress={handlePartSubmission}
-                              containerStyles={"w-full bg-primary p-5 rounded mt-3"}
+                              containerStyles={"w-full bg-primary-500 p-5 rounded mt-3"}
                               textStyles={"text-white font-semibold text-base"}
                 />
                 <ThemedButton title={"Cancel"}

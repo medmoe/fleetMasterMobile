@@ -9,9 +9,7 @@ import ServiceProviderEventForm from "../forms/ServiceProviderEventForm";
 
 
 interface MaintenanceFormProps {
-    eventsDates: { [key in "purchase_date" | "service_date"]: Date }
     handleDateChange: (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => void
-    handleEventsDateChange: (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => void
     handleMaintenanceReportCancellation: () => void
     handleMaintenanceReportFormChange: (name: string, value: string) => void
     handleMaintenanceReportSubmission: () => void
@@ -34,20 +32,22 @@ interface MaintenanceFormProps {
     maintenanceReportFormData: MaintenanceReportType
     partPurchaseFormData: PartPurchaseEventType
     searchTerm: string
-    selectPart: (name: string, value: string) => void
+    handleSelectingPart: (name: string, value: string) => void
     serviceProviderEventFormData: ServiceProviderEventType
     setIsPartSelected: (value: boolean) => void
     setShowPartPurchaseEventForm: (value: boolean) => void
     setShowServiceProviderEventForm: (value: boolean) => void
     showPartPurchaseEventForm: boolean
     showServiceProviderEventForm: boolean
+    purchaseDate: Date
+    serviceDate: Date
+    handlePurchaseDateChange: (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => void
+    handleServiceDateChange: (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => void
 }
 
 
 const MaintenanceReportForm = ({
-                                   eventsDates,
                                    handleDateChange,
-                                   handleEventsDateChange,
                                    handleMaintenanceReportCancellation,
                                    handleMaintenanceReportFormChange,
                                    handleMaintenanceReportSubmission,
@@ -70,13 +70,17 @@ const MaintenanceReportForm = ({
                                    maintenanceReportFormData,
                                    partPurchaseFormData,
                                    searchTerm,
-                                   selectPart,
+                                   handleSelectingPart,
                                    serviceProviderEventFormData,
                                    setIsPartSelected,
                                    setShowPartPurchaseEventForm,
                                    setShowServiceProviderEventForm,
                                    showPartPurchaseEventForm,
                                    showServiceProviderEventForm,
+                                   purchaseDate,
+                                   serviceDate,
+                                   handlePurchaseDateChange,
+                                   handleServiceDateChange,
                                }: MaintenanceFormProps) => {
     const {generalData} = useGlobalContext();
 
@@ -97,7 +101,8 @@ const MaintenanceReportForm = ({
         <View>
             {
                 showPartPurchaseEventForm ? <PartPurchaseEventForm
-                        handleEventsDateChange={handleEventsDateChange}
+                        handlePurchaseDateChange={handlePurchaseDateChange}
+                        purchaseDate={purchaseDate}
                         handlePartInputChange={handlePartInputChange}
                         handlePartPurchaseEventAddition={handlePartPurchaseEventAddition}
                         handlePartPurchaseEventCancellation={handlePartPurchaseEventCancellation}
@@ -106,13 +111,11 @@ const MaintenanceReportForm = ({
                         isPartPurchaseEventFormDataEdition={isPartPurchaseEventFormDataEdition}
                         isPartSelected={isPartSelected}
                         partPurchaseFormData={partPurchaseFormData}
-                        purchaseDate={eventsDates.purchase_date}
                         searchTerm={searchTerm}
-                        selectPart={selectPart}
+                        selectPart={handleSelectingPart}
                         setIsPartSelected={setIsPartSelected}
                     />
                     : showServiceProviderEventForm ? <ServiceProviderEventForm
-                            handleEventsDateChange={handleEventsDateChange}
                             handleServiceProviderEventAddition={handleServiceProviderEventAddition}
                             handleServiceProviderEventCancellation={handleServiceProviderEventCancellation}
                             handleServiceProviderEventFormChange={handleServiceProviderEventFormChange}
@@ -120,7 +123,8 @@ const MaintenanceReportForm = ({
                             isServiceProviderEventFormDataEdition={isServiceProviderEventFormDataEdition}
                             serviceProviderEventFormData={serviceProviderEventFormData}
                             serviceProviders={generalData.service_providers}
-                            service_date={eventsDates.service_date}
+                            service_date={serviceDate}
+                            handleServiceDateChange={handleServiceDateChange}
                         /> :
                         <MaintenanceForm
                             handleDateChange={handleDateChange}

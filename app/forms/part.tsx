@@ -162,7 +162,7 @@ const Part = () => {
                                     />
                                     {
                                         part.name ? <Pressable onPress={() => handleEditPart(part)}
-                                                               onLongPress={() => handlePartLongPress(part)}>
+                                                               onLongPress={() => handlePartLongPress(part)} className={"z-10"}>
                                             <View
                                                 className={`flex-row p-[16px] bg-white rounded shadow mt-3 ${showDeleteFeatures ? "shadow-error" : ""}`}>
                                                 <View className={"flex-1"}>
@@ -178,12 +178,12 @@ const Part = () => {
                                 <View className={"w-full pt-5"}>
                                     <ThemedButton title={"Add part"}
                                                   handlePress={handlePartCreation}
-                                                  containerStyles={"bg-primary p-5 rounded"}
+                                                  containerStyles={"bg-primary-500 p-5 rounded"}
                                                   textStyles={"font-semibold text-base text-white"}
                                     />
                                     {showDeleteFeatures && <ThemedButton title={"Delete Part"}
                                                                          handlePress={handlePartDeletion}
-                                                                         containerStyles={"bg-error p-5 rounded mt-3"}
+                                                                         containerStyles={"bg-error-500 p-5 rounded mt-3"}
                                                                          textStyles={"font-semibold text-base text-white"}
                                     />
                                     }

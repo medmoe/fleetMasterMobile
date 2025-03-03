@@ -46,7 +46,7 @@ const ServiceProviderForm = ({
         />
             <ThemedButton title={"Submit"}
                           handlePress={handleServiceProviderSubmission}
-                          containerStyles="bg-primary p-5 rounded mt-[10px]"
+                          containerStyles="bg-primary-500 p-5 rounded mt-[10px]"
                           textStyles={"text-white font-semibold text-base"}
             />
             <ThemedButton title={"Cancel"}

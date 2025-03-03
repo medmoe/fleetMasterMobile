@@ -15,6 +15,8 @@ interface MaintenanceReportCardProps {
     handleMaintenanceReportEdition: (id?: string) => void
     handleServiceProviderEventEdition: (service_provider_event_id?: string, maintenance_report_id?: string) => void
     handleServiceProviderEventDeletion: (service_provider_event_id?: string, maintenance_report_id?: string) => void
+    handlePartPurchaseEventDeletion: (part_purchase_event_id?: string, maintenance_report_id?: string) => void
+    handlePartPurchaseEventEdition: (part_purchase_event_id?: string, maintenance_report_id?: string) => void
 }
 
 const MaintenanceReportCard = ({
@@ -25,6 +27,8 @@ const MaintenanceReportCard = ({
                                    expanded,
                                    handleServiceProviderEventEdition,
                                    handleServiceProviderEventDeletion,
+                                   handlePartPurchaseEventDeletion,
+                                   handlePartPurchaseEventEdition,
                                }: MaintenanceReportCardProps) => {
     const {
         id,
@@ -80,10 +84,8 @@ const MaintenanceReportCard = ({
                                                                provider_phone={partPurchaseEvent.provider_details?.phone_number || "N/A"}
                                                                purchase_date={partPurchaseEvent.purchase_date}
                                                                cost={partPurchaseEvent.cost}
-                                                               handlePartPurchaseEventEdition={() => {
-                                                               }}
-                                                               handlePartPurchaseEventDeletion={() => {
-                                                               }}
+                                                               handlePartPurchaseEventEdition={() => handlePartPurchaseEventEdition(partPurchaseEvent.id, id)}
+                                                               handlePartPurchaseEventDeletion={() => handlePartPurchaseEventDeletion(partPurchaseEvent.id, id)}
                                         />
                                     )
                                 })}

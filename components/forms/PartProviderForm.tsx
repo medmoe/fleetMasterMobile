@@ -46,7 +46,7 @@ const PartProviderFrom = (
                     />
                 </View>
                 <ThemedButton title={"Submit"} handlePress={handlePartProviderSubmission}
-                              containerStyles={"w-full bg-primary p-5 rounded mt-3"}
+                              containerStyles={"w-full bg-primary-500 p-5 rounded mt-3"}
                               textStyles={"text-white font-semibold text-base"}/>
                 <ThemedButton title={"Cancel"} handlePress={handlePartProviderCancellation}
                               containerStyles={"w-full bg-default p-5 rounded mt-3"}

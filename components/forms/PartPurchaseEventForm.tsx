@@ -11,7 +11,6 @@ import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 import {PartPurchaseEventType} from "@/types/maintenance";
 
 interface PartPurchaseFormProps {
-    handleEventsDateChange: (name: string) => (_: DateTimePickerEvent, date?: Date) => void
     handlePartInputChange: (name: string, value: string) => void
     handlePartPurchaseEventAddition: (index: number | undefined) => void
     handlePartPurchaseEventCancellation: () => void
@@ -24,10 +23,10 @@ interface PartPurchaseFormProps {
     searchTerm: string
     selectPart: (name: string, value: string) => void
     setIsPartSelected: (value: boolean) => void
+    handlePurchaseDateChange: (name: string) => (_: DateTimePickerEvent, date: Date | undefined) => void
 }
 
 const PartPurchaseEventForm = ({
-                                   handleEventsDateChange,
                                    handlePartInputChange,
                                    handlePartPurchaseEventAddition,
                                    handlePartPurchaseEventCancellation,
@@ -40,6 +39,7 @@ const PartPurchaseEventForm = ({
                                    searchTerm,
                                    selectPart,
                                    setIsPartSelected,
+                                   handlePurchaseDateChange,
                                }: PartPurchaseFormProps) => {
     const {generalData} = useGlobalContext();
     const {id, name, address, phone_number} = partPurchaseFormData.provider
@@ -69,7 +69,7 @@ const PartPurchaseEventForm = ({
 
             <View className={"mt-3"}>
                 <CustomDatePicker date={purchaseDate}
-                                  handleChange={handleEventsDateChange}
+                                  handleChange={handlePurchaseDateChange}
                                   label={"Purchase Date"}
                                   name={"purchase_date"}
                 />

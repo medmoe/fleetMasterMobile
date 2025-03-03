@@ -155,7 +155,7 @@ const ServiceProvider = () => {
                                 <View className={"w-full pt-5"}>
                                     <ThemedButton title={"Create Service Provider"}
                                                   handlePress={handleServiceProviderCreation}
-                                                  containerStyles={"bg-primary p-5 rounded"}
+                                                  containerStyles={"bg-primary-500 p-5 rounded"}
                                                   textStyles={"font-semibold text-base text-white"}
                                     />
                                     {showDeleteFeatures && <ThemedButton title={"Delete Service Provider"}
