@@ -17,10 +17,8 @@ interface MaintenanceReportProps {
 }
 
 const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
-    const {vehicle, setMaintenanceReports, maintenanceReports} = useGlobalContext();
+    const {vehicle} = useGlobalContext();
     const {
-        isVisible,
-        errorMessage,
         searchingFilterLabels,
         maintenanceReport,
         isMaintenanceReportPutRequest,
@@ -29,6 +27,11 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
         showMaintenanceForm,
         isLoading,
         maintenanceReportFormData,
+        maintenanceReports,
+        selectedReports,
+        errorState,
+        setSelectedReports,
+        setMaintenanceReports,
         handleFilterRangeChange,
         setMaintenanceReportFormData,
         handleStartingRecordingMaintenance,
@@ -39,8 +42,8 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
         handleMaintenanceReportSubmission,
         handleMaintenanceReportCancellation,
         handleShowingMaintenanceReports,
-        fetchMaintenanceReport,
-    } = useMaintenanceReport(vehicle, maintenanceReports, setMaintenanceReports);
+        fetchMaintenanceReportOverview,
+    } = useMaintenanceReport(vehicle);
     const {
         showPartPurchaseEventForm,
         isPartPurchaseEventFormDataEdition,
@@ -53,14 +56,14 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
         handleNewPartsProviderAddition,
         handleSelectingPart,
         handlePartPurchaseEventAddition,
-        handlePartPurchaseEventDeletion,
-        handlePartPurchaseEventFormChange,
         handlePartInputChange,
         handlePurchaseDateChange,
-        handlePartPurchaseEventEdition,
         setShowPartPurchaseEventForm,
         setIsPartSelected,
-    } = usePartPurchaseEvent(maintenanceReportFormData, setMaintenanceReportFormData);
+        handlePartPurchaseEventEditionWithReport,
+        handlePartPurchaseEventDeletionWithReport,
+        handlePartPurchaseEventFormChangeWithReport,
+    } = usePartPurchaseEvent(maintenanceReportFormData, setMaintenanceReportFormData, maintenanceReports, setMaintenanceReports, selectedReports, setSelectedReports);
     const {
         showServiceProviderEventForm,
         isServiceProviderEventFormDataEdition,
@@ -69,12 +72,12 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
         serviceDate,
         handleNewServiceProviderAddition,
         handleServiceProviderEventAddition,
-        handleServiceProviderEventDeletion,
-        handleServiceProviderEventEdition,
         handleServiceProviderEventFormChange,
         handleServiceDateChange,
         setShowServiceProviderEventForm,
-    } = useServiceProviderEvent(maintenanceReportFormData, setMaintenanceReportFormData);
+        handleServiceProviderEventDeletionWithReport,
+        handleServiceProviderEventEditionWithReport
+    } = useServiceProviderEvent(maintenanceReportFormData, setMaintenanceReportFormData, maintenanceReports, setMaintenanceReports, selectedReports, setSelectedReports);
     const pairStatData = transformMaintenanceStatData(getMaintenanceStatData(maintenanceReport));
 
     const buttons = [
@@ -85,7 +88,7 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
         {title: "Cancel", handlePress: handleCancelingRecordingMaintenance, color: "bg-default"},
     ]
     useEffect(() => {
-        fetchMaintenanceReport();
+        fetchMaintenanceReportOverview();
     }, []);
     return (
         <SafeAreaView>
@@ -159,7 +162,10 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
                                     )
                                 })}
                             </View>
-                            <ErrorNotificationBar isVisible={isVisible} errorMessage={errorMessage} onDismiss={handleErrorNotificationDismissal}/>
+                            <ErrorNotificationBar isVisible={errorState.isErrorModalVisible}
+                                                  errorMessage={errorState.errorMessage}
+                                                  onDismiss={handleErrorNotificationDismissal}
+                            />
                         </View>
                         :
                         <View>
@@ -174,12 +180,12 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
                                 handleMaintenanceReportSubmission={handleMaintenanceReportSubmission}
                                 handlePartInputChange={handlePartInputChange}
                                 handlePartPurchaseEventAddition={handlePartPurchaseEventAddition}
-                                handlePartPurchaseEventDeletion={handlePartPurchaseEventDeletion}
-                                handlePartPurchaseEventEdition={handlePartPurchaseEventEdition}
-                                handlePartPurchaseEventFormChange={handlePartPurchaseEventFormChange}
+                                handlePartPurchaseEventDeletion={handlePartPurchaseEventDeletionWithReport}
+                                handlePartPurchaseEventEdition={handlePartPurchaseEventEditionWithReport}
+                                handlePartPurchaseEventFormChange={handlePartPurchaseEventFormChangeWithReport}
                                 handleServiceProviderEventAddition={handleServiceProviderEventAddition}
-                                handleServiceProviderEventDeletion={handleServiceProviderEventDeletion}
-                                handleServiceProviderEventEdition={handleServiceProviderEventEdition}
+                                handleServiceProviderEventDeletion={handleServiceProviderEventDeletionWithReport}
+                                handleServiceProviderEventEdition={handleServiceProviderEventEditionWithReport}
                                 handleServiceProviderEventFormChange={handleServiceProviderEventFormChange}
                                 indexOfPartPurchaseEventToEdit={indexOfPartPurchaseEventToEdit}
                                 indexOfServiceProviderEventToEdit={indexOfServiceProviderEventToEdit}
@@ -199,7 +205,10 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
                                 showPartPurchaseEventForm={showPartPurchaseEventForm}
                                 showServiceProviderEventForm={showServiceProviderEventForm}
                             />
-                            <ErrorNotificationBar isVisible={isVisible} errorMessage={errorMessage} onDismiss={handleErrorNotificationDismissal}/>
+                            <ErrorNotificationBar isVisible={errorState.isErrorModalVisible}
+                                                  errorMessage={errorState.errorMessage}
+                                                  onDismiss={handleErrorNotificationDismissal}
+                            />
                         </View>
                 }
             </ScrollView>

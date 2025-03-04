@@ -1,13 +1,24 @@
 import React, {useState} from "react";
-import {MaintenanceReportType, PartProviderType, PartPurchaseEventType} from "@/types/maintenance";
+import {MaintenanceReportType, MaintenanceReportWithStringsType, PartProviderType, PartPurchaseEventType} from "@/types/maintenance";
 import {partPurchaseEventFormInitialState} from "@/hooks/initialStates";
 import {Alert} from "react-native";
 import {router} from "expo-router";
-import {getLocalDateString} from "@/utils/helpers";
+import {getLocalDateString, isPositiveInteger} from "@/utils/helpers";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
+import {API} from "@/constants/endpoints";
+import axios from "axios";
 
 
-export const usePartPurchaseEvent = (maintenanceReportFormData: MaintenanceReportType, setMaintenanceReportFormData: React.Dispatch<React.SetStateAction<MaintenanceReportType>>) => {
+export const usePartPurchaseEvent = (
+    maintenanceReportFormData: MaintenanceReportType,
+    setMaintenanceReportFormData: React.Dispatch<React.SetStateAction<MaintenanceReportType>>,
+    maintenanceReports: MaintenanceReportWithStringsType[],
+    setMaintenanceReports: React.Dispatch<React.SetStateAction<MaintenanceReportWithStringsType[]>>,
+    selectedReports: [MaintenanceReportWithStringsType, boolean][],
+    setSelectedReports: React.Dispatch<React.SetStateAction<[MaintenanceReportWithStringsType, boolean][]>>,
+    setErrorState: React.Dispatch<React.SetStateAction<{ isErrorModalVisible: boolean, errorMessage: string }>>,
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+) => {
     const [partPurchaseEventFormData, setPartPurchaseEventFormData] = useState<PartPurchaseEventType>(partPurchaseEventFormInitialState);
     const [searchTerm, setSearchTerm] = useState("")
     const [isPartSelected, setIsPartSelected] = useState(false)
@@ -17,7 +28,7 @@ export const usePartPurchaseEvent = (maintenanceReportFormData: MaintenanceRepor
     const [purchaseDate, setPurchaseDate] = useState(new Date())
 
     // Part purchase event handlers
-    const handlePartPurchaseEventFormChange = (name: string, value: string) => {
+    const handlePartPurchaseEventFormChangeWithReport = (name: string, value: string) => {
         setPartPurchaseEventFormData((prevState) => {
             if (name === "provider") {
                 const keyValuePairs = value.split(",")
@@ -48,9 +59,8 @@ export const usePartPurchaseEvent = (maintenanceReportFormData: MaintenanceRepor
             }
         }))
         setIsPartSelected(true);
-        console.log(searchTerm);
     }
-    const handlePartInputChange = (name: string, value: string) => {
+    const handlePartInputChange = (_: string, value: string) => {
         setSearchTerm(value);
     }
     const handleValidatingPartPurchaseEventFormData = (formattedPartPurchaseEventFormData: PartPurchaseEventType) => {
@@ -65,6 +75,10 @@ export const usePartPurchaseEvent = (maintenanceReportFormData: MaintenanceRepor
         }
         if (!purchase_date) {
             Alert.alert("Error", "You must select a purchase date!");
+            return false
+        }
+        if (!isPositiveInteger(cost)) {
+            Alert.alert("Error", "You must enter a valid cost !")
             return false
         }
         return true;
@@ -94,13 +108,30 @@ export const usePartPurchaseEvent = (maintenanceReportFormData: MaintenanceRepor
         setPartPurchaseEventFormData(partPurchaseEventFormInitialState);
         setSearchTerm("");
     }
-    const handlePartPurchaseEventEdition = (index: number) => {
+    const handlePartPurchaseEventEditionWithReport = (index: number) => {
         setPartPurchaseEventFormData(maintenanceReportFormData.part_purchase_events[index])
         setShowPartPurchaseEventForm(true);
         setIsPartPurchaseEventFormDataEdition(true);
         setIndexOfPartPurchaseEventToEdit(index);
     }
-    const handlePartPurchaseEventDeletion = (index: number) => {
+    const handlePartPurchaseEventEdition = (part_purchase_event_id?: string, maintenance_report_id?: string) => {
+        setShowPartPurchaseEventForm(true)
+        const report = selectedReports.find(([report]) => report.id === maintenance_report_id)
+        if (report) {
+            const [reportToEdit, _] = report
+            const partPurchaseEventToEdit = reportToEdit.part_purchase_events.find(event => event.id === part_purchase_event_id)
+            if (partPurchaseEventToEdit) {
+                setPartPurchaseEventFormData({
+                    id: partPurchaseEventToEdit.id,
+                    part: partPurchaseEventToEdit.part_details || {id: "", name: "", description: ""},
+                    provider: partPurchaseEventToEdit.provider_details || {id: "", name: "", phone_number: "", address: ""},
+                    purchase_date: partPurchaseEventToEdit.purchase_date,
+                    cost: partPurchaseEventToEdit.cost,
+                })
+            }
+        }
+    }
+    const handlePartPurchaseEventDeletionWithReport = (index: number) => {
         setMaintenanceReportFormData(prevState => ({
             ...prevState,
             part_purchase_events: [
@@ -109,13 +140,147 @@ export const usePartPurchaseEvent = (maintenanceReportFormData: MaintenanceRepor
             ]
         }))
     }
+    const handlePartPurchaseEventDeletion = (part_purchase_event_id?: string, maintenance_report_id?: string) => {
+        const proceedWithPartPurchaseEventDeletion = async () => {
+            setIsLoading(true);
+            try {
+                const url = `${API}maintenance/part-purchase-events/${part_purchase_event_id}/`
+                const options = {headers: {"Content-Type": "application/json"}, withCredentials: true}
+                await axios.delete(url, options)
+                setSelectedReports(selectedReports.map(([report, expanded]) => {
+                    if (report.id === maintenance_report_id) {
+                        report.part_purchase_events = report.part_purchase_events.filter(event => event.id !== part_purchase_event_id);
+                    }
+                    return [report, expanded];
+                }))
+                setMaintenanceReports(maintenanceReports.map((report) => {
+                    if (report.id === maintenance_report_id) {
+                        report.part_purchase_events = report.part_purchase_events.filter(event => event.id !== part_purchase_event_id);
+                    }
+                    return report;
+                }))
+            } catch (error: any) {
+                if (error.response.status === 401) {
+                    router.replace("/");
+                } else {
+                    setErrorState({
+                        isErrorModalVisible: true,
+                        errorMessage: error.response.data.error ? error.response.data.error : "Error deleting part purchase event !"
+                    })
+                    console.error("Error deleting part purchase event:", error);
+                }
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        Alert.alert("Delete part purchase event", "Are you sure you want to delete this part purchase event? This action cannot be undone.", [
+            {
+                text: "Cancel",
+                onPress: () => {
+                },
+                style: "cancel"
+            },
+            {
+                text: "Delete",
+                onPress: () => proceedWithPartPurchaseEventDeletion(),
+                style: "destructive"
+            }
+        ], {cancelable: true})
+    }
+
+    const formatPartPurchaseEventFormData = () => {
+        return {
+            part: partPurchaseEventFormData.part.id,
+            provider: partPurchaseEventFormData.provider.id,
+            purchase_date: getLocalDateString(purchaseDate),
+            cost: partPurchaseEventFormData.cost,
+        }
+    }
+    const validatePartPurchaseEventFormData = () => {
+        if (!isPositiveInteger(partPurchaseEventFormData.cost)) {
+            Alert.alert("Invalid cost", "Cost must be a positive integer")
+            return false;
+        }
+        if (!partPurchaseEventFormData.part.id) {
+            Alert.alert("Invalid part", "Part must be selected")
+            return false;
+        }
+        return true
+    }
+    const handlePartPurchaseEventUpdateSubmission = async () => {
+        if (!validatePartPurchaseEventFormData()) {
+            return;
+        }
+        setIsLoading(true);
+        try {
+
+            const url = `${API}maintenance/part-purchase-events/${partPurchaseEventFormData.id}/`
+            const options = {headers: {"Content-Type": "application/json"}, withCredentials: true}
+            const response = await axios.put(url, formatPartPurchaseEventFormData(), options)
+            setMaintenanceReports(maintenanceReports.map((report) => {
+                if (report.id === response.data.maintenance_report) {
+                    return {
+                        ...report,
+                        part_purchase_events: report.part_purchase_events.map(event => {
+                            if (event.id === response.data.id) {
+                                return response.data
+                            }
+                            return event
+                        })
+                    }
+                } else {
+                    return report;
+                }
+            }))
+            setSelectedReports(selectedReports.map(([report, expanded]) => {
+                if (report.id === response.data.maintenance_report) {
+                    return [
+                        {
+                            ...report,
+                            part_purchase_events: report.part_purchase_events.map(event => {
+                                if (event.id === response.data.id) {
+                                    return response.data
+                                }
+                                return event
+                            })
+                        }, expanded
+                    ]
+                }
+                return [report, expanded];
+            }))
+            setShowPartPurchaseEventForm(false);
+        } catch (error: any) {
+            if (error.response.status === 401) {
+                router.replace("/");
+            } else {
+                setErrorState({
+                    isErrorModalVisible: true,
+                    errorMessage: "Error updating part purchase event !"
+                })
+                console.error("Error updating part purchase event:", error);
+            }
+        } finally {
+            setIsLoading(false);
+        }
+
+    }
+
     const handleNewPartAddition = () => {
         router.replace('/forms/part');
     }
     const handleNewPartsProviderAddition = () => {
         router.replace('/forms/part-provider')
     }
-    const handlePurchaseDateChange = (name: string) => (_: DateTimePickerEvent, date?: Date) => {
+    const handlePartPurchaseEventEditionCancellation = () => {
+        setShowPartPurchaseEventForm(false);
+    }
+    const handlePartPurchaseEventFormChange = (name: string, value: string) => {
+        setPartPurchaseEventFormData(prevState => ({
+            ...prevState,
+            [name]: value
+        }))
+    }
+    const handlePurchaseDateChange = (_: string) => (_: DateTimePickerEvent, date?: Date) => {
         setPurchaseDate(date || new Date())
         setPartPurchaseEventFormData(prevState => ({
             ...prevState,
@@ -124,25 +289,30 @@ export const usePartPurchaseEvent = (maintenanceReportFormData: MaintenanceRepor
     }
     return {
         // states
+        indexOfPartPurchaseEventToEdit,
         isPartPurchaseEventFormDataEdition,
         isPartSelected,
-        showPartPurchaseEventForm,
         partPurchaseEventFormData,
-        indexOfPartPurchaseEventToEdit,
         purchaseDate,
         searchTerm,
+        showPartPurchaseEventForm,
 
         // handlers
-        setIsPartSelected,
-        setShowPartPurchaseEventForm,
         handleNewPartAddition,
         handleNewPartsProviderAddition,
         handlePartInputChange,
         handlePartPurchaseEventAddition,
         handlePartPurchaseEventDeletion,
+        handlePartPurchaseEventDeletionWithReport,
         handlePartPurchaseEventEdition,
+        handlePartPurchaseEventEditionCancellation,
+        handlePartPurchaseEventEditionWithReport,
         handlePartPurchaseEventFormChange,
-        handleSelectingPart,
+        handlePartPurchaseEventFormChangeWithReport,
+        handlePartPurchaseEventUpdateSubmission,
         handlePurchaseDateChange,
+        handleSelectingPart,
+        setIsPartSelected,
+        setShowPartPurchaseEventForm,
     }
 }
