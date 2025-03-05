@@ -9,6 +9,7 @@ import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 import {Alert} from "react-native";
 import {getLocalDateString, isPositiveInteger} from "@/utils/helpers";
 import {DateData} from "react-native-calendars";
+import {MaintenanceReportProps} from "@/app/maintenance/maintenance-report";
 
 // View state reducer
 type ViewState = {
@@ -24,6 +25,14 @@ type ViewAction =
     | { type: 'SHOW_SERVICE_PROVIDER_FORM' }
     | { type: 'SHOW_PART_PURCHASE_FORM' }
     | { type: 'RESET' };
+
+export type SetViewType = {
+    showSelectedReports: () => void;
+    showMaintenanceReport: () => void;
+    showServiceProviderEventForm: () => void;
+    showPartPurchaseEventForm: () => void;
+    reset: () => void;
+};
 
 const viewReducer = (state: ViewState, action: ViewAction): ViewState => {
     const resetState = {
@@ -49,14 +58,13 @@ const viewReducer = (state: ViewState, action: ViewAction): ViewState => {
     }
 };
 
-export const useMaintenanceReport = (vehicle: VehicleType) => {
+export const useMaintenanceReport = (vehicle: VehicleType, props?: MaintenanceReportProps) => {
     // Data state
-    const [maintenanceReportFormData, setMaintenanceReportFormData] = useState<MaintenanceReportType>(getMaintenanceReportFormInitialState(vehicle))
-    const [maintenanceReportDates, setMaintenanceReportDates] = useState(getMaintenanceReportDatesInitialState())
-    const [showMaintenanceForm, setShowMaintenanceForm] = useState(false)
+    const [maintenanceReportDates, setMaintenanceReportDates] = useState(getMaintenanceReportDatesInitialState(props?.maintenanceReportFormData))
+    const [showMaintenanceForm, setShowMaintenanceForm] = useState(props?.showMaintenanceForm || false)
     const [maintenanceReport, setMaintenanceReport] = useState(maintenanceReportInitialState)
     const [activeFilter, setActiveFilter] = useState(0)
-    const [isMaintenanceReportPutRequest, setIsMaintenanceReportPutRequest] = useState(false)
+    const [isMaintenanceReportPutRequest, setIsMaintenanceReportPutRequest] = useState(props?.isMaintenanceReportPutRequest || false)
     // Calendar state
     const [month, setMonth] = useState((new Date().getMonth() + 1).toString());
     const [year, setYear] = useState(new Date().getFullYear().toString());
@@ -66,6 +74,7 @@ export const useMaintenanceReport = (vehicle: VehicleType) => {
     const [maintenanceReports, setMaintenanceReports] = useState<MaintenanceReportWithStringsType[]>([]);
     const [selectedReports, setSelectedReports] = useState<[MaintenanceReportWithStringsType, boolean][]>([]);
     const [maintenanceReportToEdit, setMaintenanceReportToEdit] = useState<MaintenanceReportWithStringsType | undefined>();
+    const [maintenanceReportFormData, setMaintenanceReportFormData] = useState<MaintenanceReportType>(getMaintenanceReportFormInitialState(vehicle, props?.maintenanceReportFormData))
 
     // UI state
     const [isLoading, setIsLoading] = useState(false);
@@ -82,7 +91,7 @@ export const useMaintenanceReport = (vehicle: VehicleType) => {
         showPartPurchaseEventForm: false,
     });
 
-    const setView = {
+    const setView: SetViewType = {
         showSelectedReports: () => dispatch({type: 'SHOW_SELECTED_REPORTS'}),
         showMaintenanceReport: () => dispatch({type: 'SHOW_MAINTENANCE_REPORT'}),
         showServiceProviderEventForm: () => dispatch({type: 'SHOW_SERVICE_PROVIDER_FORM'}),
@@ -214,7 +223,7 @@ export const useMaintenanceReport = (vehicle: VehicleType) => {
             }
             const url = isMaintenanceReportPutRequest ? `${API}maintenance/reports/${maintenanceReportFormData.id}/` : `${API}maintenance/reports/`
             const options = {headers: {"Content-Type": "application/json"}, withCredentials: true}
-            const response = await axios.post(url, formattedMaintenanceReportFormData, options)
+            const response = !isMaintenanceReportPutRequest ? await axios.post(url, formattedMaintenanceReportFormData, options) : await axios.put(url, formattedMaintenanceReportFormData, options)
             setShowMaintenanceForm(false)
             if (!isMaintenanceReportPutRequest) {
                 setMaintenanceReports([...maintenanceReports, response.data])
@@ -241,7 +250,7 @@ export const useMaintenanceReport = (vehicle: VehicleType) => {
         router.replace('/details/maintenance-reports-details');
     }
     const handleErrorNotificationDismissal = () => {
-
+        setErrorState({isErrorModalVisible: false, errorMessage: ""});
     }
     // Data fetching
     const fetchMaintenanceReports = useCallback(async () => {
@@ -261,7 +270,7 @@ export const useMaintenanceReport = (vehicle: VehicleType) => {
         } finally {
             setDisplayLoadingIndicator(false);
         }
-    }, [year, month]);
+    }, [year, month, vehicle.id]);
 
     // Calendar handlers
     const onMonthChange = (monthData: DateData) => {
@@ -326,12 +335,12 @@ export const useMaintenanceReport = (vehicle: VehicleType) => {
 
     const handleMaintenanceReportEdition = (id?: string) => {
         setView.showMaintenanceReport();
+        setIsMaintenanceReportPutRequest(true);
         const reportToEdit = selectedReports.find(([report]) => report.id === id);
         if (reportToEdit) {
             setMaintenanceReportToEdit(reportToEdit[0]);
         }
     };
-
     const handleMaintenanceReportDeletion = (id?: string) => {
         Alert.alert(
             "Delete report",
@@ -385,12 +394,15 @@ export const useMaintenanceReport = (vehicle: VehicleType) => {
         maintenanceReportFormData,
         maintenanceReportToEdit,
         maintenanceReports,
+        month,
+        year,
         searchingFilterLabels,
         selectedReports,
         showMaintenanceForm,
         view,
 
         //methods
+        setView,
         fetchMaintenanceReportOverview,
         fetchMaintenanceReports,
         handleCancelingRecordingMaintenance,

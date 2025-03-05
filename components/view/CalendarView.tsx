@@ -23,7 +23,7 @@ const CalendarView = ({
                                  onCancel
                              }: CalendarViewProps) => {
     return (
-        <View className={"w-full justify-center items-center h-full px-4"}>
+        <View className={"w-full justify-center items-center px-4"}>
             <View className={"w-[94%] bg-white rounded p-3"}>
                 {isLoading && <ActivityIndicator size={"large"} color={"#3f51b5"}/>}
                 <ReportsCalendar maintenanceReports={maintenanceReports}

@@ -7,6 +7,7 @@ import {getLocalDateString, isPositiveInteger} from "@/utils/helpers";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
 import {API} from "@/constants/endpoints";
 import axios from "axios";
+import {SetViewType} from "@/hooks/useMaintenanceReport";
 
 
 export const usePartPurchaseEvent = (
@@ -17,18 +18,19 @@ export const usePartPurchaseEvent = (
     selectedReports: [MaintenanceReportWithStringsType, boolean][],
     setSelectedReports: React.Dispatch<React.SetStateAction<[MaintenanceReportWithStringsType, boolean][]>>,
     setErrorState: React.Dispatch<React.SetStateAction<{ isErrorModalVisible: boolean, errorMessage: string }>>,
-    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
+    setView: SetViewType,
 ) => {
     const [partPurchaseEventFormData, setPartPurchaseEventFormData] = useState<PartPurchaseEventType>(partPurchaseEventFormInitialState);
     const [searchTerm, setSearchTerm] = useState("")
     const [isPartSelected, setIsPartSelected] = useState(false)
-    const [showPartPurchaseEventForm, setShowPartPurchaseEventForm] = useState(false);
     const [isPartPurchaseEventFormDataEdition, setIsPartPurchaseEventFormDataEdition] = useState(false);
     const [indexOfPartPurchaseEventToEdit, setIndexOfPartPurchaseEventToEdit] = useState<number | undefined>();
     const [purchaseDate, setPurchaseDate] = useState(new Date())
+    const [showPartPurchaseEventForm, setShowPartPurchaseEventForm] = useState(false);
 
     // Part purchase event handlers
-    const handlePartPurchaseEventFormChangeWithReport = (name: string, value: string) => {
+    const handlePartPurchaseEventFormChange = (name: string, value: string) => {
         setPartPurchaseEventFormData((prevState) => {
             if (name === "provider") {
                 const keyValuePairs = value.split(",")
@@ -115,7 +117,7 @@ export const usePartPurchaseEvent = (
         setIndexOfPartPurchaseEventToEdit(index);
     }
     const handlePartPurchaseEventEdition = (part_purchase_event_id?: string, maintenance_report_id?: string) => {
-        setShowPartPurchaseEventForm(true)
+        setView.showPartPurchaseEventForm()
         const report = selectedReports.find(([report]) => report.id === maintenance_report_id)
         if (report) {
             const [reportToEdit, _] = report
@@ -248,7 +250,7 @@ export const usePartPurchaseEvent = (
                 }
                 return [report, expanded];
             }))
-            setShowPartPurchaseEventForm(false);
+            setView.reset()
         } catch (error: any) {
             if (error.response.status === 401) {
                 router.replace("/");
@@ -273,12 +275,7 @@ export const usePartPurchaseEvent = (
     }
     const handlePartPurchaseEventEditionCancellation = () => {
         setShowPartPurchaseEventForm(false);
-    }
-    const handlePartPurchaseEventFormChange = (name: string, value: string) => {
-        setPartPurchaseEventFormData(prevState => ({
-            ...prevState,
-            [name]: value
-        }))
+        setView.reset()
     }
     const handlePurchaseDateChange = (_: string) => (_: DateTimePickerEvent, date?: Date) => {
         setPurchaseDate(date || new Date())
@@ -308,7 +305,6 @@ export const usePartPurchaseEvent = (
         handlePartPurchaseEventEditionCancellation,
         handlePartPurchaseEventEditionWithReport,
         handlePartPurchaseEventFormChange,
-        handlePartPurchaseEventFormChangeWithReport,
         handlePartPurchaseEventUpdateSubmission,
         handlePurchaseDateChange,
         handleSelectingPart,

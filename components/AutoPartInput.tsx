@@ -44,7 +44,6 @@ const AutoPartInput = ({handlePartInputChange, parts, searchTerm, selectPart, is
         return suggestions;
     }
     useEffect(() => {
-        console.log(isPartSelected, "is part selected in useEffect");
         if (isPartSelected) {
             setShowSuggestions(false);
             setIsPartSelected(false);

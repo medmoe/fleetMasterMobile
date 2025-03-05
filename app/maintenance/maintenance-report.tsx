@@ -10,7 +10,7 @@ import {usePartPurchaseEvent} from "@/hooks/usePartPurchaseEvent";
 import {useServiceProviderEvent} from "@/hooks/useServiceProviderEvent";
 import {getMaintenanceStatData, transformMaintenanceStatData} from "@/utils/helpers";
 
-interface MaintenanceReportProps {
+export interface MaintenanceReportProps {
     maintenanceReportFormData?: MaintenanceReportWithStringsType;
     isMaintenanceReportPutRequest?: boolean
     showMaintenanceForm?: boolean
@@ -30,6 +30,9 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
         maintenanceReports,
         selectedReports,
         errorState,
+        setView,
+        setIsLoading,
+        setErrorState,
         setSelectedReports,
         setMaintenanceReports,
         handleFilterRangeChange,
@@ -43,7 +46,7 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
         handleMaintenanceReportCancellation,
         handleShowingMaintenanceReports,
         fetchMaintenanceReportOverview,
-    } = useMaintenanceReport(vehicle);
+    } = useMaintenanceReport(vehicle, props);
     const {
         showPartPurchaseEventForm,
         isPartPurchaseEventFormDataEdition,
@@ -62,8 +65,18 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
         setIsPartSelected,
         handlePartPurchaseEventEditionWithReport,
         handlePartPurchaseEventDeletionWithReport,
-        handlePartPurchaseEventFormChangeWithReport,
-    } = usePartPurchaseEvent(maintenanceReportFormData, setMaintenanceReportFormData, maintenanceReports, setMaintenanceReports, selectedReports, setSelectedReports);
+        handlePartPurchaseEventFormChange
+    } = usePartPurchaseEvent(
+        maintenanceReportFormData,
+        setMaintenanceReportFormData,
+        maintenanceReports,
+        setMaintenanceReports,
+        selectedReports,
+        setSelectedReports,
+        setErrorState,
+        setIsLoading,
+        setView
+    );
     const {
         showServiceProviderEventForm,
         isServiceProviderEventFormDataEdition,
@@ -77,7 +90,17 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
         setShowServiceProviderEventForm,
         handleServiceProviderEventDeletionWithReport,
         handleServiceProviderEventEditionWithReport
-    } = useServiceProviderEvent(maintenanceReportFormData, setMaintenanceReportFormData, maintenanceReports, setMaintenanceReports, selectedReports, setSelectedReports);
+    } = useServiceProviderEvent(
+        maintenanceReportFormData,
+        setMaintenanceReportFormData,
+        maintenanceReports,
+        setMaintenanceReports,
+        selectedReports,
+        setSelectedReports,
+        setErrorState,
+        setIsLoading,
+        setView
+    );
     const pairStatData = transformMaintenanceStatData(getMaintenanceStatData(maintenanceReport));
 
     const buttons = [
@@ -94,7 +117,7 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
         <SafeAreaView>
             <ScrollView>
                 {isLoading ?
-                    <View className={"w-full justify-center items-center h-full px-4"}><Spinner isVisible={isLoading}/></View> :
+                    <View className={"w-full justify-center items-center px-4"}><Spinner isVisible={isLoading}/></View> :
                     !showMaintenanceForm ?
                         <View className={"w-full justify-center items-center"}>
                             <View className={"w-[94%] bg-white rounded p-3"}>
@@ -162,10 +185,6 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
                                     )
                                 })}
                             </View>
-                            <ErrorNotificationBar isVisible={errorState.isErrorModalVisible}
-                                                  errorMessage={errorState.errorMessage}
-                                                  onDismiss={handleErrorNotificationDismissal}
-                            />
                         </View>
                         :
                         <View>
@@ -182,7 +201,7 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
                                 handlePartPurchaseEventAddition={handlePartPurchaseEventAddition}
                                 handlePartPurchaseEventDeletion={handlePartPurchaseEventDeletionWithReport}
                                 handlePartPurchaseEventEdition={handlePartPurchaseEventEditionWithReport}
-                                handlePartPurchaseEventFormChange={handlePartPurchaseEventFormChangeWithReport}
+                                handlePartPurchaseEventFormChange={handlePartPurchaseEventFormChange}
                                 handleServiceProviderEventAddition={handleServiceProviderEventAddition}
                                 handleServiceProviderEventDeletion={handleServiceProviderEventDeletionWithReport}
                                 handleServiceProviderEventEdition={handleServiceProviderEventEditionWithReport}
@@ -205,12 +224,12 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
                                 showPartPurchaseEventForm={showPartPurchaseEventForm}
                                 showServiceProviderEventForm={showServiceProviderEventForm}
                             />
-                            <ErrorNotificationBar isVisible={errorState.isErrorModalVisible}
-                                                  errorMessage={errorState.errorMessage}
-                                                  onDismiss={handleErrorNotificationDismissal}
-                            />
                         </View>
                 }
+                <ErrorNotificationBar isVisible={errorState.isErrorModalVisible}
+                                      errorMessage={errorState.errorMessage}
+                                      onDismiss={handleErrorNotificationDismissal}
+                />
             </ScrollView>
         </SafeAreaView>
     );

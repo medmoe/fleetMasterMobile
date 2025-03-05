@@ -3,10 +3,11 @@ import React, {useState} from "react";
 import {serviceProviderEventFormInitialState} from "@/hooks/initialStates";
 import {Alert} from "react-native";
 import {DateTimePickerEvent} from "@react-native-community/datetimepicker";
-import {getLocalDateString} from "@/utils/helpers";
+import {getLocalDateString, isPositiveInteger} from "@/utils/helpers";
 import {router} from "expo-router";
 import {API} from "@/constants/endpoints";
 import axios from "axios";
+import {SetViewType} from "@/hooks/useMaintenanceReport";
 
 
 export const useServiceProviderEvent = (
@@ -17,7 +18,8 @@ export const useServiceProviderEvent = (
     selectedReports: [MaintenanceReportWithStringsType, boolean][],
     setSelectedReports: React.Dispatch<React.SetStateAction<[MaintenanceReportWithStringsType, boolean][]>>,
     setErrorState: React.Dispatch<React.SetStateAction<{ isErrorModalVisible: boolean, errorMessage: string }>>,
-    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
+    setView: SetViewType
 ) => {
     const [serviceProviderEventFormData, setServiceProviderEventFormData] = useState<ServiceProviderEventType>(serviceProviderEventFormInitialState)
     const [showServiceProviderEventForm, setShowServiceProviderEventForm] = useState(false);
@@ -141,7 +143,7 @@ export const useServiceProviderEvent = (
         setIndexOfServiceProviderEventToEdit(index);
     }
     const handleServiceProviderEventEdition = (service_provider_event_id?: string, maintenance_report_id?: string) => {
-        setShowServiceProviderEventForm(true)
+        setView.showServiceProviderEventForm();
         const report = selectedReports.find(([report]) => report.id === maintenance_report_id)
         if (report) {
             const [reportToEdit] = report
@@ -161,6 +163,7 @@ export const useServiceProviderEvent = (
     }
     const handleServiceProviderEventEditionCancellation = () => {
         setShowServiceProviderEventForm(false);
+        setView.reset();
     }
     const handleServiceDateChange = (_: string) => (_: DateTimePickerEvent, date?: Date) => {
         setServiceDate(date || new Date())
@@ -172,6 +175,21 @@ export const useServiceProviderEvent = (
     const handleNewServiceProviderAddition = () => {
         router.replace('/forms/service-provider')
     }
+    const validateServiceProviderEventFormData = () => {
+        if (!isPositiveInteger(serviceProviderEventFormData.cost)) {
+            Alert.alert("Invalid cost", "Cost must be a positive integer")
+            return false;
+        }
+        if (!serviceProviderEventFormData.service_provider) {
+            Alert.alert("Invalid service provider", "Service provider must be selected")
+            return false;
+        }
+        if (!serviceDate) {
+            Alert.alert("Invalid service date", "Service date must be selected")
+            return false;
+        }
+        return true;
+    }
     const formatServiceProviderEventFormData = () => {
         return {
             ...serviceProviderEventFormData,
@@ -181,6 +199,9 @@ export const useServiceProviderEvent = (
     }
     const handleServiceProviderEventUpdateSubmission = async () => {
         setIsLoading(true);
+        if (!validateServiceProviderEventFormData()) {
+            return;
+        }
         try {
             const url = `${API}maintenance/service-provider-events/${serviceProviderEventFormData.id}/`
             const options = {headers: {"Content-Type": "application/json"}, withCredentials: true}
@@ -215,7 +236,7 @@ export const useServiceProviderEvent = (
                     return [report, expanded];
                 }
             }))
-            setShowServiceProviderEventForm(false);
+            setView.reset();
         } catch (error: any) {
             if (error.response.status === 401) {
                 router.replace("/");
