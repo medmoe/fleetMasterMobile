@@ -32,6 +32,7 @@ export interface MaintenanceReportType {
     part_purchase_events: PartPurchaseEventType[]
     service_provider_events: ServiceProviderEventType[]
     vehicle_details?: VehicleType
+    total_cost?: string
 }
 
 export interface PartPurchaseEventType {
@@ -61,20 +62,10 @@ export interface ServiceProviderEventType {
     service_provider_details?: ServiceProviderType
 }
 
-export type MaintenanceOverviewType = {
-    previous_report: MaintenanceSummaryType,
-    current_report: MaintenanceSummaryType,
+export type ReportSummaryType = { [key: string]: number }
+
+export type FilteredReportPeriodType = {
+    current: MaintenanceReportWithStringsType[]
+    previous: MaintenanceReportWithStringsType[]
 }
 
-export interface MaintenanceSummaryType {
-    total_maintenance?: string
-    total_maintenance_cost?: string
-    preventive?: string
-    preventive_cost?: string
-    curative?: string
-    curative_cost?: string
-    total_service_cost?: string
-    mechanic?: string
-    electrician?: string
-    cleaning?: string
-}

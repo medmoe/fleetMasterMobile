@@ -30,3 +30,5 @@ export {default as ThemedInputText} from "./ThemedInputText";
 export {default as Vehicle} from "./cards/VehicleCardComponent";
 export {default as ServiceProviderEventForm} from "./forms/ServiceProviderEventForm";
 export {default as PartPurchaseEventForm} from "./forms/PartPurchaseEventForm";
+export {default as CalendarView} from "./view/CalendarView";
+export {default as ReportsListView} from "./view/ReportsListView";

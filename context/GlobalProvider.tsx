@@ -23,7 +23,6 @@ interface ContextProps {
     setGeneralData: (generalData: GeneralDataType) => void
     maintenanceReports: MaintenanceReportWithStringsType[]
     setMaintenanceReports: (maintenanceReports: MaintenanceReportWithStringsType[]) => void
-
 }
 
 export const currentVehicleInitialState: VehicleType = {

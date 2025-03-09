@@ -1,6 +1,6 @@
 import {useCallback, useReducer, useState} from "react";
-import {MaintenanceReportType, MaintenanceReportWithStringsType} from "@/types/maintenance";
-import {getMaintenanceReportDatesInitialState, getMaintenanceReportFormInitialState, maintenanceReportInitialState} from "@/hooks/initialStates";
+import {FilteredReportPeriodType, MaintenanceReportType, MaintenanceReportWithStringsType} from "@/types/maintenance";
+import {getMaintenanceReportDatesInitialState, getMaintenanceReportFormInitialState} from "@/hooks/initialStates";
 import {VehicleType} from "@/types/types";
 import {API} from "@/constants/endpoints";
 import axios from "axios";
@@ -10,6 +10,7 @@ import {Alert} from "react-native";
 import {getLocalDateString, isPositiveInteger} from "@/utils/helpers";
 import {DateData} from "react-native-calendars";
 import {MaintenanceReportProps} from "@/app/maintenance/maintenance-report";
+import {filterReports, insertReport} from "@/utils/maintenance";
 
 // View state reducer
 type ViewState = {
@@ -58,31 +59,25 @@ const viewReducer = (state: ViewState, action: ViewAction): ViewState => {
     }
 };
 
-export const useMaintenanceReport = (vehicle: VehicleType, props?: MaintenanceReportProps) => {
-    // Data state
+export const useMaintenanceReport = (
+    vehicle: VehicleType,
+    maintenanceReports: MaintenanceReportWithStringsType[],
+    setMaintenanceReports: (maintenanceReports: MaintenanceReportWithStringsType[]) => void,
+    props?: MaintenanceReportProps) => {
     const [maintenanceReportDates, setMaintenanceReportDates] = useState(getMaintenanceReportDatesInitialState(props?.maintenanceReportFormData))
     const [showMaintenanceForm, setShowMaintenanceForm] = useState(props?.showMaintenanceForm || false)
-    const [maintenanceReport, setMaintenanceReport] = useState(maintenanceReportInitialState)
-    const [activeFilter, setActiveFilter] = useState(0)
+    const [activeFilter, setActiveFilter] = useState(4) // ["7D", "2W", "4W", "3M", "1Y"] initial range is 1 year
     const [isMaintenanceReportPutRequest, setIsMaintenanceReportPutRequest] = useState(props?.isMaintenanceReportPutRequest || false)
-    // Calendar state
-    const [month, setMonth] = useState((new Date().getMonth() + 1).toString());
-    const [year, setYear] = useState(new Date().getFullYear().toString());
-    const [currentDate, setCurrentDate] = useState(`${year}-${month}-01`);
-
-    // Data state
-    const [maintenanceReports, setMaintenanceReports] = useState<MaintenanceReportWithStringsType[]>([]);
+    const [monthlyReports, setMonthlyReports] = useState<MaintenanceReportWithStringsType[]>(maintenanceReports.filter(report => report.start_date.substring(0, 4) === new Date().getFullYear().toString()));
     const [selectedReports, setSelectedReports] = useState<[MaintenanceReportWithStringsType, boolean][]>([]);
     const [maintenanceReportToEdit, setMaintenanceReportToEdit] = useState<MaintenanceReportWithStringsType | undefined>();
     const [maintenanceReportFormData, setMaintenanceReportFormData] = useState<MaintenanceReportType>(getMaintenanceReportFormInitialState(vehicle, props?.maintenanceReportFormData))
-
-    // UI state
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingStatData, setIsLoadingStatData] = useState(true)
     const [displayLoadingIndicator, setDisplayLoadingIndicator] = useState(false);
-    const [errorState, setErrorState] = useState({
-        isErrorModalVisible: false,
-        errorMessage: "",
-    });
+    const [errorState, setErrorState] = useState({isErrorModalVisible: false, errorMessage: "",});
+    const [currentDate, setCurrentDate] = useState("");
+    const [periodicalReports, setPeriodicalReports] = useState<FilteredReportPeriodType>({current: [], previous: []})
     // View state managed with reducer
     const [view, dispatch] = useReducer(viewReducer, {
         showSelectedReports: false,
@@ -117,11 +112,11 @@ export const useMaintenanceReport = (vehicle: VehicleType, props?: MaintenanceRe
 
 
     // Data fetching
-    const fetchMaintenanceReportOverview = useCallback(async () => {
+    const fetchMaintenanceReports = useCallback(async () => {
         setIsLoading(true)
         try {
-            const response = await axios.get(`${API}maintenance/overview/`, {withCredentials: true});
-            setMaintenanceReport(response.data);
+            const response = await axios.get(`${API}maintenance/overview/?vehicle_id=${vehicle.id}`, {withCredentials: true});
+            setMaintenanceReports(response.data);
         } catch (error: any) {
             if (error.response.status === 401) {
                 router.replace("/");
@@ -135,6 +130,7 @@ export const useMaintenanceReport = (vehicle: VehicleType, props?: MaintenanceRe
     const handleFilterRangeChange = (label: string) => {
         const idx = searchingFilterLabels.indexOf(label);
         setActiveFilter(idx);
+        setPeriodicalReports(filterReports(maintenanceReports, label))
     }
 
     // Maintenance report handlers
@@ -226,16 +222,18 @@ export const useMaintenanceReport = (vehicle: VehicleType, props?: MaintenanceRe
             const response = !isMaintenanceReportPutRequest ? await axios.post(url, formattedMaintenanceReportFormData, options) : await axios.put(url, formattedMaintenanceReportFormData, options)
             setShowMaintenanceForm(false)
             if (!isMaintenanceReportPutRequest) {
-                setMaintenanceReports([...maintenanceReports, response.data])
+                setMaintenanceReports(insertReport(maintenanceReports, response.data))
+                router.replace("/maintenance/maintenance-report")
             } else {
                 setMaintenanceReports(maintenanceReports.map((report) => {
                     if (report.id === response.data.id) {
                         return response.data
                     }
-                    return report
+                    return report;
                 }))
                 router.replace('/details/maintenance-reports-details');
             }
+
         } catch (error: any) {
             if (error.response.status === 401) {
                 router.replace("/");
@@ -252,79 +250,22 @@ export const useMaintenanceReport = (vehicle: VehicleType, props?: MaintenanceRe
     const handleErrorNotificationDismissal = () => {
         setErrorState({isErrorModalVisible: false, errorMessage: ""});
     }
-    // Data fetching
-    const fetchMaintenanceReports = useCallback(async () => {
-        setDisplayLoadingIndicator(true);
-        try {
-            const url = `${API}maintenance/reports/?vehicle_id=${vehicle.id}&year=${year}&month=${month}`;
-            const options = {headers: {'Content-Type': "application/json"}, withCredentials: true};
-            const response = await axios.get(url, options);
-            setMaintenanceReports(response.data.results);
-        } catch (error: any) {
-            if (error.response?.status === 401) {
-                router.replace("/");
-            } else {
-                showError("Could not fetch maintenance reports!");
-                console.log(error.response?.data || error);
-            }
-        } finally {
-            setDisplayLoadingIndicator(false);
-        }
-    }, [year, month, vehicle.id]);
 
     // Calendar handlers
-    const onMonthChange = (monthData: DateData) => {
-        setMonth(monthData.month.toString());
-        setYear(monthData.year.toString());
+    const onMonthChange = (date: DateData) => {
+        setDisplayLoadingIndicator(true);
+        setCurrentDate(date.dateString)
+        setMonthlyReports(maintenanceReports.filter(report => report.start_date.substring(0, 7) === date.dateString.substring(0, 7)))
     };
-
     const onDayPressed = (date: DateData) => {
         setView.showSelectedReports();
-        setSelectedReports(getReports(date.dateString));
+        setSelectedReports(monthlyReports.filter(report => report.start_date === date.dateString).map(report => [report, false] as [MaintenanceReportWithStringsType, boolean]));
     };
 
-    // Helper to find reports for a date using binary search
-    const getReports = (date: string): [MaintenanceReportWithStringsType, boolean][] => {
-        let left = 0;
-        let right = maintenanceReports.length - 1;
-        let anyMatchIndex = -1;
-
-        while (left <= right) {
-            const mid = Math.floor((left + right) / 2);
-            const midDate = maintenanceReports[mid].start_date;
-            const comparison = date.localeCompare(midDate);
-
-            if (comparison === 0) {
-                anyMatchIndex = mid;
-                break;
-            } else if (comparison < 0) {
-                right = mid - 1;
-            } else {
-                left = mid + 1;
-            }
-        }
-
-        if (anyMatchIndex === -1) {
-            return [];
-        }
-
-        let start = anyMatchIndex;
-        while (start >= 0 && maintenanceReports[start].start_date === date) {
-            start--;
-        }
-
-        let end = anyMatchIndex;
-        while (end < maintenanceReports.length && maintenanceReports[end].start_date === date) {
-            end++;
-        }
-
-        return maintenanceReports.slice(start + 1, end).map(report => [report, false]);
-    };
 
     // Report handlers
     const handleMaintenanceReportViewCancellation = () => {
         setView.reset();
-        setCurrentDate(`${year}-${month}-01`);
     };
 
     const handleCollapse = (id?: string) => {
@@ -389,21 +330,20 @@ export const useMaintenanceReport = (vehicle: VehicleType, props?: MaintenanceRe
         errorState,
         isLoading,
         isMaintenanceReportPutRequest,
-        maintenanceReport,
         maintenanceReportDates,
         maintenanceReportFormData,
         maintenanceReportToEdit,
-        maintenanceReports,
-        month,
-        year,
         searchingFilterLabels,
         selectedReports,
+        periodicalReports,
         showMaintenanceForm,
+        isLoadingStatData,
         view,
+        monthlyReports,
 
         //methods
         setView,
-        fetchMaintenanceReportOverview,
+        setIsLoadingStatData,
         fetchMaintenanceReports,
         handleCancelingRecordingMaintenance,
         handleCollapse,
@@ -425,7 +365,8 @@ export const useMaintenanceReport = (vehicle: VehicleType, props?: MaintenanceRe
         setErrorState,
         setIsLoading,
         setMaintenanceReportFormData,
-        setMaintenanceReports,
         setSelectedReports,
+        setPeriodicalReports,
+        setDisplayLoadingIndicator,
     }
 }

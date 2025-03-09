@@ -1,14 +1,11 @@
 import React, {useEffect} from 'react';
-import {Pressable, SafeAreaView, ScrollView, Text, View} from 'react-native';
+import {ActivityIndicator, Pressable, SafeAreaView, ScrollView, Text, View} from 'react-native';
 import {ErrorNotificationBar, ListItemDetail, MaintenanceReportForm, RangeCard, Spinner, StatCard, ThemedButton} from "@/components";
-
 import {useGlobalContext} from "@/context/GlobalProvider";
 import {MaintenanceReportWithStringsType} from "@/types/maintenance";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import {useMaintenanceReport} from "@/hooks/useMaintenanceReport";
-import {usePartPurchaseEvent} from "@/hooks/usePartPurchaseEvent";
-import {useServiceProviderEvent} from "@/hooks/useServiceProviderEvent";
-import {getMaintenanceStatData, transformMaintenanceStatData} from "@/utils/helpers";
+import {useMaintenanceReport, usePartPurchaseEvent, useServiceProviderEvent} from "@/hooks";
+import {filterReports, getMaintenanceStatData, transformMaintenanceStatData} from "@/utils/maintenance";
 
 export interface MaintenanceReportProps {
     maintenanceReportFormData?: MaintenanceReportWithStringsType;
@@ -17,24 +14,26 @@ export interface MaintenanceReportProps {
 }
 
 const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
-    const {vehicle} = useGlobalContext();
+    const {vehicle, maintenanceReports, setMaintenanceReports} = useGlobalContext();
     const {
         searchingFilterLabels,
-        maintenanceReport,
         isMaintenanceReportPutRequest,
         maintenanceReportDates,
         activeFilter,
         showMaintenanceForm,
         isLoading,
         maintenanceReportFormData,
-        maintenanceReports,
         selectedReports,
         errorState,
+        periodicalReports,
         setView,
+        fetchMaintenanceReports,
+        isLoadingStatData,
+        setIsLoadingStatData,
         setIsLoading,
         setErrorState,
         setSelectedReports,
-        setMaintenanceReports,
+        setPeriodicalReports,
         handleFilterRangeChange,
         setMaintenanceReportFormData,
         handleStartingRecordingMaintenance,
@@ -45,8 +44,7 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
         handleMaintenanceReportSubmission,
         handleMaintenanceReportCancellation,
         handleShowingMaintenanceReports,
-        fetchMaintenanceReportOverview,
-    } = useMaintenanceReport(vehicle, props);
+    } = useMaintenanceReport(vehicle, maintenanceReports, setMaintenanceReports, props);
     const {
         showPartPurchaseEventForm,
         isPartPurchaseEventFormDataEdition,
@@ -101,8 +99,7 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
         setIsLoading,
         setView
     );
-    const pairStatData = transformMaintenanceStatData(getMaintenanceStatData(maintenanceReport));
-
+    const pairStatData = transformMaintenanceStatData(getMaintenanceStatData(periodicalReports));
     const buttons = [
         {title: "Add New Part", handlePress: handleNewPartAddition, color: "bg-secondary-500"},
         {title: "Add New Parts Provider", handlePress: handleNewPartsProviderAddition, color: "bg-secondary-500"},
@@ -111,8 +108,14 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
         {title: "Cancel", handlePress: handleCancelingRecordingMaintenance, color: "bg-default"},
     ]
     useEffect(() => {
-        fetchMaintenanceReportOverview();
+        fetchMaintenanceReports();
     }, []);
+    useEffect(() => {
+        if (maintenanceReports.length > 0) {
+            setPeriodicalReports(filterReports(maintenanceReports, "1Y"))
+            setIsLoadingStatData(false);
+        }
+    }, [maintenanceReports]);
     return (
         <SafeAreaView>
             <ScrollView>
@@ -152,28 +155,31 @@ const MaintenanceReport = ({...props}: MaintenanceReportProps) => {
                                                           isActive={activeFilter === idx} key={idx}/>
                                     })}
                                 </View>
-                                <View className={"flex-col"}>
-                                    {pairStatData.map(([[label1, value1, percentage1, color1, icon1], [label2, value2, percentage2, color2, icon2]], idx) => {
-                                        return (
-                                            <View className={"mt-[20px] flex-row"} key={idx}>
-                                                <StatCard label={label1}
-                                                          result={value1}
-                                                          percentage={percentage1}
-                                                          color={color1}
-                                                          icon={icon1}
-                                                          containerStyles={"mr-[5px] w-[48%] h-full"}
-                                                />
-                                                <StatCard label={label2}
-                                                          result={value2}
-                                                          percentage={percentage2}
-                                                          color={color2}
-                                                          icon={icon2}
-                                                          containerStyles={"ml-[5px] w-[48%] h-full"}
-                                                />
-                                            </View>
-                                        )
-                                    })}
-                                </View>
+                                {isLoadingStatData ? <ActivityIndicator size={"large"} color={"#ef6c00"}/> :
+                                    <View className={"flex-col"}>
+                                        {pairStatData.map(([item1, item2], idx) => {
+                                            const [label1, value1, percentage1, color1, icon1] = item1
+                                            const [label2, value2, percentage2, color2, icon2] = item2
+                                            return (
+                                                <View className={"mt-[20px] flex-row"} key={idx}>
+                                                    <StatCard label={label1}
+                                                              result={value1}
+                                                              percentage={percentage1}
+                                                              color={color1}
+                                                              icon={icon1}
+                                                              containerStyles={"mr-[5px] w-[48%] h-full"}
+                                                    />
+                                                    <StatCard label={label2}
+                                                              result={value2}
+                                                              percentage={percentage2}
+                                                              color={color2}
+                                                              icon={icon2}
+                                                              containerStyles={"w-[48%] h-full"}
+                                                    />
+                                                </View>
+                                            )
+                                        })}
+                                    </View>}
                                 {buttons.map(({title, handlePress, color}, idx) => {
                                     return (
                                         <ThemedButton title={title}

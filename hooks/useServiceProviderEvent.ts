@@ -1,4 +1,11 @@
-import {MaintenanceReportType, MaintenanceReportWithStringsType, ServiceProviderEventType, ServiceProviderType} from "@/types/maintenance";
+import {
+    MaintenanceReportsType,
+    MaintenanceReportType,
+    MaintenanceReportWithStringsType,
+    ServiceProviderEventType,
+    ServiceProviderEventWithNumbersType,
+    ServiceProviderType
+} from "@/types/maintenance";
 import React, {useState} from "react";
 import {serviceProviderEventFormInitialState} from "@/hooks/initialStates";
 import {Alert} from "react-native";
@@ -13,8 +20,8 @@ import {SetViewType} from "@/hooks/useMaintenanceReport";
 export const useServiceProviderEvent = (
     maintenanceReportFormData: MaintenanceReportType,
     setMaintenanceReportFormData: React.Dispatch<React.SetStateAction<MaintenanceReportType>>,
-    maintenanceReports: MaintenanceReportWithStringsType[],
-    setMaintenanceReports: React.Dispatch<React.SetStateAction<MaintenanceReportWithStringsType[]>>,
+    maintenanceReports: MaintenanceReportsType,
+    setMaintenanceReports: (maintenanceReports: MaintenanceReportsType) => void,
     selectedReports: [MaintenanceReportWithStringsType, boolean][],
     setSelectedReports: React.Dispatch<React.SetStateAction<[MaintenanceReportWithStringsType, boolean][]>>,
     setErrorState: React.Dispatch<React.SetStateAction<{ isErrorModalVisible: boolean, errorMessage: string }>>,
@@ -198,6 +205,18 @@ export const useServiceProviderEvent = (
         }
     }
     const handleServiceProviderEventUpdateSubmission = async () => {
+        const updateReports = (reports: MaintenanceReportWithStringsType[], reportId: string, eventId: string, newEvent: ServiceProviderEventWithNumbersType) => {
+            return reports.map(report => {
+                if (report.id === reportId) {
+                    return {
+                        ...report,
+                        service_provider_events: report.service_provider_events.map(event => event.id === eventId ? newEvent : event)
+                    }
+                } else {
+                    return report;
+                }
+            })
+        }
         setIsLoading(true);
         if (!validateServiceProviderEventFormData()) {
             return;
@@ -206,36 +225,12 @@ export const useServiceProviderEvent = (
             const url = `${API}maintenance/service-provider-events/${serviceProviderEventFormData.id}/`
             const options = {headers: {"Content-Type": "application/json"}, withCredentials: true}
             const response = await axios.put(url, formatServiceProviderEventFormData(), options)
-            setMaintenanceReports(maintenanceReports.map((report) => {
-                if (report.id === response.data.maintenance_report) {
-                    return {
-                        ...report,
-                        service_provider_events: report.service_provider_events.map(event => {
-                            if (event.id === response.data.id) {
-                                return response.data
-                            }
-                            return event
-                        })
-                    }
-                } else {
-                    return report;
-                }
-            }))
-            setSelectedReports(selectedReports.map(([report, expanded]) => {
-                if (report.id === response.data.maintenance_report) {
-                    return [{
-                        ...report,
-                        service_provider_events: report.service_provider_events.map(event => {
-                            if (event.id === response.data.id) {
-                                return response.data
-                            }
-                            return event
-                        })
-                    }, expanded]
-                } else {
-                    return [report, expanded];
-                }
-            }))
+            setMaintenanceReports({
+                current: updateReports(maintenanceReports.current, response.data.maintenance_report, response.data.id, response.data),
+                previous: updateReports(maintenanceReports.previous, response.data.maintenance_report, response.data.id, response.data)
+            })
+            const updatedSelectedReports = updateReports(selectedReports.map(([report, _]) => report), response.data.maintenance_report, response.data.id, response.data)
+            setSelectedReports(updatedSelectedReports.map(report => [report, false]))
             setView.reset();
         } catch (error: any) {
             if (error.response.status === 401) {

@@ -1,24 +1,18 @@
 import {SafeAreaView, ScrollView} from "react-native";
-import {PartPurchaseEventForm, ServiceProviderEventForm} from "@/components";
+import {CalendarView, ErrorNotificationBar, PartPurchaseEventForm, ReportsListView, ServiceProviderEventForm} from "@/components";
 import MaintenanceReport from "@/app/maintenance/maintenance-report";
-import {useMaintenanceReport} from "@/hooks/useMaintenanceReport";
 import {useGlobalContext} from "@/context/GlobalProvider";
-import {useServiceProviderEvent} from "@/hooks/useServiceProviderEvent";
-import {usePartPurchaseEvent} from "@/hooks/usePartPurchaseEvent";
-import ReportsListView from "@/components/view/ReportsListView";
-import CalendarView from "@/components/view/CalendarView";
 import React, {useEffect} from "react";
-import ErrorNotificationBar from "../../components/ErrorNotificationBar";
+import {useMaintenanceReport, usePartPurchaseEvent, useServiceProviderEvent} from "@/hooks";
 
 const MaintenanceReportsDetails = () => {
-    const {vehicle, generalData} = useGlobalContext()
+    const {vehicle, generalData, maintenanceReports, setMaintenanceReports} = useGlobalContext()
     const {
+        displayLoadingIndicator,
         maintenanceReportFormData,
-        maintenanceReports,
         selectedReports,
+        currentDate,
         maintenanceReportToEdit,
-        month,
-        year,
         view: {
             showMaintenanceReport,
             showPartPurchaseEventForm,
@@ -27,7 +21,7 @@ const MaintenanceReportsDetails = () => {
         },
         isLoading,
         errorState,
-        currentDate,
+        monthlyReports,
         setView,
         setErrorState,
         setIsLoading,
@@ -37,12 +31,11 @@ const MaintenanceReportsDetails = () => {
         handleMaintenanceReportViewCancellation,
         handleMaintenanceReportEdition,
         handleMaintenanceReportDeletion,
-        setMaintenanceReports,
         setSelectedReports,
         setMaintenanceReportFormData,
         handleLeavingMaintenanceReportsCalendar,
-        fetchMaintenanceReports,
-    } = useMaintenanceReport(vehicle);
+        setDisplayLoadingIndicator,
+    } = useMaintenanceReport(vehicle, maintenanceReports, setMaintenanceReports);
     const {
         serviceDate,
         serviceProviderEventFormData,
@@ -90,8 +83,8 @@ const MaintenanceReportsDetails = () => {
         setView
     )
     useEffect(() => {
-        fetchMaintenanceReports();
-    }, [year, month, vehicle.id]);
+        setDisplayLoadingIndicator(false);
+    }, [monthlyReports])
     const renderContent = () => {
         if (showServiceProviderEventForm) {
             return (
@@ -154,7 +147,7 @@ const MaintenanceReportsDetails = () => {
             <CalendarView maintenanceReports={maintenanceReports}
                           onMonthChange={onMonthChange}
                           onDayPressed={onDayPressed}
-                          isLoading={isLoading}
+                          displayLoadingIndicator={displayLoadingIndicator}
                           currentDate={currentDate}
                           onCancel={handleLeavingMaintenanceReportsCalendar}
             />
