@@ -1,12 +1,5 @@
 import React, {useState} from "react";
-import {
-    MaintenanceReportsType,
-    MaintenanceReportType,
-    MaintenanceReportWithStringsType,
-    PartProviderType,
-    PartPurchaseEventType,
-    PartPurchaseEventWithNumbersType
-} from "@/types/maintenance";
+import {MaintenanceReportType, MaintenanceReportWithStringsType, PartProviderType, PartPurchaseEventType} from "@/types/maintenance";
 import {partPurchaseEventFormInitialState} from "@/hooks/initialStates";
 import {Alert} from "react-native";
 import {router} from "expo-router";
@@ -20,8 +13,8 @@ import {SetViewType} from "@/hooks/useMaintenanceReport";
 export const usePartPurchaseEvent = (
     maintenanceReportFormData: MaintenanceReportType,
     setMaintenanceReportFormData: React.Dispatch<React.SetStateAction<MaintenanceReportType>>,
-    maintenanceReports: MaintenanceReportsType,
-    setMaintenanceReports: (maintenanceReports: MaintenanceReportsType) => void,
+    maintenanceReports: MaintenanceReportWithStringsType[],
+    setMaintenanceReports: (maintenanceReports: MaintenanceReportWithStringsType[]) => void,
     selectedReports: [MaintenanceReportWithStringsType, boolean][],
     setSelectedReports: React.Dispatch<React.SetStateAction<[MaintenanceReportWithStringsType, boolean][]>>,
     setErrorState: React.Dispatch<React.SetStateAction<{ isErrorModalVisible: boolean, errorMessage: string }>>,
@@ -135,7 +128,7 @@ export const usePartPurchaseEvent = (
                     part: partPurchaseEventToEdit.part_details || {id: "", name: "", description: ""},
                     provider: partPurchaseEventToEdit.provider_details || {id: "", name: "", phone_number: "", address: ""},
                     purchase_date: partPurchaseEventToEdit.purchase_date,
-                    cost: partPurchaseEventToEdit.cost,
+                    cost: partPurchaseEventToEdit.cost.toString(),
                 })
             }
         }
@@ -150,25 +143,31 @@ export const usePartPurchaseEvent = (
         }))
     }
     const handlePartPurchaseEventDeletion = (part_purchase_event_id?: string, maintenance_report_id?: string) => {
-        const updateReports = (reports: MaintenanceReportWithStringsType[], reportId?: string, eventId?: string) => {
-            return reports.map(report => {
-                if (report.id === reportId) {
-                    report.part_purchase_events = report.part_purchase_events.filter(event => event.id !== eventId)
-                }
-                return report;
-            })
-        }
         const proceedWithPartPurchaseEventDeletion = async () => {
             setIsLoading(true);
             try {
                 const url = `${API}maintenance/part-purchase-events/${part_purchase_event_id}/`
                 const options = {headers: {"Content-Type": "application/json"}, withCredentials: true}
                 await axios.delete(url, options)
-                setSelectedReports(updateReports(selectedReports.map(([report]) => report), maintenance_report_id, part_purchase_event_id).map(report => [report, false]))
-                setMaintenanceReports({
-                    current: updateReports(maintenanceReports.current, maintenance_report_id, part_purchase_event_id),
-                    previous: updateReports(maintenanceReports.previous, maintenance_report_id, part_purchase_event_id),
-                })
+                setMaintenanceReports(maintenanceReports.map((report) => {
+                    if (report.id === maintenance_report_id) {
+                        return {
+                            ...report,
+                            part_purchase_events: report.part_purchase_events.filter(event => event.id !== part_purchase_event_id)
+                        }
+                    }
+                    return report;
+                }))
+                setSelectedReports(selectedReports.map(([report, expanded]) => {
+                    if (report.id === maintenance_report_id) {
+                        report.part_purchase_events = report.part_purchase_events.filter(event => event.id !== part_purchase_event_id);
+                    }
+                    return [report, expanded];
+                }))
+                setView.showSelectedReports();
+                setPartPurchaseEventFormData(partPurchaseEventFormInitialState)
+                setSearchTerm("")
+                setIsPartSelected(false)
             } catch (error: any) {
                 if (error.response.status === 401) {
                     router.replace("/");
@@ -218,17 +217,6 @@ export const usePartPurchaseEvent = (
         return true
     }
     const handlePartPurchaseEventUpdateSubmission = async () => {
-        const updateReports = (reports: MaintenanceReportWithStringsType[], reportId: string, eventId: string, newEvent: PartPurchaseEventWithNumbersType) => {
-            return reports.map(report => {
-                if (report.id === reportId) {
-                    return {
-                        ...report,
-                        part_purchase_events: report.part_purchase_events.map(event => event.id === eventId ? newEvent : event)
-                    }
-                }
-                return report;
-            })
-        }
         if (!validatePartPurchaseEventFormData()) {
             return;
         }
@@ -238,12 +226,29 @@ export const usePartPurchaseEvent = (
             const url = `${API}maintenance/part-purchase-events/${partPurchaseEventFormData.id}/`
             const options = {headers: {"Content-Type": "application/json"}, withCredentials: true}
             const response = await axios.put(url, formatPartPurchaseEventFormData(), options)
-            setMaintenanceReports({
-                current: updateReports(maintenanceReports.current, response.data.maintenance_report, response.data.id, response.data),
-                previous: updateReports(maintenanceReports.previous, response.data.maintenance_report, response.data.id, response.data),
-            })
-            setSelectedReports(updateReports(selectedReports.map(([report, _]) => report), response.data.maintenance_report, response.data.id, response.data).map(report => [report, false]))
-            setView.reset()
+            setMaintenanceReports(maintenanceReports.map(report => {
+                if (report.id === response.data.maintenance_report) {
+                    report.part_purchase_events = report.part_purchase_events.map(event => {
+                        if (event.id === response.data.id) {
+                            return response.data
+                        }
+                        return event;
+                    })
+                }
+                return report;
+            }))
+            setSelectedReports(selectedReports.map(([report, expanded]) => {
+                if (report.id === response.data.maintenance_report) {
+                    report.part_purchase_events = report.part_purchase_events.map(event => {
+                        if (event.id === response.data.id) {
+                            return response.data
+                        }
+                        return event;
+                    })
+                }
+                return [report, expanded];
+            }))
+            setView.showSelectedReports();
         } catch (error: any) {
             if (error.response.status === 401) {
                 router.replace("/");
@@ -268,7 +273,7 @@ export const usePartPurchaseEvent = (
     }
     const handlePartPurchaseEventEditionCancellation = () => {
         setShowPartPurchaseEventForm(false);
-        setView.reset()
+        setView.showSelectedReports();
     }
     const handlePurchaseDateChange = (_: string) => (_: DateTimePickerEvent, date?: Date) => {
         setPurchaseDate(date || new Date())

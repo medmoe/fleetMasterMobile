@@ -231,7 +231,7 @@ export const useMaintenanceReport = (
                     }
                     return report;
                 }))
-                router.replace('/details/maintenance-reports-details');
+                router.replace("/details/maintenance-reports-details")
             }
 
         } catch (error: any) {
@@ -301,7 +301,8 @@ export const useMaintenanceReport = (
                             const options = {headers: {"Content-Type": "application/json"}, withCredentials: true};
                             await axios.delete(url, options);
                             setMaintenanceReports(maintenanceReports.filter(report => report.id !== id));
-                            setView.reset();
+                            setSelectedReports(selectedReports.filter(([report]) => report.id !== id));
+                            setView.showSelectedReports();
                         } catch (error: any) {
                             if (error.response?.status === 401) {
                                 router.replace("/");

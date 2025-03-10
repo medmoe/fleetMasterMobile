@@ -39,7 +39,8 @@ const MaintenanceReportCard = ({
         description,
         part_purchase_events,
         service_provider_events,
-        vehicle_details
+        vehicle_details,
+        total_cost,
     } = maintenanceReport;
     return (
         <View>
@@ -67,6 +68,7 @@ const MaintenanceReportCard = ({
                     <ListItemDetail label={"Start date"} value={start_date}/>
                     <ListItemDetail label={"End date"} value={end_date}/>
                     <ListItemDetail label={"Mileage"} value={mileage}/>
+                    <ListItemDetail label={"Total cost"} value={total_cost} />
                     <ListItemDetail label={"Description"} value={description}/>
                     {part_purchase_events.length !== 0 && expanded &&
                         <View>
