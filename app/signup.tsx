@@ -3,7 +3,7 @@ import {Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View} from 'rea
 import {Link, useRouter} from "expo-router";
 import axios from "axios";
 import {API} from "@/constants/endpoints";
-import {handleCookies, handleAuthenticationErrors} from "@/utils/authentication";
+import {handleAuthenticationErrors, handleCookies} from "@/utils/authentication";
 import {SafeAreaView} from "react-native-safe-area-context";
 import Spinner from "@/components/Spinner";
 import ThemedInputText from "@/components/ThemedInputText";
@@ -100,48 +100,69 @@ const SignUp = () => {
         <SafeAreaView>
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
                 <ScrollView>
-                    {loading ? <View className="w-full justify-center items-center h-full px-4"><Spinner isVisible={loading}/></View> :
+                    {loading ?
+                        <View className="w-full justify-center items-center h-full px-4"><Spinner isVisible={loading}/></View> :
                         <View className={"w-full justify-center items-center h-full px-4"}>
                             <View>
-                                <Text className={"text-2xl font-merriweather-bold text-center text-txt"}>Welcome to Fleet Master</Text>
+                                <Text className={"text-2xl font-merriweather-bold text-center text-txt"}>Welcome to
+                                    Fleet Master</Text>
                             </View>
                             <View className={"mt-[15px]"}>
-                                <Text className={"text-txt text-center font-open-sans"}>Start managing your fleet with ease</Text>
-                                <Text className={"text-txt text-center font-open-sans"}>Sign up now to keep track of your fleet and stay
+                                <Text className={"text-txt text-center font-open-sans"}>Start managing your fleet with
+                                    ease</Text>
+                                <Text className={"text-txt text-center font-open-sans"}>Sign up now to keep track of
+                                    your fleet and stay
                                     organized</Text>
                             </View>
-                            <ThemedInputText name={"firstname"} value={formState.user.firstname ? formState.user.firstname : ""}
-                                             containerStyles={"bg-white w-full p-5 mt-[15px]"} placeholder={"Your first name"}
+                            <ThemedInputText name={"firstname"}
+                                             value={formState.user.firstname ? formState.user.firstname : ""}
+                                             containerStyles={"mt-[15px]"}
+                                             inputContainerStyles={"bg-white w-full p-5"}
+                                             placeholder={"Your first name"}
                                              onChange={handleChange}/>
-                            <ThemedInputText name={"lastname"} value={formState.user.lastname ? formState.user.lastname : ""}
-                                             containerStyles={"bg-white w-full p-5 mt-[15px]"} placeholder={"Your last name"}
+                            <ThemedInputText name={"lastname"}
+                                             value={formState.user.lastname ? formState.user.lastname : ""}
+                                             containerStyles={"mt-[15px]"}
+                                             inputContainerStyles={"bg-white w-full p-5"}
+                                             placeholder={"Your last name"}
                                              onChange={handleChange}/>
-                            <ThemedInputText name={"username"} value={formState.user.username} containerStyles={"bg-white w-full p-5 mt-[15px]"}
+                            <ThemedInputText name={"username"} value={formState.user.username}
+                                             containerStyles={"mt-[15px]"}
+                                             inputContainerStyles={"bg-white w-full p-5"}
                                              placeholder={"Your username"} onChange={handleChange}/>
-                            <ThemedInputText name={"email"} value={formState.user.email} containerStyles={"bg-white w-full p-5 mt-[15px]"}
+                            <ThemedInputText name={"email"} value={formState.user.email}
+                                             containerStyles={"mt-[15px]"}
+                                             inputContainerStyles={"bg-white w-full p-5"}
                                              placeholder={"Your email"} onChange={handleChange}/>
                             <ThemedInputText name={"phone"} value={formState.phone ? formState.phone : ""}
-                                             containerStyles={"bg-white w-full p-5 mt-[15px]"} placeholder={"Your phone number"}
+                                             containerStyles={"mt-[15px]"}
+                                             inputContainerStyles={"bg-white w-full p-5"}
+                                             placeholder={"Your phone number"}
                                              onChange={handleChange}/>
-                            <ThemedInputText name={"password"} value={formState.user.password} containerStyles={"bg-white w-full p-5 mt-[15px]"}
+                            <ThemedInputText name={"password"} value={formState.user.password}
+                                             containerStyles={"mt-[15px]"}
+                                             inputContainerStyles={"bg-white w-full p-5"}
                                              placeholder={"Your password"} onChange={handleChange}/>
-                            <ThemedInputText name={"password"} value={password} containerStyles={"bg-white w-full p-5 mt-[15px]"}
+                            <ThemedInputText name={"password"} value={password}
+                                             containerStyles={"mt-[15px]"}
+                                             inputContainerStyles={"bg-white w-full p-5"}
                                              placeholder={"re-enter password"} onChange={updatePassword}/>
                             <View className="mt-[15px]">
                                 <Text className={"text-txt font-open-sans"}>
                                     By continuing you agree to Fleet Master's
-                                    <Text className="text-secondary"> Terms of service </Text> and
-                                    <Text className="text-secondary"> privacy policy</Text>
+                                    <Text className="text-secondary-500"> Terms of service </Text> and
+                                    <Text className="text-secondary-500"> privacy policy</Text>
                                 </Text>
                             </View>
                             <ThemedButton
                                 title={"Continue"}
                                 handlePress={submitForm}
-                                containerStyles={"w-full mt-[50px] bg-primary p-5 rounded-[50%]"}
+                                containerStyles={"w-full mt-[15px] bg-primary-500 p-5 rounded"}
                                 textStyles={"text-white font-semibold text-base"}
                             />
                             <View className={"mt-[25px]"}>
-                                <Text>Already registered? <Link href={"/"} className={"text-secondary font-open-sans"}>Sign in</Link></Text>
+                                <Text>Already registered? <Link href={"/"} className={"text-secondary-500 font-open-sans"}>Sign
+                                    in</Link></Text>
                             </View>
                         </View>
                     }

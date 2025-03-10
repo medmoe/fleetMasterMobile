@@ -13,7 +13,7 @@ import {DriverDatesType} from "@/types/driver";
 
 
 const Driver = () => {
-    const {responseData, setResponseData, currentItem, isPostRequest} = useGlobalContext();
+    const {responseData, setResponseData, vehicle, isPostRequest} = useGlobalContext();
     const vehicles: PickerItemType[] = responseData.vehicles ? responseData.vehicles.map((vehicle) => {
         return {
             label: `${vehicle.make} ${vehicle.model} ${vehicle.year}`,
@@ -21,7 +21,7 @@ const Driver = () => {
         }
     }) : []
     const [isLoading, setIsLoading] = useState(false);
-    const [driverData, setDriverData] = useState<DriverType>(currentItem as DriverType)
+    const [driverData, setDriverData] = useState<DriverType>(vehicle as DriverType)
     const [dates, setDates] = useState<DriverDatesType>({
         date_of_birth: new Date(),
         license_expiry_date: new Date(),
@@ -51,7 +51,7 @@ const Driver = () => {
         }
         try {
             const response = isPostRequest ? await axios.post(`${API}drivers/`, driverData, {headers: {'Content-Type': 'application/json'}, withCredentials: true}) :
-                await axios.put(`${API}drivers/${currentItem.id}/`, driverData, {headers: {"Content-Type": "application/json"}, withCredentials: true});
+                await axios.put(`${API}drivers/${vehicle.id}/`, driverData, {headers: {"Content-Type": "application/json"}, withCredentials: true});
             updateResponseData(response, isPostRequest);
             router.replace("/drivers");
         } catch (error: any) {
@@ -102,7 +102,7 @@ const Driver = () => {
         if (isPostRequest) {
             drivers = responseData.drivers ? [...responseData.drivers, response.data] : [response.data]
         } else {
-            drivers = responseData.drivers?.filter((driver) => driver.id != currentItem.id) || []
+            drivers = responseData.drivers?.filter((driver) => driver.id != vehicle.id) || []
             drivers.push(response.data)
         }
         setResponseData({...responseData, drivers: drivers})

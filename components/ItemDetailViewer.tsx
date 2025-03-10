@@ -1,8 +1,7 @@
 import React from 'react';
-import {SafeAreaView, ScrollView, Text, View} from 'react-native';
+import {Pressable, SafeAreaView, ScrollView, Text, View} from 'react-native';
 import ListItemDetail from "@/components/ListItemDetail";
-import ThemedButton from "@/components/ThemedButton";
-import {icons} from "@/constants/icons";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 interface ItemDetailViewerProps {
     title: string
@@ -13,7 +12,14 @@ interface ItemDetailViewerProps {
     handleCancel: () => void
 }
 
-const ItemDetailViewer = ({title, subtitle, details, handleUpdate, handleDelete, handleCancel}: ItemDetailViewerProps) => {
+const ItemDetailViewer = ({
+                              title,
+                              subtitle,
+                              details,
+                              handleUpdate,
+                              handleDelete,
+                              handleCancel
+                          }: ItemDetailViewerProps) => {
     return (
         <SafeAreaView>
             <ScrollView>
@@ -25,14 +31,22 @@ const ItemDetailViewer = ({title, subtitle, details, handleUpdate, handleDelete,
                         <Text className={"font-open-sans text-txt"}>{subtitle}</Text>
                     </View>
                     <View className={"flex-1 mt-3"}>
-                        {details.map(({label, value}, idx) => <ListItemDetail label={label} value={value} containerStyle={"pt-1 pb-1"} key={idx}/>)}
+                        {details.map(({label, value}, idx) => <ListItemDetail label={label} value={value}
+                                                                              containerStyle={"pt-1 pb-1"} key={idx}/>)}
                     </View>
-                    <View className={"flex-row mt-3"}>
-                        <ThemedButton title={"Edit"} handlePress={handleUpdate} containerStyles={"bg-primary p-5 rounded-[50%] flex-1"} textStyles={"text-white font-semibold text-base"}
-                                      icon={icons.pen}/>
-                        <ThemedButton title={"Delete"} handlePress={handleDelete} containerStyles={"bg-error p-5 rounded-[50%] flex-1"} textStyles={"text-white font-semibold text-base"}
-                                      icon={icons.trash}/>
-                        <ThemedButton title={"Cancel"} handlePress={handleCancel} containerStyles={"bg-default p-5 rounded-[50%] flex-1"} textStyles={"text-white font-semibold text-base"}/>
+                    <View className={"mt-5 flex-row justify-between"}>
+                        <Pressable className={"items-center m-4 p-4"} onPress={handleUpdate}>
+                            <FontAwesome name={"pencil"} size={39} color={"#ffa726"}/>
+                            <Text className={"text-secondary-500 font-semibold text-base"}>Edit</Text>
+                        </Pressable>
+                        <Pressable className={"items-center m-4 p-4"} onPress={handleDelete}>
+                            <FontAwesome name={"trash"} size={39} color={"#f76751"}/>
+                            <Text className={"text-error-500 font-semibold text-base"}>Delete</Text>
+                        </Pressable>
+                        <Pressable className={"items-center m-4 p-4"} onPress={handleCancel}>
+                            <FontAwesome name={"close"} size={39} color={"#9ba1a6"}/>
+                            <Text className={"text-default font-semibold text-base"}>Cancel</Text>
+                        </Pressable>
 
                     </View>
                 </View>

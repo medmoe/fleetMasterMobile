@@ -3,19 +3,24 @@ import {SafeAreaView, ScrollView, Text, View} from 'react-native';
 import {ThemedButton} from "@/components";
 import {router} from "expo-router";
 import {currentVehicleInitialState, useGlobalContext} from "@/context/GlobalProvider";
-import VehicleCardComponent from "@/components/VehicleCardComponent";
+import VehicleCardComponent from "@/components/cards/VehicleCardComponent";
 import {VehicleType} from "@/types/types";
 
 const Fleet = () => {
-    const {responseData, setCurrentItem, setIsPostRequest} = useGlobalContext();
+    const {responseData, setVehicle, setIsPostRequest} = useGlobalContext();
     const addVehicle = () => {
         setIsPostRequest(true);
-        setCurrentItem(currentVehicleInitialState);
+        setVehicle(currentVehicleInitialState);
         router.replace("/forms/vehicle");
     }
     const handlePress = (vehicle: VehicleType): void => {
-        setCurrentItem(vehicle);
+        setVehicle(vehicle);
         router.replace("/details/item-details");
+    }
+
+    const handleMaintenance = (vehicle: VehicleType) => {
+        setVehicle(vehicle);
+        router.replace("/maintenance/maintenance-report");
     }
     return (
         <SafeAreaView>
@@ -31,15 +36,16 @@ const Fleet = () => {
                         <View>
                             {responseData.vehicles?.map((vehicle, idx) => {
                                 return (
-                                    <VehicleCardComponent vehicle={vehicle} onPress={() => handlePress(vehicle)} key={idx}/>
+                                    <VehicleCardComponent vehicle={vehicle} onPress={() => handlePress(vehicle)} key={idx}
+                                                          handleMaintenance={() => handleMaintenance(vehicle)}/>
                                 )
                             })}
                         </View>
                         <View className={"w-full pt-5"}>
                             <ThemedButton title={"Add vehicle"}
                                           handlePress={addVehicle}
-                                          containerStyles={"bg-secondary w-[40%] p-5 rounded-[50%]"}
-                                          textStyles={"text-txt font-semibold text-base text-white"}
+                                          containerStyles={"bg-secondary-500 w-[40%] p-5 rounded"}
+                                          textStyles={"font-semibold text-base text-white"}
                             />
                         </View>
                     </View>

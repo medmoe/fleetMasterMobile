@@ -16,7 +16,9 @@ const CustomDatePicker = ({date, handleChange, label, name}: CustomDatePickerPro
             <Text className={"text-txt font-open-sans text-sm"}>{label}</Text>
             <View className={"mt-3 justify-start items-center flex-row"}>
                 <Image source={icons.calendar} resizeMode={"contain"} className={"w-[25px] h-[25px] mr-[5px]"}/>
-                <DateTimePicker value={date} mode={"date"} display={"default"}
+                <DateTimePicker value={date}
+                                mode={"date"}
+                                display={"default"}
                                 onChange={handleChange(name)}/>
             </View>
         </View>

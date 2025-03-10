@@ -1,12 +1,18 @@
 import {Text, View} from "react-native";
 import React from "react";
 
-function ListItemDetail({label, value, containerStyle}: { label: string, value: string | undefined, containerStyle: string | undefined }) {
+interface ListItemDetailProps {
+    label: string
+    value?: string
+    containerStyle?: string
+    textStyle?: string
+}
+
+function ListItemDetail({label, value, containerStyle, textStyle}: ListItemDetailProps) {
     return (
         <View className={`${containerStyle}`}>
-            <Text className={"text-txt text-sm font-open-sans"}>
-                <Text className={"text-default text-sm font-open-sans"}>{label}:</Text> {value}
-            </Text>
+            <Text className={`text-sm font-open-sans ${textStyle}`}>
+                <Text className={"text-default text-sm font-open-sans"}>{label}:</Text> {value}</Text>
         </View>
     );
 }

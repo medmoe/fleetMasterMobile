@@ -1,37 +1,11 @@
 import React from 'react';
-import {Image, ImageSourcePropType, Text, View} from 'react-native';
+import {ImageSourcePropType} from 'react-native';
 import {Tabs} from "expo-router";
 import {icons} from "@/constants/icons"
-import {StatusBar} from "expo-status-bar";
-import {bgWhite} from "colorette";
-
-
-
-interface TabIconProps {
-    icon: ImageSourcePropType | undefined,
-    color: string,
-    name: string,
-    focused: boolean,
-}
-
-const TabIcon = ({icon, color, name, focused}: TabIconProps) => {
-    return (
-        <View className="items-center justify-center gap-1">
-            <Image
-                source={icon}
-                resizeMode="contain"
-                tintColor={color}
-                className="w-6 h-6"
-            />
-            <Text className={`${focused ? 'font-merriweather-bold' : 'font-merriweather-regular'} text-xs`}>
-                {name}
-            </Text>
-        </View>
-    )
-}
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const TabsLayout = () => {
-    const tabsInfo: [string, ImageSourcePropType | undefined][] = [
+    const tabsInfo: [string, ImageSourcePropType?][] = [
         ["dashboard", icons.dashboard],
         ["fleet", icons.fleet],
         ["drivers", icons.drivers],
@@ -39,35 +13,39 @@ const TabsLayout = () => {
         ["notifications", icons.notifications]
     ]
     return (
-        <>
-
-            <Tabs screenOptions={{
-                headerShown: false,
-                tabBarShowLabel: false,
-                tabBarActiveTintColor: "#9c27b0",
-                tabBarInactiveTintColor: "#CDCDE0",
-                tabBarStyle: {
-                    backgroundColor: "#fff",
-                    borderTopWidth: 1,
-                    borderTopColor: "#f1f2ee",
-                    height: 114,
-                }
-            }}>
-                {tabsInfo.map(([name, icon], idx) => {
-                    return (
-                        <Tabs.Screen key={idx} name={name} options={{
-                            title: name,
-                            headerShown: false,
-                            tabBarIcon: ({color, focused}) => (
-                                <TabIcon icon={icon} color={color} name={name} focused={focused}/>
-                            )
-                        }}
-                        />
-                    )
-                })}
-            </Tabs>
-
-        </>
+        <Tabs screenOptions={{
+            headerShown: false,
+            tabBarShowLabel: true,
+            tabBarActiveTintColor: "#9c27b0",
+            tabBarInactiveTintColor: "#CDCDE0",
+            tabBarStyle: {
+                backgroundColor: "#fff",
+                borderTopWidth: 1,
+                borderTopColor: "#f1f2ee",
+                height: 100,
+            }
+        }}>
+            <Tabs.Screen name={"dashboard"} options={{
+                tabBarIcon: ({color}) => <FontAwesome size={30} name={"dashboard"} color={color}/>
+            }}
+            />
+            <Tabs.Screen name={"fleet"} options={{
+                tabBarIcon: ({color}) => <FontAwesome size={30} name={"car"} color={color}/>
+            }}
+            />
+            <Tabs.Screen name={"drivers"} options={{
+                tabBarIcon: ({color}) => <FontAwesome size={30} name={"user"} color={color}/>
+            }}
+            />
+            <Tabs.Screen name={"settings"} options={{
+                tabBarIcon: ({color}) => <FontAwesome size={30} name={"cog"} color={color}/>
+            }}
+            />
+            <Tabs.Screen name={"notifications"} options={{
+                tabBarIcon: ({color}) => <FontAwesome size={30} name={"bell"} color={color}/>
+            }}
+            />
+        </Tabs>
     );
 };
 

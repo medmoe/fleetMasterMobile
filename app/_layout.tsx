@@ -4,7 +4,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import React, {useEffect} from 'react';
 import 'react-native-reanimated';
 import {GlobalProvider} from "@/context/GlobalProvider";
-
+import "../global.css";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -38,6 +38,7 @@ export default function RootLayout() {
                 <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
                 <Stack.Screen name="forms" options={{headerShown: false}}/>
                 <Stack.Screen name="details" options={{headerShown: false}}/>
+                <Stack.Screen name={"maintenance"} options={{headerShown: false}}/>
             </Stack>
         </GlobalProvider>
 

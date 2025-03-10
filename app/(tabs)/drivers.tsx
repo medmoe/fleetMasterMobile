@@ -7,14 +7,14 @@ import {currentDriverInitialState, useGlobalContext} from "@/context/GlobalProvi
 import {DriverType} from "@/types/types";
 
 const Drivers = () => {
-    const {responseData, setCurrentItem, setIsPostRequest} = useGlobalContext();
+    const {responseData, setVehicle, setIsPostRequest, setDriver} = useGlobalContext();
     const addDriver = () => {
         setIsPostRequest(true);
-        setCurrentItem(currentDriverInitialState);
+        setDriver(currentDriverInitialState);
         router.replace("/forms/driver")
     }
     const handlePress = (driver: DriverType): void => {
-        setCurrentItem(driver)
+        setDriver(driver)
         router.replace("/details/item-details");
     }
     return (
@@ -41,8 +41,8 @@ const Drivers = () => {
                             <ThemedButton
                                 title={"Add driver"}
                                 handlePress={addDriver}
-                                containerStyles={"bg-secondary w-[40%] p-5 rounded-[50%]"}
-                                textStyles={"text-txt font-semibold text-base text-white"}
+                                containerStyles={"bg-secondary-500 w-[40%] p-5 rounded"}
+                                textStyles={"font-semibold text-base text-white"}
                             />
                         </View>
                     </View>

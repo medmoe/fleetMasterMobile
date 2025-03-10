@@ -66,24 +66,28 @@ const App = () => {
     return (
         <SafeAreaView className="bg-background hl-full">
             <ScrollView contentContainerStyle={{height: "100%"}}>
-                {loading ? <View className="w-full justify-center items-center h-full px-4"><Spinner isVisible={loading}/></View> :
+                {loading ? <View className="w-full justify-center items-center h-full px-4"><Spinner
+                        isVisible={loading}/></View> :
                     <View className="w-full justify-center items-center h-full px-4">
                         <Image source={images.logo} className="w-[140px] h-[140px]"/>
-                        <View className="relative mt-5">
-                            <Text className="text-2xl text-txt font-merriweather-bold text-center">Welcome to Fleet Master</Text>
+                        <View className="mt-3">
+                            <Text className="text-2xl text-txt font-merriweather-bold text-center">Welcome to Fleet
+                                Master</Text>
                         </View>
-                        <View className="relative mt-5">
+                        <View className="mt-3">
                             <Text className="text-txt text-center font-open-sans">Sign in to manage your fleet</Text>
                         </View>
                         <ThemedInputText
-                            containerStyles={"bg-white w-full p-5"}
+                            containerStyles={"mt-3"}
+                            inputContainerStyles={"bg-white w-full p-5"}
                             placeholder={"Enter Your username"}
                             onChange={handleChange}
                             name={"username"}
                             value={formState.username}
                         />
                         <ThemedInputText
-                            containerStyles={"bg-white w-full p-5"}
+                            containerStyles={"mt-3"}
+                            inputContainerStyles={"bg-white w-full p-5"}
                             placeholder={"Enter your password"}
                             onChange={handleChange}
                             name={"password"}
@@ -92,26 +96,28 @@ const App = () => {
                         <ThemedButton
                             title="Log in"
                             handlePress={submitForm}
-                            containerStyles="w-full mt-[50px] bg-primary p-5 rounded-[50%]"
+                            containerStyles="w-full bg-primary-500 p-5 rounded mt-[50px]"
                             textStyles={"text-white font-semibold text-base"}
                         />
-                        <View className={"mt-[50px]"}>
+                        <View className={"mt-[25px]"}>
                             <Text className={"text-txt font-open-sans"}>
-                                Don't have an account? <Link href={"/signup"} className={"text-secondary font-open-sans"}>Create account</Link>
+                                Don't have an account? <Link href={"/signup"}
+                                                             className={"text-secondary-500 font-open-sans"}>Create
+                                account</Link>
                             </Text>
                         </View>
                         <ThemedButton
                             title={"Log in with Google"}
                             handlePress={() => {
                             }}
-                            containerStyles={"w-full bg-white mt-[50px] p-5 rounded-[50%]"}
+                            containerStyles={"w-full bg-white p-5 rounded mt-[15px]"}
                             icon={icons.google}
                         />
                         <ThemedButton
                             title={"Log in with Apple"}
                             handlePress={() => {
                             }}
-                            containerStyles={"w-full bg-white mt-[15px] p-5 rounded-[50%]"}
+                            containerStyles={"w-full bg-white mt-[15px] p-5 rounded mt-[15px]"}
                             icon={icons.apple}
                         />
                     </View>

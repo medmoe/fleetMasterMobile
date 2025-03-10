@@ -2,6 +2,9 @@ import React, {createContext, ReactNode, useContext, useState} from "react";
 import {DriverType, ResponseDataType, VehicleType} from "@/types/types";
 import {driverStatus} from "@/constants/forms/driver";
 import {vehicleStatus, vehicleTypes} from "@/constants/forms/vehicle";
+import {MaintenanceReportWithStringsType, PartProviderType, PartType, ServiceProviderType} from "@/types/maintenance";
+
+export type GeneralDataType = { parts: PartType[], part_providers: PartProviderType[], service_providers: ServiceProviderType[] }
 
 type GlobalProviderProps = {
     children: ReactNode
@@ -12,8 +15,14 @@ interface ContextProps {
     setResponseData: (data: ResponseDataType) => void
     isPostRequest: boolean
     setIsPostRequest: (isPostRequest: boolean) => void
-    currentItem: DriverType | VehicleType
-    setCurrentItem: (item: DriverType | VehicleType) => void
+    vehicle: VehicleType
+    setVehicle: (vehicle: VehicleType) => void
+    driver: DriverType
+    setDriver: (driver: DriverType) => void
+    generalData: GeneralDataType
+    setGeneralData: (generalData: GeneralDataType) => void
+    maintenanceReports: MaintenanceReportWithStringsType[]
+    setMaintenanceReports: (maintenanceReports: MaintenanceReportWithStringsType[]) => void
 }
 
 export const currentVehicleInitialState: VehicleType = {
@@ -36,14 +45,33 @@ export const responseDataInitialState: ResponseDataType = {
         email: "",
     }
 }
+export const generalDataInitialState: GeneralDataType = {
+    parts: [],
+    part_providers: [],
+    service_providers: [],
+}
+
+export const maintenanceReportsInitialState: MaintenanceReportWithStringsType[] = []
 
 const GlobalContext = createContext<ContextProps>({
-    setResponseData: () => {},
+    setResponseData: () => {
+    },
     responseData: responseDataInitialState,
-    setIsPostRequest: () => {},
+    setIsPostRequest: () => {
+    },
     isPostRequest: true,
-    setCurrentItem: () => {},
-    currentItem: currentVehicleInitialState,
+    setVehicle: () => {
+    },
+    vehicle: currentVehicleInitialState,
+    setDriver: () => {
+    },
+    driver: currentDriverInitialState,
+    setGeneralData: () => {
+    },
+    generalData: generalDataInitialState,
+    setMaintenanceReports: () => {
+    },
+    maintenanceReports: maintenanceReportsInitialState,
 })
 
 export const useGlobalContext = () => useContext(GlobalContext);
@@ -52,16 +80,25 @@ export const useGlobalContext = () => useContext(GlobalContext);
 export const GlobalProvider: React.FC<GlobalProviderProps> = ({children}) => {
     const [responseData, setResponseData] = useState<ResponseDataType>(responseDataInitialState);
     const [isPostRequest, setIsPostRequest] = useState(true);
-    const [currentItem, setCurrentItem] = useState<VehicleType | DriverType>(currentVehicleInitialState)
+    const [vehicle, setVehicle] = useState<VehicleType>(currentVehicleInitialState)
+    const [generalData, setGeneralData] = useState<GeneralDataType>(generalDataInitialState)
+    const [maintenanceReports, setMaintenanceReports] = useState<MaintenanceReportWithStringsType[]>(maintenanceReportsInitialState)
+    const [driver, setDriver] = useState<DriverType>(currentDriverInitialState)
     return (
         <GlobalContext.Provider
             value={{
                 responseData,
                 setResponseData,
-                setIsPostRequest,
                 isPostRequest,
-                setCurrentItem,
-                currentItem,
+                setIsPostRequest,
+                vehicle,
+                setVehicle,
+                generalData,
+                setGeneralData,
+                maintenanceReports,
+                setMaintenanceReports,
+                driver,
+                setDriver,
             }}
         >
             {children}
