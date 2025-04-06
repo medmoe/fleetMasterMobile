@@ -1,1 +1,3 @@
-export const API: string = "http://192.168.1.181:8000/";
+import getEnvVars from "../config";
+const config = getEnvVars();
+export const API: string = config?.API || "";

@@ -52,11 +52,16 @@ const App = () => {
     const submitForm = async () => {
         setLoading(true)
         try {
-            const response = await axios.post(`${API}accounts/login/`, formState, {headers: {'Content-Type': 'application/json'}})
+            const response = await axios.post(`${API}accounts/login/`, formState, {headers:
+                    {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }})
             handleCookies(response.headers);
             setResponseData(response.data);
             router.replace("/dashboard");
-        } catch (error) {
+        } catch (error: any) {
+            console.log("Error: ", error.response?.data);
             const errorMessage: string = handleAuthenticationErrors(error);
             Alert.alert("Error", errorMessage);
         } finally {
