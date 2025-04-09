@@ -6,7 +6,6 @@ import {MaintenanceReportWithStringsType} from "@/types/maintenance";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {useMaintenanceReport, usePartPurchaseEvent, useServiceProviderEvent} from "@/hooks";
 import {filterReports, getMaintenanceStatData, transformMaintenanceStatData} from "@/utils/maintenance";
-import SimpleChart from "@/components/charts/SimpleChart";
 
 export interface MaintenanceReportProps {
     maintenanceReportFormData?: MaintenanceReportWithStringsType;
